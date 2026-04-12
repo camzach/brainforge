@@ -8,10 +8,8 @@ import {
 } from "../cards/card-utils";
 import {
   type Card as CardType,
-  type Expansion,
   pickRandom,
   type Fragment as FragmentType,
-  type HouseData,
   type GameConfig,
 } from "../types";
 
@@ -26,18 +24,9 @@ type Props = {
 
 type Phase = "loading" | "challenge" | "results";
 
-function matchHouse(house: string, expansion: Expansion, houseSpec: HouseData) {
-  if (typeof houseSpec === "string") {
-    return house === houseSpec;
-  }
-  if (Array.isArray(houseSpec)) {
-    return houseSpec.includes(house);
-  }
-  return matchHouse(house, expansion, houseSpec[expansion]);
-}
-
 export function ChallengeScreen({ config, onFinish }: Props) {
   const [card, setCard] = useState<CardType | null>(null);
+  const [cardHouse, setCardHouse] = useState<string | null>(config.house);
   const [fragments, setFragments] = useState<FragmentType[]>([]);
   const [phase, setPhase] = useState<Phase>("loading");
   const [selections, setSelections] = useState<Record<Zone, string | null>>({
@@ -75,30 +64,49 @@ export function ChallengeScreen({ config, onFinish }: Props) {
         }
 
         const targetCard = pickRandom(incompleteCards);
+        console.log(targetCard.title);
         setCard(targetCard);
 
-        const cardsOfTargetType = cards.filter(
-          (c) =>
-            c.type === targetCard.type &&
-            (!config.house ||
-              matchHouse(config.house, config.expansion, c.house)),
-        );
+        const targetHouseOrHouses = getCardHouse(targetCard, config.expansion);
+        const targetHouse =
+          config.house ??
+          (Array.isArray(targetHouseOrHouses)
+            ? pickRandom(targetHouseOrHouses)
+            : targetHouseOrHouses);
 
-        const distractors = [];
+        setCardHouse(targetHouse);
+
+        const cardsOfTargetType = cards.filter((c) => {
+          if (c.type !== targetCard.type) {
+            return false;
+          }
+          const distractorHouse = getCardHouse(c, config.expansion);
+          console.log(targetHouse, distractorHouse);
+          if (typeof distractorHouse === "string") {
+            return targetHouse === distractorHouse;
+          }
+          return distractorHouse.includes(targetHouse);
+        });
+
+        console.log(cardsOfTargetType);
+
         const newFragments: FragmentType[] = [];
 
         for (const zone of config.zones[targetCard.type]) {
           for (let i = 0; i < 3; i++) {
+            console.log(i);
             const j = Math.floor(Math.random() * cardsOfTargetType.length);
-            if (cardsOfTargetType[j].title === targetCard.title) {
+            console.log(j, "/", cardsOfTargetType.length);
+            const distractor = cardsOfTargetType.splice(j, 1)[0];
+            if (distractor.title === targetCard.title) {
+              console.log("already saw the card");
               i--;
               continue;
             }
-            distractors.push();
             newFragments.push({
               id: makeId(),
               zone,
-              card: cardsOfTargetType.splice(j, 1)[0],
+              card: distractor,
               isCorrect: false,
             });
           }
@@ -129,9 +137,6 @@ export function ChallengeScreen({ config, onFinish }: Props) {
     correctCards,
     onFinish,
   ]);
-
-  const cardHouse =
-    card && (config.house ?? getCardHouse(card, config.expansion));
 
   // This effect is intended to run only once, hence the empty deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -196,11 +201,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
       <div id="center" className="challenge-container">
         <div className="card-section">
           <h2>Match the clipped regions</h2>
-          <Card
-            card={card}
-            house={config.house ?? getCardHouse(card, config.expansion)}
-            hiddenZones={zones}
-          />
+          <Card card={card} house={cardHouse!} hiddenZones={zones} />
         </div>
 
         <div className="fragments-section">

@@ -77,7 +77,7 @@ export function makeId() {
 }
 
 export function getCardHouse(card: Card, expansion: Expansion) {
-  if (typeof card.house === "object") {
+  if (typeof card.house === "object" && !Array.isArray(card.house)) {
     return card.house[expansion];
   }
   return card.house;
@@ -88,6 +88,9 @@ export function loadCardImage(slug: string, house: string) {
   let uriHouse = house.toLowerCase();
   if (uriHouse === "skybeast") {
     uriHouse = "skyborn";
+  }
+  if (uriHouse === "revenant") {
+    uriHouse = "geistoid";
   }
   const src = `${import.meta.env.VITE_CARD_IMAGE_BASEURL}${uriHouse}/${slug}.png`;
   const cachedPromise = imageCache.get(src);

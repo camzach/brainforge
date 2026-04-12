@@ -7,22 +7,16 @@ import {
   ZONE_DISPLAY,
   type Zone,
 } from "../cards/card-utils";
-import { queryCards } from "../cards/card-db";
+import { openCardDB, queryCards } from "../cards/card-db";
 
 type Props = {
   onStart: (config: GameConfig) => void;
 };
 
-const ALL_CARD_TYPES: CardKind[] = [
-  "Creature",
-  "Action",
-  "Artifact",
-  "Upgrade",
-];
-
 export function SetupScreen({ onStart }: Props) {
   const [expansion, setExpansion] = useState<Expansion | null>(null);
-  const [expansionHouses, setExpansionHouses] = useState<string[] | null>(null);
+  const [expansionHouses, setExpansionHouses] = useState<string[]>([]);
+  const [targetCardTypes, setTargetCardTypes] = useState<CardKind[]>([]);
   const [house, setHouse] = useState<string | null>(null);
   const [cardTypes, setCardTypes] = useState<Set<CardKind>>(new Set());
   const [zones, setZones] = useState<Record<CardKind, Set<Zone>>>({
@@ -42,11 +36,45 @@ export function SetupScreen({ onStart }: Props) {
     if (!expansion) {
       return;
     }
-    queryCards({ expansion: expansion ?? undefined }).then((cards) => {
-      const houses = new Set(cards.map((c) => getCardHouse(c, expansion)));
-      setExpansionHouses(Array.from(houses));
-    });
+    openCardDB()
+      .then(() => queryCards({ expansion: expansion ?? undefined }))
+      .then((cards) => {
+        const dedupedHouses = new Set<string>();
+        cards.forEach((c) => {
+          const h = getCardHouse(c, expansion);
+          if (Array.isArray(h)) {
+            h.forEach((_h) => dedupedHouses.add(_h));
+          } else {
+            dedupedHouses.add(h);
+          }
+        });
+        setExpansionHouses(Array.from(dedupedHouses).sort());
+      });
   }, [expansion]);
+
+  useEffect(() => {
+    if (!expansion) {
+      return;
+    }
+    openCardDB()
+      .then(() =>
+        queryCards({
+          expansion: expansion ?? undefined,
+          house: house ?? undefined,
+        }),
+      )
+      .then((cards) => {
+        const dedupedTypes = new Set<CardKind>();
+        cards.forEach((c) => {
+          dedupedTypes.add(c.type);
+        });
+        setTargetCardTypes(
+          Array.from(dedupedTypes)
+            .filter((t) => t in cardTypeZoneMaps)
+            .sort(),
+        );
+      });
+  }, [expansion, house]);
 
   const handleCardTypeToggle = (cardType: CardKind) => {
     setCardTypes((prev) => {
@@ -92,7 +120,7 @@ export function SetupScreen({ onStart }: Props) {
           onChange={(e) => {
             setExpansion((e.target.value as Expansion) || null);
             setHouse(null);
-            setExpansionHouses(null);
+            setExpansionHouses([]);
           }}
           className="expansion-select"
         >
@@ -105,7 +133,7 @@ export function SetupScreen({ onStart }: Props) {
         </select>
       </div>
 
-      {expansion && expansionHouses && (
+      {expansion && (
         <div className="setup-section">
           <h3>2. Select House (optional)</h3>
           <div className="house-buttons">
@@ -132,7 +160,7 @@ export function SetupScreen({ onStart }: Props) {
         <div className="setup-section">
           <h3>3. Select Card Types to Practice</h3>
           <div className="zone-selectors">
-            {ALL_CARD_TYPES.map((cardType) => (
+            {targetCardTypes.map((cardType) => (
               <label key={cardType}>
                 <input
                   type="checkbox"

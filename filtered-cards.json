@@ -129,7 +129,13 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "CRUCIBLE_CLASH": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -388,7 +394,17 @@
     "amber": 0,
     "power": 5,
     "armor": 2,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "DISCOVERY": "Sanctum",
+      "PROPHETIC_VISIONS": "Redemption",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "DARK_TIDINGS": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -618,7 +634,13 @@
     "amber": 0,
     "power": 4,
     "armor": 1,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "MASS_MUTATION": "Sanctum",
+      "DARK_TIDINGS": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "MASS_MUTATION",
       "DARK_TIDINGS",
@@ -1979,7 +2001,11 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "PROPHETIC_VISIONS": "Redemption",
+      "DARK_TIDINGS": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "PROPHETIC_VISIONS", "DARK_TIDINGS"]
   },
   {
@@ -2047,7 +2073,13 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum",
+      "MASS_MUTATION": "Sanctum"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -2584,7 +2616,10 @@
     "amber": 0,
     "power": 6,
     "armor": 0,
-    "house": "Unfathomable",
+    "house": {
+      "ANOMALY_EXPANSION": "Anomaly",
+      "DARK_TIDINGS": "Unfathomable"
+    },
     "expansions": ["ANOMALY_EXPANSION", "DARK_TIDINGS"]
   },
   {
@@ -3514,7 +3549,12 @@
     "amber": 0,
     "power": 5,
     "armor": 2,
-    "house": ["Logos", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Logos",
+      "MASS_MUTATION": "Logos",
+      "MENAGERIE_2024": "Logos"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -3854,7 +3894,11 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Untamed", "Redemption"],
+    "house": {
+      "MORE_MUTATION": "Untamed",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MASS_MUTATION": "Untamed"
+    },
     "expansions": ["MORE_MUTATION", "PROPHETIC_VISIONS", "MASS_MUTATION"]
   },
   {
@@ -4661,7 +4705,11 @@
     "amber": 0,
     "power": 6,
     "armor": 2,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum",
+      "CALL_OF_THE_ARCHONS": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "DISCOVERY", "CALL_OF_THE_ARCHONS"]
   },
   {
@@ -4937,7 +4985,11 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "WINDS_OF_EXCHANGE": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "WINDS_OF_EXCHANGE", "MENAGERIE_2024"]
   },
   {
@@ -5046,7 +5098,11 @@
     "amber": 0,
     "power": 4,
     "armor": 1,
-    "house": "Skyborn",
+    "house": {
+      "AEMBER_SKIES": "Skyborn",
+      "TOKENS_OF_CHANGE": "Skyborn",
+      "ANOMALY_EXPANSION": "Anomaly"
+    },
     "expansions": ["AEMBER_SKIES", "TOKENS_OF_CHANGE", "ANOMALY_EXPANSION"]
   },
   {
@@ -5274,7 +5330,13 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "DISCOVERY": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "WINDS_OF_EXCHANGE": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "DISCOVERY",
@@ -5290,7 +5352,18 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum",
+      "MORE_MUTATION": "Sanctum",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MASS_MUTATION": "Sanctum",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "WINDS_OF_EXCHANGE": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -5987,7 +6060,18 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Untamed", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Untamed",
+      "TOKENS_OF_CHANGE": "Untamed",
+      "MORE_MUTATION": "Untamed",
+      "PROPHETIC_VISIONS": "Redemption",
+      "DISCOVERY": "Untamed",
+      "MASS_MUTATION": "Untamed",
+      "VAULT_MASTERS_2023": "Untamed",
+      "CALL_OF_THE_ARCHONS": "Untamed",
+      "DARK_TIDINGS": "Untamed",
+      "GRIM_REMINDERS": "Untamed"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -6549,7 +6633,12 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": "Geistoid",
+    "house": {
+      "VAULT_MASTERS_2025": "Geistoid",
+      "MENAGERIE_2024": "Geistoid",
+      "GRIM_REMINDERS": "Geistoid",
+      "ANOMALY_EXPANSION": "Anomaly"
+    },
     "expansions": [
       "VAULT_MASTERS_2025",
       "MENAGERIE_2024",
@@ -8838,7 +8927,11 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Sanctum",
+      "PROPHETIC_VISIONS": "Redemption",
+      "WINDS_OF_EXCHANGE": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "PROPHETIC_VISIONS", "WINDS_OF_EXCHANGE"]
   },
   {
@@ -9455,7 +9548,14 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": ["Saurian", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2025": "Saurian",
+      "VAULT_MASTERS_2023": "Saurian",
+      "MASS_MUTATION": "Saurian",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Saurian",
+      "PROPHETIC_VISIONS": "Redemption"
+    },
     "expansions": [
       "VAULT_MASTERS_2025",
       "VAULT_MASTERS_2023",
@@ -9876,7 +9976,13 @@
     "amber": 0,
     "power": 5,
     "armor": 0,
-    "house": ["Logos", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Logos",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MASS_MUTATION": "Logos",
+      "MENAGERIE_2024": "Logos"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -10096,7 +10202,14 @@
     "amber": 0,
     "power": 2,
     "armor": 0,
-    "house": ["Logos", "Redemption"],
+    "house": {
+      "MORE_MUTATION": "Logos",
+      "PROPHETIC_VISIONS": "Redemption",
+      "DISCOVERY": "Logos",
+      "CALL_OF_THE_ARCHONS": "Logos",
+      "MASS_MUTATION": "Logos",
+      "AGE_OF_ASCENSION": "Logos"
+    },
     "expansions": [
       "MORE_MUTATION",
       "PROPHETIC_VISIONS",
@@ -10139,7 +10252,12 @@
     "amber": 0,
     "power": 4,
     "armor": 2,
-    "house": ["Dis", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Dis",
+      "MASS_MUTATION": "Dis",
+      "MENAGERIE_2024": "Dis"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -10154,7 +10272,13 @@
     "amber": 0,
     "power": 5,
     "armor": 2,
-    "house": ["StarAlliance", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "StarAlliance",
+      "DISCOVERY": "StarAlliance",
+      "MENAGERIE_2024": "StarAlliance",
+      "MASS_MUTATION": "StarAlliance"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -10643,7 +10767,14 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": "Sanctum",
+    "house": {
+      "CRUCIBLE_CLASH": "Sanctum",
+      "DISCOVERY": "Sanctum",
+      "MORE_MUTATION": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "ANOMALY_EXPANSION": "Anomaly",
+      "DARK_TIDINGS": "Sanctum"
+    },
     "expansions": [
       "CRUCIBLE_CLASH",
       "DISCOVERY",
@@ -10736,7 +10867,12 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "WINDS_OF_EXCHANGE": "Sanctum",
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum"
+    },
     "expansions": [
       "WINDS_OF_EXCHANGE",
       "VAULT_MASTERS_2024",
@@ -11463,7 +11599,14 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Brobnar", "Redemption"],
+    "house": {
+      "DISCOVERY": "Brobnar",
+      "MENAGERIE_2024": "Brobnar",
+      "PROPHETIC_VISIONS": "Redemption",
+      "CALL_OF_THE_ARCHONS": "Brobnar",
+      "VAULT_MASTERS_2023": "Brobnar",
+      "GRIM_REMINDERS": "Brobnar"
+    },
     "expansions": [
       "DISCOVERY",
       "MENAGERIE_2024",
@@ -11628,7 +11771,13 @@
     "amber": 0,
     "power": 4,
     "armor": 0,
-    "house": ["Logos", "Redemption"],
+    "house": {
+      "MASS_MUTATION": "Logos",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Logos",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MENAGERIE_2024": "Logos"
+    },
     "expansions": [
       "MASS_MUTATION",
       "TOKENS_OF_CHANGE",
@@ -12135,7 +12284,11 @@
     "amber": 0,
     "power": 4,
     "armor": 0,
-    "house": ["Logos", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Logos",
+      "MASS_MUTATION": "Logos"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "MORE_MUTATION", "MASS_MUTATION"]
   },
   {
@@ -13042,7 +13195,10 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": "StarAlliance",
+    "house": {
+      "ANOMALY_EXPANSION": "Anomaly",
+      "GRIM_REMINDERS": "StarAlliance"
+    },
     "expansions": ["ANOMALY_EXPANSION", "GRIM_REMINDERS"]
   },
   {
@@ -13117,7 +13273,15 @@
     "amber": 0,
     "power": 5,
     "armor": 0,
-    "house": ["Saurian", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2025": "Saurian",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MENAGERIE_2024": "Saurian",
+      "MORE_MUTATION": "Saurian",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MASS_MUTATION": "Saurian",
+      "VAULT_MASTERS_2023": "Saurian"
+    },
     "expansions": [
       "VAULT_MASTERS_2025",
       "TOKENS_OF_CHANGE",
@@ -13335,7 +13499,12 @@
     "amber": 0,
     "power": 4,
     "armor": 0,
-    "house": "Geistoid",
+    "house": {
+      "VAULT_MASTERS_2025": "Geistoid",
+      "GRIM_REMINDERS": "Geistoid",
+      "MENAGERIE_2024": "Geistoid",
+      "ANOMALY_EXPANSION": "Anomaly"
+    },
     "expansions": [
       "VAULT_MASTERS_2025",
       "GRIM_REMINDERS",
@@ -14123,7 +14292,12 @@
     "amber": 0,
     "power": 4,
     "armor": 1,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "MORE_MUTATION": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MASS_MUTATION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "MORE_MUTATION",
       "TOKENS_OF_CHANGE",
@@ -14188,7 +14362,13 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum",
+      "WINDS_OF_EXCHANGE": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "DISCOVERY",
@@ -14220,7 +14400,11 @@
     "amber": 0,
     "power": 4,
     "armor": 0,
-    "house": ["Shadows", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Shadows",
+      "MASS_MUTATION": "Shadows"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "MORE_MUTATION", "MASS_MUTATION"]
   },
   {
@@ -15111,7 +15295,10 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DARK_TIDINGS": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "DARK_TIDINGS"]
   },
   {
@@ -15863,7 +16050,12 @@
     "amber": 0,
     "power": 4,
     "armor": 0,
-    "house": ["Dis", "Redemption"],
+    "house": {
+      "MASS_MUTATION": "Dis",
+      "VAULT_MASTERS_2023": "Dis",
+      "TOKENS_OF_CHANGE": "Dis",
+      "MORE_MUTATION": "Dis"
+    },
     "expansions": [
       "MASS_MUTATION",
       "VAULT_MASTERS_2023",
@@ -16878,16 +17070,7 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": [
-      "Logos",
-      "Brobnar",
-      "Untamed",
-      "Geistoid",
-      "Unfathomable",
-      "StarAlliance",
-      "Ekwidon",
-      "Mars"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -16897,15 +17080,7 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": [
-      "Unfathomable",
-      "Geistoid",
-      "StarAlliance",
-      "Brobnar",
-      "Mars",
-      "Untamed",
-      "Ekwidon"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -16978,16 +17153,7 @@
     "amber": 0,
     "power": 6,
     "armor": 4,
-    "house": [
-      "Saurian",
-      "Mars",
-      "Untamed",
-      "StarAlliance",
-      "Brobnar",
-      "Unfathomable",
-      "Geistoid",
-      "Ekwidon"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -16997,16 +17163,7 @@
     "amber": 0,
     "power": 2,
     "armor": 0,
-    "house": [
-      "Logos",
-      "Geistoid",
-      "Untamed",
-      "Brobnar",
-      "Unfathomable",
-      "Ekwidon",
-      "StarAlliance",
-      "Mars"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17139,15 +17296,7 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": [
-      "StarAlliance",
-      "Unfathomable",
-      "Untamed",
-      "Mars",
-      "Geistoid",
-      "Brobnar",
-      "Ekwidon"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17157,15 +17306,7 @@
     "amber": 0,
     "power": 7,
     "armor": 0,
-    "house": [
-      "Geistoid",
-      "Brobnar",
-      "Untamed",
-      "Mars",
-      "Ekwidon",
-      "Unfathomable",
-      "StarAlliance"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17243,16 +17384,7 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": [
-      "Sanctum",
-      "Ekwidon",
-      "Untamed",
-      "Unfathomable",
-      "Brobnar",
-      "StarAlliance",
-      "Geistoid",
-      "Mars"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17272,15 +17404,7 @@
     "amber": 0,
     "power": 6,
     "armor": 0,
-    "house": [
-      "Brobnar",
-      "StarAlliance",
-      "Geistoid",
-      "Ekwidon",
-      "Untamed",
-      "Mars",
-      "Unfathomable"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17290,15 +17414,7 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": [
-      "Mars",
-      "Brobnar",
-      "Unfathomable",
-      "StarAlliance",
-      "Untamed",
-      "Geistoid",
-      "Ekwidon"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17308,15 +17424,7 @@
     "amber": 0,
     "power": 4,
     "armor": 1,
-    "house": [
-      "Ekwidon",
-      "Unfathomable",
-      "Geistoid",
-      "Mars",
-      "Brobnar",
-      "Untamed",
-      "StarAlliance"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17326,15 +17434,7 @@
     "amber": 0,
     "power": 1,
     "armor": 0,
-    "house": [
-      "Brobnar",
-      "Ekwidon",
-      "Unfathomable",
-      "StarAlliance",
-      "Geistoid",
-      "Mars",
-      "Untamed"
-    ],
+    "house": "Revenant",
     "expansions": ["GRIM_REMINDERS"]
   },
   {
@@ -17643,7 +17743,10 @@
     "amber": 0,
     "power": 3,
     "armor": 1,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "WINDS_OF_EXCHANGE": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "WINDS_OF_EXCHANGE"]
   },
   {
@@ -18103,7 +18206,12 @@
     "amber": 0,
     "power": 5,
     "armor": 2,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "MORE_MUTATION": "Sanctum",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MASS_MUTATION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "MORE_MUTATION",
       "PROPHETIC_VISIONS",
@@ -22682,7 +22790,13 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "PROPHETIC_VISIONS": "Sanctum",
+      "MASS_MUTATION": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -22886,7 +23000,12 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": "Geistoid",
+    "house": {
+      "TOKENS_OF_CHANGE": "Geistoid",
+      "GRIM_REMINDERS": "Geistoid",
+      "ANOMALY_EXPANSION": "Anomaly",
+      "MENAGERIE_2024": "Geistoid"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "GRIM_REMINDERS",
@@ -22921,7 +23040,12 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "MASS_MUTATION": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "PROPHETIC_VISIONS": "Sanctum"
+    },
     "expansions": [
       "MASS_MUTATION",
       "TOKENS_OF_CHANGE",
@@ -23326,7 +23450,10 @@
     "amber": 0,
     "power": 6,
     "armor": 0,
-    "house": ["Brobnar", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "CALL_OF_THE_ARCHONS": "Brobnar"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "CALL_OF_THE_ARCHONS"]
   },
   {
@@ -23829,7 +23956,11 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "DARK_TIDINGS": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum"
+    },
     "expansions": ["DARK_TIDINGS", "TOKENS_OF_CHANGE", "DISCOVERY"]
   },
   {
@@ -24997,7 +25128,14 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Unfathomable", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2025": "Unfathomable",
+      "VAULT_MASTERS_2024": "Unfathomable",
+      "PROPHETIC_VISIONS": "Redemption",
+      "DARK_TIDINGS": "Unfathomable",
+      "WINDS_OF_EXCHANGE": "Unfathomable",
+      "GRIM_REMINDERS": "Unfathomable"
+    },
     "expansions": [
       "VAULT_MASTERS_2025",
       "VAULT_MASTERS_2024",
@@ -25024,7 +25162,17 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum",
+      "MORE_MUTATION": "Sanctum",
+      "WINDS_OF_EXCHANGE": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "DARK_TIDINGS": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -25389,7 +25537,12 @@
     "amber": 0,
     "power": 4,
     "armor": 2,
-    "house": ["Shadows", "Redemption"],
+    "house": {
+      "MORE_MUTATION": "Shadows",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MENAGERIE_2024": "Shadows",
+      "MASS_MUTATION": "Shadows"
+    },
     "expansions": [
       "MORE_MUTATION",
       "TOKENS_OF_CHANGE",
@@ -26068,7 +26221,14 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "PROPHETIC_VISIONS": "Sanctum",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -27349,7 +27509,15 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum",
+      "MORE_MUTATION": "Sanctum",
+      "CRUCIBLE_CLASH": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -28274,7 +28442,11 @@
     "amber": 0,
     "power": 3,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "AGE_OF_ASCENSION": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "DISCOVERY": "Sanctum"
+    },
     "expansions": ["AGE_OF_ASCENSION", "TOKENS_OF_CHANGE", "DISCOVERY"]
   },
   {
@@ -28779,7 +28951,13 @@
     "amber": 0,
     "power": 1,
     "armor": 0,
-    "house": ["Shadows", "Redemption"],
+    "house": {
+      "DISCOVERY": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MENAGERIE_2024": "Sanctum",
+      "MORE_MUTATION": "Sanctum"
+    },
     "expansions": [
       "DISCOVERY",
       "MASS_MUTATION",
@@ -29413,7 +29591,10 @@
     "amber": 0,
     "power": 6,
     "armor": 1,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "CALL_OF_THE_ARCHONS": "Sanctum"
+    },
     "expansions": ["TOKENS_OF_CHANGE", "CALL_OF_THE_ARCHONS"]
   },
   {
@@ -29459,7 +29640,13 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Dis", "Redemption"],
+    "house": {
+      "DISCOVERY": "Dis",
+      "MORE_MUTATION": "Dis",
+      "PROPHETIC_VISIONS": "Redemption",
+      "MASS_MUTATION": "Dis",
+      "MENAGERIE_2024": "Dis"
+    },
     "expansions": [
       "DISCOVERY",
       "MORE_MUTATION",
@@ -30226,7 +30413,18 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": ["Sanctum", "Redemption"],
+    "house": {
+      "VAULT_MASTERS_2024": "Sanctum",
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Sanctum",
+      "MENAGERIE_2024": "Sanctum",
+      "DISCOVERY": "Sanctum",
+      "CRUCIBLE_CLASH": "Sanctum",
+      "CALL_OF_THE_ARCHONS": "Sanctum",
+      "DARK_TIDINGS": "Sanctum",
+      "MASS_MUTATION": "Sanctum",
+      "AGE_OF_ASCENSION": "Sanctum"
+    },
     "expansions": [
       "VAULT_MASTERS_2024",
       "TOKENS_OF_CHANGE",
@@ -30311,7 +30509,12 @@
     "amber": 0,
     "power": 5,
     "armor": 2,
-    "house": ["Untamed", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Untamed",
+      "MASS_MUTATION": "Untamed",
+      "MENAGERIE_2024": "Untamed"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -30612,7 +30815,12 @@
     "amber": 0,
     "power": 6,
     "armor": 2,
-    "house": ["Saurian", "Redemption"],
+    "house": {
+      "TOKENS_OF_CHANGE": "Redemption",
+      "MORE_MUTATION": "Saurian",
+      "MASS_MUTATION": "Saurian",
+      "MENAGERIE_2024": "Saurian"
+    },
     "expansions": [
       "TOKENS_OF_CHANGE",
       "MORE_MUTATION",
@@ -30800,4 +31008,3 @@
     "expansions": ["PROPHETIC_VISIONS"]
   }
 ]
-

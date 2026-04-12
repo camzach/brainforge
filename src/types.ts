@@ -28,7 +28,10 @@ export type Expansion =
   | "WINDS_OF_EXCHANGE"
   | "WORLDS_COLLIDE";
 
-export type HouseData = string | Record<Expansion, string>;
+export type HouseData =
+  | string
+  | string[]
+  | Record<Expansion, string | string[]>;
 
 export type Card = {
   type: CardKind;
