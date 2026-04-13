@@ -98,6 +98,9 @@ export function ChallengeScreen({ config, onFinish }: Props) {
             const j = Math.floor(Math.random() * cardsOfTargetType.length);
             console.log(j, "/", cardsOfTargetType.length);
             const distractor = cardsOfTargetType.splice(j, 1)[0];
+            if (!distractor) {
+              break;
+            }
             if (distractor.title === targetCard.title) {
               console.log("already saw the card");
               i--;
