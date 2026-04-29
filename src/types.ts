@@ -15,6 +15,7 @@ export type Expansion =
   | "CRUCIBLE_CLASH"
   | "DARK_TIDINGS"
   | "DISCOVERY"
+  | "DRACONIAN_MEASURES"
   | "GRIM_REMINDERS"
   | "MARTIAN_CIVIL_WAR"
   | "MASS_MUTATION"
@@ -51,6 +52,7 @@ export const Expansions: Record<Expansion, string> = {
   CRUCIBLE_CLASH: "Crucible Clash",
   DARK_TIDINGS: "Dark Tidings",
   DISCOVERY: "Discovery",
+  DRACONIAN_MEASURES: "Draconian Measures",
   GRIM_REMINDERS: "Grim Reminders",
   MARTIAN_CIVIL_WAR: "Martian Civil War",
   MASS_MUTATION: "Mass Mutation",

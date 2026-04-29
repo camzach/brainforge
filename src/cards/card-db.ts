@@ -1,7 +1,7 @@
 import type { Card, CardKind, Expansion } from "../types";
 
 const DB_NAME = "card-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "cards";
 
 const INDEX_CARD_TYPE = "cardType";
@@ -27,19 +27,20 @@ export async function openCardDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
-        store.createIndex(INDEX_CARD_TYPE, "cardType", { unique: false });
-        store.createIndex(INDEX_EXPANSION, "expansionIdx", {
-          unique: false,
-          multiEntry: true,
-        });
-        store.createIndex(INDEX_HOUSE, "houseIdx", {
-          unique: false,
-          multiEntry: true,
-        });
-        seedCardDB();
+      if (db.objectStoreNames.contains(STORE_NAME)) {
+        db.deleteObjectStore(STORE_NAME);
       }
+      const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
+      store.createIndex(INDEX_CARD_TYPE, "cardType", { unique: false });
+      store.createIndex(INDEX_EXPANSION, "expansionIdx", {
+        unique: false,
+        multiEntry: true,
+      });
+      store.createIndex(INDEX_HOUSE, "houseIdx", {
+        unique: false,
+        multiEntry: true,
+      });
+      seedCardDB();
     };
   });
 }
@@ -116,6 +117,7 @@ export async function getCardsByExpansion(
     const store = transaction.objectStore(STORE_NAME);
     const index = store.index(INDEX_EXPANSION);
     const request = index.getAll(expansion);
+    console.log(request);
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
