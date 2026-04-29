@@ -3833,7 +3833,8 @@
       "MARTIAN_CIVIL_WAR": "IronyxRebels",
       "AGE_OF_ASCENSION": "Mars",
       "WINDS_OF_EXCHANGE": "Mars",
-      "VAULT_MASTERS_2023": "Mars"
+      "VAULT_MASTERS_2023": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "VAULT_MASTERS_2025",
@@ -4233,7 +4234,8 @@
     "house": {
       "MARTIAN_CIVIL_WAR": "Elders",
       "GRIM_REMINDERS": "Mars",
-      "MENAGERIE_2024": "Mars"
+      "MENAGERIE_2024": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -6127,7 +6129,8 @@
       "MARTIAN_CIVIL_WAR": "Elders",
       "AEMBER_SKIES": "Mars",
       "GRIM_REMINDERS": "Mars",
-      "MENAGERIE_2024": "Mars"
+      "MENAGERIE_2024": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -6207,7 +6210,8 @@
     "house": {
       "MARTIAN_CIVIL_WAR": "Elders",
       "CALL_OF_THE_ARCHONS": "Mars",
-      "GRIM_REMINDERS": "Mars"
+      "GRIM_REMINDERS": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -6675,7 +6679,8 @@
       "VAULT_MASTERS_2025": "Geistoid",
       "MENAGERIE_2024": "Geistoid",
       "GRIM_REMINDERS": "Geistoid",
-      "ANOMALY_EXPANSION": "Anomaly"
+      "ANOMALY_EXPANSION": "Anomaly",
+      "DRACONIAN_MEASURES": "Geistoid"
     },
     "expansions": [
       "VAULT_MASTERS_2025",
@@ -16347,7 +16352,8 @@
       "CALL_OF_THE_ARCHONS": "Mars",
       "AGE_OF_ASCENSION": "Mars",
       "VAULT_MASTERS_2023": "Mars",
-      "GRIM_REMINDERS": "Mars"
+      "GRIM_REMINDERS": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -17432,7 +17438,8 @@
     "house": {
       "MARTIAN_CIVIL_WAR": "IronyxRebels",
       "AEMBER_SKIES": "Mars",
-      "CRUCIBLE_CLASH": "Mars"
+      "CRUCIBLE_CLASH": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -25295,7 +25302,8 @@
       "PROPHETIC_VISIONS": "Redemption",
       "DARK_TIDINGS": "Unfathomable",
       "WINDS_OF_EXCHANGE": "Unfathomable",
-      "GRIM_REMINDERS": "Unfathomable"
+      "GRIM_REMINDERS": "Unfathomable",
+      "DRACONIAN_MEASURES": "Unfathomable"
     },
     "expansions": [
       "VAULT_MASTERS_2025",
@@ -25587,15 +25595,26 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": [
-      "Logos",
-      "Dis",
-      "Saurian",
-      "StarAlliance",
-      "Sanctum",
-      "Untamed",
-      "Shadows"
-    ],
+    "house": {
+      "MORE_MUTATION": [
+        "Logos",
+        "Dis",
+        "Saurian",
+        "StarAlliance",
+        "Sanctum",
+        "Untamed",
+        "Shadows"
+      ],
+      "DRACONIAN_MEASURES": [
+        "Unfathomable",
+        "Skyborn",
+        "Shadows",
+        "Ouboros",
+        "Mars",
+        "Geistoid",
+        "Ekwidon"
+      ]
+    },
     "expansions": ["MORE_MUTATION", "DRACONIAN_MEASURES"]
   },
   {
@@ -25994,15 +26013,26 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": [
-      "Dis",
-      "Shadows",
-      "Untamed",
-      "StarAlliance",
-      "Sanctum",
-      "Saurian",
-      "Logos"
-    ],
+    "house": {
+      "MORE_MUTATION": [
+        "Dis",
+        "Shadows",
+        "Untamed",
+        "StarAlliance",
+        "Sanctum",
+        "Saurian",
+        "Logos"
+      ],
+      "DRACONIAN_MEASURES": [
+        "Unfathomable",
+        "Skyborn",
+        "Shadows",
+        "Ouboros",
+        "Mars",
+        "Geistoid",
+        "Ekwidon"
+      ]
+    },
     "expansions": ["MORE_MUTATION", "DRACONIAN_MEASURES"]
   },
   {
@@ -26300,7 +26330,8 @@
     "armor": 0,
     "house": {
       "MARTIAN_CIVIL_WAR": "IronyxRebels",
-      "AEMBER_SKIES": "Mars"
+      "AEMBER_SKIES": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": ["MARTIAN_CIVIL_WAR", "AEMBER_SKIES", "DRACONIAN_MEASURES"]
   },
@@ -27107,7 +27138,8 @@
       "WINDS_OF_EXCHANGE": "Mars",
       "VAULT_MASTERS_2023": "Mars",
       "AGE_OF_ASCENSION": "Mars",
-      "GRIM_REMINDERS": "Mars"
+      "GRIM_REMINDERS": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -28336,15 +28368,26 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": [
-      "Untamed",
-      "Logos",
-      "Dis",
-      "StarAlliance",
-      "Saurian",
-      "Sanctum",
-      "Shadows"
-    ],
+    "house": {
+      "MORE_MUTATION": [
+        "Untamed",
+        "Logos",
+        "Dis",
+        "StarAlliance",
+        "Saurian",
+        "Sanctum",
+        "Shadows"
+      ],
+      "DRACONIAN_MEASURES": [
+        "Unfathomable",
+        "Skyborn",
+        "Shadows",
+        "Ouboros",
+        "Mars",
+        "Geistoid",
+        "Ekwidon"
+      ]
+    },
     "expansions": ["MORE_MUTATION", "DRACONIAN_MEASURES"]
   },
   {
@@ -29383,7 +29426,8 @@
       "MENAGERIE_2024": "Mars",
       "AGE_OF_ASCENSION": "Mars",
       "VAULT_MASTERS_2023": "Mars",
-      "WINDS_OF_EXCHANGE": "Mars"
+      "WINDS_OF_EXCHANGE": "Mars",
+      "DRACONIAN_MEASURES": "Mars"
     },
     "expansions": [
       "MARTIAN_CIVIL_WAR",
@@ -31126,7 +31170,10 @@
     "amber": 1,
     "power": 0,
     "armor": 0,
-    "house": ["Saurian", "Logos", "Untamed"],
+    "house": {
+      "MASS_MUTATION": ["Saurian", "Logos", "Untamed"],
+      "MENAGERIE_2024": ["Saurian", "Logos", "Untamed"]
+    },
     "expansions": ["MENAGERIE_2024", "MASS_MUTATION"]
   },
   {
@@ -32675,4 +32722,3 @@
     "expansions": ["DRACONIAN_MEASURES"]
   }
 ]
-
