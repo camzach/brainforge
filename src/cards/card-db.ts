@@ -15,6 +15,8 @@ export async function openCardDB(): Promise<IDBDatabase> {
     return dbInstance;
   }
 
+  const cards = (await import("../../filtered-cards.json")).default;
+
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -27,6 +29,7 @@ export async function openCardDB(): Promise<IDBDatabase> {
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
+
       if (db.objectStoreNames.contains(STORE_NAME)) {
         db.deleteObjectStore(STORE_NAME);
       }
@@ -40,44 +43,29 @@ export async function openCardDB(): Promise<IDBDatabase> {
         unique: false,
         multiEntry: true,
       });
-      seedCardDB();
-    };
-  });
-}
 
-export async function seedCardDB(): Promise<void> {
-  const db = await openCardDB();
-  return import("../../filtered-cards.json").then(
-    ({ default: cards }) =>
-      new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, "readwrite");
-        const store = transaction.objectStore(STORE_NAME);
+      store.clear();
 
-        store.clear();
-
-        let id = 0;
-        for (const card of cards) {
-          let houseIdx;
-          if (typeof card.house === "string") {
-            houseIdx = [card.house];
-          } else if (Array.isArray(card.house)) {
-            houseIdx = card.house;
-          } else {
-            houseIdx = Object.values(card.house).flat();
-          }
-
-          store.add({
-            id: id++,
-            houseIdx,
-            expansionIdx: card.expansions,
-            ...card,
-          });
+      let id = 0;
+      for (const card of cards) {
+        let houseIdx;
+        if (typeof card.house === "string") {
+          houseIdx = [card.house];
+        } else if (Array.isArray(card.house)) {
+          houseIdx = card.house;
+        } else {
+          houseIdx = Object.values(card.house).flat();
         }
 
-        transaction.oncomplete = () => resolve();
-        transaction.onerror = () => reject(transaction.error);
-      }),
-  );
+        store.add({
+          id: id++,
+          houseIdx,
+          expansionIdx: card.expansions,
+          ...card,
+        });
+      }
+    };
+  });
 }
 
 export async function getAllCards(): Promise<Card[]> {
@@ -117,7 +105,6 @@ export async function getCardsByExpansion(
     const store = transaction.objectStore(STORE_NAME);
     const index = store.index(INDEX_EXPANSION);
     const request = index.getAll(expansion);
-    console.log(request);
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
