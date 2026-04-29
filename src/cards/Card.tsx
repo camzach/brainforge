@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Card } from "../types";
-import { getZoneRect, loadCardImage, type Zone } from "./card-utils";
+import { getClipPath, loadCardImage, type Zone } from "./card-utils";
 import classNames from "classnames";
 
 type Props = {
@@ -24,23 +24,21 @@ export function Card({ card, house, hiddenZones = [], showResults }: Props) {
       ctx.drawImage(image, 0, 0, 300, 420);
 
       for (const zone of hiddenZones) {
-        const rect = getZoneRect(card, zone);
-        if (!rect) continue;
-        const { pos, size } = rect;
+        const path = getClipPath(card, zone);
+        if (!path) continue;
         ctx.fillStyle = "black";
-        ctx.fillRect(pos[0], pos[1], size[0], size[1]);
+        ctx.fill(path.path);
       }
 
       if (showResults) {
         for (const zone of hiddenZones) {
           const isCorrect = showResults[zone];
           if (isCorrect === undefined) continue;
-          const rect = getZoneRect(card, zone);
-          if (!rect) continue;
-          const { pos, size } = rect;
+          const path = getClipPath(card, zone);
+          if (!path) continue;
           ctx.strokeStyle = isCorrect ? "#22c55e" : "#ef4444";
           ctx.lineWidth = 4;
-          ctx.strokeRect(pos[0], pos[1], size[0], size[1]);
+          ctx.stroke(path.path);
         }
       }
 
