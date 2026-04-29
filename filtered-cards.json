@@ -20181,10 +20181,7 @@
     "amber": 0,
     "power": 0,
     "armor": 0,
-    "house": {
-      "DRACONIAN_MEASURES": "Ouboros",
-      "ANOMALY_EXPANSION": "Anomaly"
-    },
+    "house": "Anomaly",
     "expansions": ["ANOMALY_EXPANSION", "DRACONIAN_MEASURES"]
   },
   {

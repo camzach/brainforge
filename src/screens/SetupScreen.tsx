@@ -7,7 +7,7 @@ import {
   ZONE_DISPLAY,
   type Zone,
 } from "../cards/card-utils";
-import { openCardDB, queryCards } from "../cards/card-db";
+import { getCardsByExpansion, openCardDB } from "../cards/card-db";
 
 type Props = {
   onStart: (config: GameConfig) => void;
@@ -37,7 +37,7 @@ export function SetupScreen({ onStart }: Props) {
       return;
     }
     openCardDB()
-      .then(() => queryCards({ expansion: expansion ?? undefined }))
+      .then(() => getCardsByExpansion(expansion))
       .then((cards) => {
         const dedupedHouses = new Set<string>();
         cards.forEach((c) => {
@@ -57,10 +57,16 @@ export function SetupScreen({ onStart }: Props) {
       return;
     }
     openCardDB()
-      .then(() =>
-        queryCards({
-          expansion: expansion ?? undefined,
-          house: house ?? undefined,
+      .then(() => getCardsByExpansion(expansion))
+      .then((cards) =>
+        cards.filter((c) => {
+          if (house !== null) {
+            const cardHouse = getCardHouse(c, expansion);
+            if (typeof cardHouse === "string") {
+              return cardHouse === house;
+            }
+            return cardHouse.includes(house);
+          }
         }),
       )
       .then((cards) => {

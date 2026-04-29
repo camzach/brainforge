@@ -1,7 +1,7 @@
 import type { Card, CardKind, Expansion } from "../types";
 
 const DB_NAME = "card-db";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 const STORE_NAME = "cards";
 
 const INDEX_CARD_TYPE = "cardType";
@@ -139,44 +139,4 @@ export async function getCardsByHouse(house: string): Promise<Card[]> {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
-}
-
-export type CardQuery = {
-  expansion?: Expansion;
-  house?: string | null;
-  cardTypes?: Set<CardKind>;
-};
-
-export async function queryCards(query: CardQuery): Promise<Card[]> {
-  const { expansion, house, cardTypes } = query;
-
-  const getCards = async (): Promise<Card[]> => {
-    if (expansion) {
-      return getCardsByExpansion(expansion) as Promise<Card[]>;
-    }
-    if (house) {
-      return getCardsByHouse(house) as Promise<Card[]>;
-    }
-    return getAllCards() as Promise<Card[]>;
-  };
-
-  let cards = await getCards();
-
-  if (house) {
-    cards = cards.filter((c) => {
-      if (typeof c.house === "string") {
-        return c.house === house;
-      }
-      if (Array.isArray(c.house)) {
-        return c.house.includes(house);
-      }
-      return Object.values(c.house).some((h) => h.includes(house));
-    });
-  }
-
-  if (cardTypes && cardTypes.size > 0) {
-    cards = cards.filter((c) => cardTypes.has(c.type));
-  }
-
-  return cards;
 }

@@ -13,7 +13,7 @@ import {
   type GameConfig,
 } from "../types";
 
-import { openCardDB, queryCards } from "../cards/card-db";
+import { getCardsByExpansion, openCardDB } from "../cards/card-db";
 import { Card } from "../cards/Card";
 import { Fragment } from "../cards/Fragment";
 
@@ -49,14 +49,19 @@ export function ChallengeScreen({ config, onFinish }: Props) {
 
   const loadNextCard = useCallback(() => {
     openCardDB().then(() => {
-      queryCards({
-        expansion: config.expansion,
-        house: config.house,
-        cardTypes: config.cardTypes,
-      }).then((cards) => {
-        const incompleteCards = cards.filter(
-          (c) => !correctCards.includes(c.title),
-        );
+      getCardsByExpansion(config.expansion).then((cards) => {
+        const incompleteCards = cards.filter((c) => {
+          if (correctCards.includes(c.title)) {
+            return false;
+          }
+          if (config.house !== null) {
+            const cardHouse = getCardHouse(c, config.expansion);
+            if (typeof cardHouse === "string") {
+              return cardHouse === config.house;
+            }
+            return cardHouse.includes(config.house);
+          }
+        });
 
         if (incompleteCards.length === 0) {
           onFinish(correctCards.length);
@@ -64,7 +69,6 @@ export function ChallengeScreen({ config, onFinish }: Props) {
         }
 
         const targetCard = pickRandom(incompleteCards);
-        console.log(targetCard.title);
         setCard(targetCard);
 
         const targetHouseOrHouses = getCardHouse(targetCard, config.expansion);
@@ -81,28 +85,22 @@ export function ChallengeScreen({ config, onFinish }: Props) {
             return false;
           }
           const distractorHouse = getCardHouse(c, config.expansion);
-          console.log(targetHouse, distractorHouse);
           if (typeof distractorHouse === "string") {
             return targetHouse === distractorHouse;
           }
           return distractorHouse.includes(targetHouse);
         });
 
-        console.log(cardsOfTargetType);
-
         const newFragments: FragmentType[] = [];
 
         for (const zone of config.zones[targetCard.type]) {
           for (let i = 0; i < 3; i++) {
-            console.log(i);
             const j = Math.floor(Math.random() * cardsOfTargetType.length);
-            console.log(j, "/", cardsOfTargetType.length);
             const distractor = cardsOfTargetType.splice(j, 1)[0];
             if (!distractor) {
               break;
             }
             if (distractor.title === targetCard.title) {
-              console.log("already saw the card");
               i--;
               continue;
             }
@@ -132,14 +130,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
         setPhase("challenge");
       });
     });
-  }, [
-    config.expansion,
-    config.house,
-    config.cardTypes,
-    config.zones,
-    correctCards,
-    onFinish,
-  ]);
+  }, [config.expansion, config.house, config.zones, correctCards, onFinish]);
 
   // This effect is intended to run only once, hence the empty deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
