@@ -62,6 +62,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
               }
               return cardHouse.includes(config.house);
             }
+            return true;
           }),
         )
         .then((cards) => {

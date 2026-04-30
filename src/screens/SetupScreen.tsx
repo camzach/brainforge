@@ -59,15 +59,15 @@ export function SetupScreen({ onStart }: Props) {
     openCardDB()
       .then(() => getCardsByExpansion(expansion))
       .then((cards) =>
-        cards.filter((c) => {
-          if (house !== null) {
-            const cardHouse = getCardHouse(c, expansion);
-            if (typeof cardHouse === "string") {
-              return cardHouse === house;
-            }
-            return cardHouse.includes(house);
-          }
-        }),
+        house === null
+          ? cards
+          : cards.filter((c) => {
+              const cardHouse = getCardHouse(c, expansion);
+              if (typeof cardHouse === "string") {
+                return cardHouse === house;
+              }
+              return cardHouse.includes(house);
+            }),
       )
       .then((cards) => {
         const dedupedTypes = new Set<CardKind>();
