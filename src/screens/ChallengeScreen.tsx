@@ -49,88 +49,125 @@ export function ChallengeScreen({ config, onFinish }: Props) {
 
   const loadNextCard = useCallback(() => {
     openCardDB().then(() => {
-      getCardsByExpansion(config.expansion).then((cards) => {
-        const incompleteCards = cards.filter((c) => {
-          if (correctCards.includes(c.title)) {
-            return false;
-          }
-          if (config.house !== null) {
-            const cardHouse = getCardHouse(c, config.expansion);
-            if (typeof cardHouse === "string") {
-              return cardHouse === config.house;
+      getCardsByExpansion(config.expansion)
+        .then((cards) =>
+          cards.filter((c) => {
+            if (!config.cardTypes.has(c.type)) {
+              return false;
             }
-            return cardHouse.includes(config.house);
-          }
-        });
-
-        if (incompleteCards.length === 0) {
-          onFinish(correctCards.length);
-          return;
-        }
-
-        const targetCard = pickRandom(incompleteCards);
-        setCard(targetCard);
-
-        const targetHouseOrHouses = getCardHouse(targetCard, config.expansion);
-        const targetHouse =
-          config.house ??
-          (Array.isArray(targetHouseOrHouses)
-            ? pickRandom(targetHouseOrHouses)
-            : targetHouseOrHouses);
-
-        setCardHouse(targetHouse);
-
-        const cardsOfTargetType = cards.filter((c) => {
-          if (c.type !== targetCard.type) {
-            return false;
-          }
-          const distractorHouse = getCardHouse(c, config.expansion);
-          if (typeof distractorHouse === "string") {
-            return targetHouse === distractorHouse;
-          }
-          return distractorHouse.includes(targetHouse);
-        });
-
-        const newFragments: FragmentType[] = [];
-
-        for (const zone of config.zones[targetCard.type]) {
-          for (let i = 0; i < 3; i++) {
-            const j = Math.floor(Math.random() * cardsOfTargetType.length);
-            const distractor = cardsOfTargetType.splice(j, 1)[0];
-            if (!distractor) {
-              break;
+            if (config.house !== null) {
+              const cardHouse = getCardHouse(c, config.expansion);
+              if (typeof cardHouse === "string") {
+                return cardHouse === config.house;
+              }
+              return cardHouse.includes(config.house);
             }
-            if (distractor.title === targetCard.title) {
-              i--;
-              continue;
+          }),
+        )
+        .then((cards) => {
+          const incompleteCards = cards.filter(
+            (c) => !correctCards.includes(c.title),
+          );
+
+          if (incompleteCards.length === 0) {
+            onFinish(correctCards.length);
+            return;
+          }
+
+          const targetCard = pickRandom(incompleteCards);
+          setCard(targetCard);
+
+          const targetHouseOrHouses = getCardHouse(
+            targetCard,
+            config.expansion,
+          );
+          const targetHouse =
+            config.house ??
+            (Array.isArray(targetHouseOrHouses)
+              ? pickRandom(targetHouseOrHouses)
+              : targetHouseOrHouses);
+
+          setCardHouse(targetHouse);
+
+          const cardsOfTargetType = cards.filter((c) => {
+            if (c.type !== targetCard.type) {
+              return false;
+            }
+            const distractorHouse = getCardHouse(c, config.expansion);
+            if (typeof distractorHouse === "string") {
+              return targetHouse === distractorHouse;
+            }
+            return distractorHouse.includes(targetHouse);
+          });
+
+          const newFragments: FragmentType[] = [];
+
+          for (const zone of config.zones[targetCard.type]) {
+            const usedCards = new Set<string>([targetCard.title]);
+            const usedValues = new Set<number | undefined>(
+              zone in targetCard
+                ? [
+                    targetCard[zone as keyof typeof targetCard] as
+                      | number
+                      | undefined,
+                  ]
+                : [],
+            );
+
+            for (let i = 0; i < 3; i++) {
+              const eligibleCards = cardsOfTargetType.filter((c) => {
+                if (usedCards.has(c.title)) return false;
+                if (
+                  (zone === "power" || zone === "armor") &&
+                  usedValues.has(c[zone])
+                ) {
+                  return false;
+                }
+                return true;
+              });
+
+              if (eligibleCards.length > 0) {
+                const distractor = pickRandom(eligibleCards);
+                console.log(zone, distractor);
+                usedCards.add(distractor.title);
+                if (zone === "power" || zone === "armor") {
+                  usedValues.add(distractor[zone]);
+                }
+                newFragments.push({
+                  id: makeId(),
+                  zone,
+                  card: distractor,
+                  isCorrect: false,
+                });
+              }
             }
             newFragments.push({
               id: makeId(),
               zone,
-              card: distractor,
-              isCorrect: false,
+              card: targetCard,
+              isCorrect: true,
             });
           }
-          newFragments.push({
-            id: makeId(),
-            zone,
-            card: targetCard,
-            isCorrect: true,
-          });
-        }
-        for (let i = newFragments.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * i);
-          [newFragments[i], newFragments[j]] = [
-            newFragments[j],
-            newFragments[i],
-          ];
-        }
-        setFragments(newFragments);
+          for (let i = newFragments.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * i);
+            [newFragments[i], newFragments[j]] = [
+              newFragments[j],
+              newFragments[i],
+            ];
+          }
+          setFragments(newFragments);
 
-        setPhase("challenge");
-      });
+          setPhase("challenge");
+        });
     });
-  }, [config.expansion, config.house, config.zones, correctCards, onFinish]);
+  }, [
+    config.cardTypes,
+    config.expansion,
+    config.house,
+    config.zones,
+    correctCards,
+    onFinish,
+  ]);
 
   // This effect is intended to run only once, hence the empty deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
