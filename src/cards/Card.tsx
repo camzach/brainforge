@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import type { Card } from "../types";
-import { getClipPath, loadCardImage, type Zone } from "./card-utils";
+import {
+  FOUR_AEMBER,
+  getClipPath,
+  loadCardImage,
+  type Zone,
+} from "./card-utils";
 import classNames from "classnames";
 
 type Props = {
@@ -11,7 +16,13 @@ type Props = {
   onImageError?: () => void;
 };
 
-export function Card({ card, house, hiddenZones = [], showResults, onImageError }: Props) {
+export function Card({
+  card,
+  house,
+  hiddenZones = [],
+  showResults,
+  onImageError,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -26,10 +37,14 @@ export function Card({ card, house, hiddenZones = [], showResults, onImageError 
         ctx.drawImage(image, 0, 0, 300, 420);
 
         for (const zone of hiddenZones) {
-          const path = getClipPath(card, zone);
-          if (!path) continue;
           ctx.fillStyle = "black";
-          ctx.fill(path.path);
+          if (zone === "amber") {
+            ctx.fill(FOUR_AEMBER);
+          } else {
+            const path = getClipPath(card, zone);
+            if (!path) continue;
+            ctx.fill(path.path);
+          }
         }
 
         if (showResults) {
@@ -51,7 +66,7 @@ export function Card({ card, house, hiddenZones = [], showResults, onImageError 
           onImageError();
         }
       });
-  }, [card, hiddenZones, house, showResults]);
+  }, [card, hiddenZones, house, onImageError, showResults]);
 
   return (
     <canvas

@@ -34,7 +34,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
     traits: null,
     power: null,
     armor: null,
-    pips: null,
+    amber: null,
     rules: null,
   });
   const [results, setResults] = useState<Record<Zone, boolean>>({
@@ -42,7 +42,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
     traits: false,
     power: false,
     armor: false,
-    pips: false,
+    amber: false,
     rules: false,
   });
   const [correctCards, setCorrectCards] = useState<string[]>([]);
@@ -101,6 +101,8 @@ export function ChallengeScreen({ config, onFinish }: Props) {
             return distractorHouse.includes(targetHouse);
           });
 
+          const cardsOfTargetTypeAllHouses = cards.filter((c) => c.type === targetCard.type);
+
           const newFragments: FragmentType[] = [];
 
           for (const zone of config.zones[targetCard.type]) {
@@ -112,40 +114,56 @@ export function ChallengeScreen({ config, onFinish }: Props) {
                       | number
                       | undefined,
                   ]
-                : [],
+                : [0],
             );
 
+            const cardPool = (zone === "power" || zone === "armor" || zone === "amber") 
+              ? cardsOfTargetTypeAllHouses 
+              : cardsOfTargetType;
+
             for (let i = 0; i < 3; i++) {
-              const eligibleCards = cardsOfTargetType.filter((c) => {
+              const eligibleCards = cardPool.filter((c) => {
                 if (usedCards.has(c.title)) return false;
-                if (
-                  (zone === "power" || zone === "armor") &&
-                  usedValues.has(c[zone])
-                ) {
-                  return false;
+                if (zone === "power" || zone === "armor" || zone === "amber") {
+                  const cardValue = c[zone] ?? 0;
+                  if (usedValues.has(cardValue)) {
+                    return false;
+                  }
                 }
                 return true;
               });
 
               if (eligibleCards.length > 0) {
                 const distractor = pickRandom(eligibleCards);
+                console.log(usedValues, targetCard[zone], distractor[zone]);
                 console.log(zone, distractor);
                 usedCards.add(distractor.title);
-                if (zone === "power" || zone === "armor") {
-                  usedValues.add(distractor[zone]);
+                if (zone === "power" || zone === "armor" || zone === "amber") {
+                  const distractorValue = (distractor[
+                    zone as keyof typeof distractor
+                  ] ?? 0) as number;
+                  usedValues.add(distractorValue);
                 }
+                const distractorHouseData = getCardHouse(distractor, config.expansion);
+                const distractorHouse = Array.isArray(distractorHouseData) 
+                  ? pickRandom(distractorHouseData) 
+                  : distractorHouseData;
                 newFragments.push({
                   id: makeId(),
                   zone,
                   card: distractor,
+                  house: distractorHouse,
                   isCorrect: false,
                 });
+              } else {
+                console.log("exhausted eligible cards");
               }
             }
             newFragments.push({
               id: makeId(),
               zone,
               card: targetCard,
+              house: targetHouse,
               isCorrect: true,
             });
           }
@@ -196,7 +214,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
       traits: false,
       power: false,
       armor: false,
-      pips: false,
+      amber: false,
       rules: false,
     };
 
@@ -254,7 +272,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
                       <Fragment
                         key={fragment.id}
                         card={fragment.card}
-                        house={cardHouse!}
+                        house={fragment.house}
                         zone={fragment.zone}
                         selected={
                           selections[zone]?.includes(fragment.id) ?? false
@@ -304,7 +322,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
                   <div className="result-fragment">
                     <Fragment
                       card={fragment.card}
-                      house={cardHouse!}
+                      house={fragment.house}
                       zone={zone}
                     />
                     <span>{results[zone] ? "✓" : "✗"}</span>

@@ -1,16 +1,29 @@
 import type { Card, CardKind, Expansion } from "../types";
 import { getCardImageUrl } from "./card-image-utils";
 
-export type Zone = "pips" | "rules" | "power" | "armor" | "traits" | "name";
+export type Zone = "amber" | "rules" | "power" | "armor" | "traits" | "name";
 
 export const ZONE_DISPLAY: Record<Zone, string> = {
-  pips: "Pips",
+  amber: "Æmber",
   rules: "Rules Text",
   power: "Power",
   armor: "Armor",
   traits: "Traits",
   name: "Name",
 };
+
+const ONE_AEMBER = new Path2D(
+  "m 21.408915 59.436964 11.799549 10.113902 2.528481 -2.287672 11.317943 -0.842759 9.7527 14.689247 -4.81615 9.752655 -15.772887 4.575383 -14.809636 12.04033 -6.260992 -2.64888 -0.722419 -40.21482 z",
+);
+const TWO_AEMBER = new Path2D(
+  "m 21.529311 59.918589 10.95673 8.789442 3.973323 -1.926425 10.354722 -0.120567 9.87309 14.568832 -6.260991 10.354696 -8.789458 2.889713 0.240794 4.816139 6.863002 0.240756 7.946638 13.485205 -6.020179 9.2711 -8.789461 5.17735 -5.658974 -0.602 -15.05046 14.20762 -5.899778 -4.57534 V 64.132498 Z",
+);
+const THREE_AEMBER = new Path2D(
+  "m 14.864523 64.385008 0.510829 100.803632 5.789401 3.91638 12.430179 -11.40854 8.513824 0.17046 12.941012 -9.70576 1.021659 -8.5138 -8.002991 -9.19495 -6.81106 0.34054 0.85138 -2.55417 8.684099 -4.93803 5.789401 -8.5138 -6.470498 -12.77076 -6.81106 -1.36218 0.480983 -5.219221 5.989515 -2.783773 7.32189 -9.876056 -9.194929 -14.132939 -11.067971 -0.340535 -4.256914 1.702752 -10.386859 -10.38686 z",
+);
+export const FOUR_AEMBER = new Path2D(
+  "m 21.079612 59.532094 11.408519 9.450369 3.916363 -2.554167 10.982833 0.255496 9.109788 13.536983 -5.363709 10.301707 -8.088129 2.383899 -0.08511 6.470513 5.95968 0.936496 7.832719 12.60045 -5.533992 8.59899 -9.02465 6.12994 v 2.80955 l 6.215093 0.085 7.407027 8.5138 v 8.68411 l -13.877529 9.7909 0.340535 2.12844 2.469011 -0.17045 11.49366 13.45183 -3.490669 13.02618 -11.66394 6.98131 -4.256915 -0.25549 -15.495161 13.87755 -5.448839 -3.91638 -0.510829 -138.094187 z",
+);
 
 export type ZoneRect = { pos: [number, number]; size: [number, number] };
 
@@ -19,12 +32,12 @@ export const cardTypeZoneMaps: Record<
   Partial<Record<Zone, { bbox: ZoneRect; path: Path2D }>>
 > = {
   Creature: {
-    pips: {
+    amber: {
       bbox: {
-        pos: [10, 60],
-        size: [50, 125],
+        pos: [14, 60],
+        size: [42, 148],
       },
-      path: new Path2D("M 10 60 l 50 0 l 0 125 l -50 0 z"),
+      path: new Path2D(), // Placeholder - actual path determined dynamically in getClipPath
     },
     name: {
       bbox: {
@@ -69,6 +82,13 @@ export const cardTypeZoneMaps: Record<
     },
   },
   TokenCreature: {
+    amber: {
+      bbox: {
+        pos: [10, 60],
+        size: [50, 125],
+      },
+      path: new Path2D(), // Placeholder - actual path determined dynamically in getClipPath
+    },
     name: {
       bbox: {
         pos: [70, 220],
@@ -92,6 +112,13 @@ export const cardTypeZoneMaps: Record<
     },
   },
   Action: {
+    amber: {
+      bbox: {
+        pos: [10, 60],
+        size: [50, 125],
+      },
+      path: new Path2D(), // Placeholder - actual path determined dynamically in getClipPath
+    },
     name: {
       bbox: {
         pos: [28, 218],
@@ -110,12 +137,12 @@ export const cardTypeZoneMaps: Record<
     },
   },
   Artifact: {
-    pips: {
+    amber: {
       bbox: {
         pos: [10, 60],
         size: [50, 125],
       },
-      path: new Path2D("M 10 60 l 50 0 l 0 125 l -50 0 z"),
+      path: new Path2D(), // Placeholder - actual path determined dynamically in getClipPath
     },
     name: {
       bbox: {
@@ -142,6 +169,13 @@ export const cardTypeZoneMaps: Record<
     },
   },
   Upgrade: {
+    amber: {
+      bbox: {
+        pos: [10, 60],
+        size: [50, 125],
+      },
+      path: new Path2D(), // Placeholder - actual path determined dynamically in getClipPath
+    },
     name: {
       bbox: {
         pos: [30, 15],
@@ -150,13 +184,6 @@ export const cardTypeZoneMaps: Record<
       path: new Path2D(
         "M 44.402624,29.199867 C 111.78441,10.867753 194.63993,9.0861613 260.63799,30.684781 l 12.42003,20.456521 -20.63916,10.410908 c -67.38429,-18.748446 -135.66329,-20.49741 -205.113155,0 L 30.752833,46.115807 Z",
       ),
-    },
-    pips: {
-      bbox: {
-        pos: [10, 60],
-        size: [50, 125],
-      },
-      path: new Path2D("M 10 60 l 50 0 l 0 125 l -50 0 z"),
     },
     rules: {
       bbox: {
@@ -181,8 +208,19 @@ export function getClipPath(
   card: Card,
   zone: Zone,
 ): { bbox: ZoneRect; path: Path2D } | undefined {
-  if (zone === "pips" && card.amber !== undefined) {
-    // return getPipsRect(card.amber);
+  if (zone === "amber" && card.amber !== undefined) {
+    const amberPath = [ONE_AEMBER, TWO_AEMBER, THREE_AEMBER, FOUR_AEMBER][
+      card.amber - 1
+    ];
+    if (amberPath) {
+      return {
+        bbox: {
+          pos: [10, 60],
+          size: [50, 125],
+        },
+        path: amberPath,
+      };
+    }
   }
   if (card.type in cardTypeZoneMaps) {
     const zoneMap = cardTypeZoneMaps[card.type];

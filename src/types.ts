@@ -76,6 +76,7 @@ export type Fragment = {
   id: string;
   zone: Zone;
   card: Card;
+  house: string;
   isCorrect: boolean;
 };
 

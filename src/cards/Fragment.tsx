@@ -20,10 +20,22 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
 
   useEffect(() => {
     if (!canvasRef.current) return;
-    if (!path) return;
 
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
+
+    // Handle 0 pips case - show placeholder
+    if (zone === "amber" && card.amber === 0) {
+      ctx.fillStyle = "#333";
+      ctx.fillRect(0, 0, path?.bbox.size[0] || 50, path?.bbox.size[1] || 125);
+      ctx.fillStyle = "#666";
+      ctx.font = "12px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("0", (path?.bbox.size[0] || 50) / 2, (path?.bbox.size[1] || 125) / 2);
+      return;
+    }
+
+    if (!path) return;
 
     loadCardImage(card.slug, house).then((image) => {
       sketchpadCtx.save();
