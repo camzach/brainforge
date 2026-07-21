@@ -1,5 +1,5 @@
 import type { Card, CardKind, Expansion } from "../types";
-import { normalizeHouseForUrl, getCardImageUrl } from "./card-image-utils";
+import { getCardImageUrl } from "./card-image-utils";
 
 export type Zone = "pips" | "rules" | "power" | "armor" | "traits" | "name";
 

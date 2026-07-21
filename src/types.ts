@@ -42,6 +42,7 @@ export type Card = {
   armor?: number;
   amber?: number;
   house: HouseData;
+  expansions: Expansion[];
 };
 
 export const Expansions: Record<Expansion, string> = {
