@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "degit --force keyteki/keyteki/master-vault-data/packs packs && npm run build:cards",
+    "prebuild": "pnpm build:cards",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:cards": "node scripts/build-cards.cjs",
+    "build:cards": "degit --force keyteki/keyteki/master-vault-data/packs packs && node scripts/build-cards.cjs",
     "test:images": "tsx scripts/test-card-images.ts"
   },
   "dependencies": {

@@ -33,6 +33,10 @@ jobs:
         env:
           NODE_ENV: production
           VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
+      - name: Test Card Images
+        run: pnpm test:images
+        env:
+          VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
