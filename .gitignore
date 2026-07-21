@@ -2,3 +2,7 @@ node_modules
 dist
 .env
 
+# Generated card database bundles (created at build time)
+public/card-db.bin
+public/card-db.version.json
+packs

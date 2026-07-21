@@ -1,7 +1,8 @@
+import { decode } from "@msgpack/msgpack";
 import type { Card, CardKind, Expansion } from "../types";
 
 const DB_NAME = "card-db";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 const STORE_NAME = "cards";
 
 const INDEX_CARD_TYPE = "cardType";
@@ -10,12 +11,22 @@ const INDEX_HOUSE = "houseIdx";
 
 let dbInstance: IDBDatabase | null = null;
 
+async function loadCardDatabase(): Promise<Card[]> {
+  const response = await fetch("/brainforge/card-db.bin");
+  if (!response.ok) {
+    throw new Error(`Failed to load card database: ${response.statusText}`);
+  }
+  const buffer = await response.arrayBuffer();
+  const cards = decode(new Uint8Array(buffer)) as Card[];
+  return cards;
+}
+
 export async function openCardDB(): Promise<IDBDatabase> {
   if (dbInstance) {
     return dbInstance;
   }
 
-  const cards = (await import("../../filtered-cards.json")).default;
+  const cards = await loadCardDatabase();
 
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
