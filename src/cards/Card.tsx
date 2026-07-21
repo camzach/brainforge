@@ -8,9 +8,10 @@ type Props = {
   house: string;
   hiddenZones?: Zone[];
   showResults?: Partial<Record<Zone, boolean>>;
+  onImageError?: () => void;
 };
 
-export function Card({ card, house, hiddenZones = [], showResults }: Props) {
+export function Card({ card, house, hiddenZones = [], showResults, onImageError }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -20,30 +21,36 @@ export function Card({ card, house, hiddenZones = [], showResults }: Props) {
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
 
-    loadCardImage(card.slug, house).then((image) => {
-      ctx.drawImage(image, 0, 0, 300, 420);
+    loadCardImage(card.slug, house)
+      .then((image) => {
+        ctx.drawImage(image, 0, 0, 300, 420);
 
-      for (const zone of hiddenZones) {
-        const path = getClipPath(card, zone);
-        if (!path) continue;
-        ctx.fillStyle = "black";
-        ctx.fill(path.path);
-      }
-
-      if (showResults) {
         for (const zone of hiddenZones) {
-          const isCorrect = showResults[zone];
-          if (isCorrect === undefined) continue;
           const path = getClipPath(card, zone);
           if (!path) continue;
-          ctx.strokeStyle = isCorrect ? "#22c55e" : "#ef4444";
-          ctx.lineWidth = 4;
-          ctx.stroke(path.path);
+          ctx.fillStyle = "black";
+          ctx.fill(path.path);
         }
-      }
 
-      setLoaded(true);
-    });
+        if (showResults) {
+          for (const zone of hiddenZones) {
+            const isCorrect = showResults[zone];
+            if (isCorrect === undefined) continue;
+            const path = getClipPath(card, zone);
+            if (!path) continue;
+            ctx.strokeStyle = isCorrect ? "#22c55e" : "#ef4444";
+            ctx.lineWidth = 4;
+            ctx.stroke(path.path);
+          }
+        }
+
+        setLoaded(true);
+      })
+      .catch(() => {
+        if (onImageError) {
+          onImageError();
+        }
+      });
   }, [card, hiddenZones, house, showResults]);
 
   return (

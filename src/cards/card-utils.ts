@@ -1,4 +1,5 @@
 import type { Card, CardKind, Expansion } from "../types";
+import { normalizeHouseForUrl, getCardImageUrl } from "./card-image-utils";
 
 export type Zone = "pips" | "rules" | "power" | "armor" | "traits" | "name";
 
@@ -207,14 +208,7 @@ export function getCardHouse(card: Card, expansion: Expansion) {
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
 export function loadCardImage(slug: string, house: string) {
-  let uriHouse = house.toLowerCase();
-  if (uriHouse === "skybeast") {
-    uriHouse = "skyborn";
-  }
-  if (uriHouse === "revenant") {
-    uriHouse = "geistoid";
-  }
-  const src = `${import.meta.env.VITE_CARD_IMAGE_BASEURL}${uriHouse}/${slug}.png`;
+  const src = getCardImageUrl(slug, house);
   const cachedPromise = imageCache.get(src);
   if (cachedPromise) {
     return cachedPromise;

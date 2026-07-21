@@ -178,8 +178,14 @@ function transformCard(keytekiCard, expansionCode) {
     return null;
   }
 
-  // Generate slug from card name: split on spaces, remove non-alphanumeric, join with hyphens, lowercase
-  const slug = keytekiCard.name.split(/\s+/).map(part => part.replace(/[^a-zA-Z0-9]/g, '')).filter(part => part.length > 0).join('-').toLowerCase();
+  // Generate slug from card name: lowercase first, replace æ with ae, split on spaces, remove non-alphanumeric, join with hyphens
+  const slug = keytekiCard.name
+    .toLowerCase()
+    .replace(/æ/g, 'ae')  // Replace æ with ae after lowercasing
+    .split(/\s+/)
+    .map(part => part.replace(/[^a-z0-9]/g, ''))
+    .filter(part => part.length > 0)
+    .join('-');
 
   // Check if this card has a forced house override
   if (FORCED_HOUSE_CARDS[slug]) {
@@ -195,23 +201,29 @@ function transformCard(keytekiCard, expansionCode) {
     };
   }
 
-  // Handle Revenant/Skybeast/Anomaly cards (can go in any house in their expansion)
-  // GR: Revenants have card numbers starting with "R" (R01-R11)
-  // AS/CC: Skybeasts are identified by card ID
-  // Anomalies: Cards with expansion ID 453 (appear in WC, WoE, PV, VM25)
+  // Handle special card types
+  // GR: Revenants have card numbers starting with "R" (R01-R11) - can go in any house in their expansion
+  // AS/CC: Skybeasts are identified by card ID - go in "Skybeast" house
+  // Anomalies: Cards with expansion ID 453 (appear in WC, WoE, PV, VM25) - go in "Anomaly" house and expansion
   let house;
+  let expansion;
   const isRevenant =
     expansionCode === "GR" && keytekiCard.number?.startsWith("R");
   const isSkybeast = SKYBEAST_IDS.has(keytekiCard.id);
   const isAnomaly = keytekiCard.expansion === ANOMALY_EXPANSION_ID;
 
-  if (
-    (isRevenant || isSkybeast || isAnomaly) &&
-    EXPANSION_HOUSES[expansionCode]
-  ) {
+  if (isSkybeast) {
+    house = "Skybeast";
+    expansion = EXPANSION_MAP[expansionCode];
+  } else if (isAnomaly) {
+    house = "Anomaly";
+    expansion = "ANOMALY_EXPANSION";
+  } else if (isRevenant && EXPANSION_HOUSES[expansionCode]) {
     house = EXPANSION_HOUSES[expansionCode];
+    expansion = EXPANSION_MAP[expansionCode];
   } else {
     house = normalizeHouse(keytekiCard.house);
+    expansion = EXPANSION_MAP[expansionCode];
   }
 
   return {
@@ -222,7 +234,7 @@ function transformCard(keytekiCard, expansionCode) {
     power: keytekiCard.power || undefined,
     armor: keytekiCard.armor || undefined,
     house: house,
-    expansion: EXPANSION_MAP[expansionCode],
+    expansion: expansion,
   };
 }
 
