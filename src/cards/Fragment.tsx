@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Card, Fragment } from "../types";
 import { getClipPath, loadCardImage, type Zone } from "./card-utils";
 import classNames from "classnames";
@@ -16,10 +16,37 @@ type Props = {
 
 export function Fragment({ card, house, zone, selected, onClick }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const path = getClipPath(card, zone);
 
+  // Set up IntersectionObserver to detect when canvas is visible
   useEffect(() => {
     if (!canvasRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect(); // Stop observing once visible
+          }
+        });
+      },
+      {
+        rootMargin: "50px", // Start loading slightly before entering viewport
+      }
+    );
+
+    observer.observe(canvasRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // Only load and render image when visible
+  useEffect(() => {
+    if (!canvasRef.current || !isVisible) return;
 
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
@@ -53,7 +80,7 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
         ...path.bbox.size,
       );
     });
-  }, [card, house, path, zone]);
+  }, [card, house, path, zone, isVisible]);
 
   const aspectRatio = path && path.bbox.size[1] > 0
     ? path.bbox.size[0] / path.bbox.size[1]

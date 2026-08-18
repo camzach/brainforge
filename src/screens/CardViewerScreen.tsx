@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { getAllCards } from "../cards/card-db";
 import { Fragment } from "../cards/Fragment";
-import { Card as CardComponent } from "../cards/Card";
 import type { Card, CardKind, Expansion } from "../types";
 import { Expansions } from "../types";
 import { cardTypeZoneMaps, getCardHouse, ZONE_DISPLAY, type Zone } from "../cards/card-utils";
+import { getCardImageUrl } from "../cards/card-image-utils";
 
 const CARD_TYPES: CardKind[] = ["Creature", "TokenCreature", "Action", "Artifact", "Upgrade"];
 
@@ -382,10 +382,16 @@ export function CardViewerScreen() {
           return (
             <div key={`${card.slug}-${index}`} style={styles.cardItem}>
               <div style={styles.cardPreview}>
-                <CardComponent 
-                  card={card} 
-                  house={house}
-                  onImageError={() => handleImageError(card.slug)}
+                <img
+                  src={getCardImageUrl(card.slug, house)}
+                  alt={card.title}
+                  loading="lazy"
+                  onError={() => handleImageError(card.slug)}
+                  style={{
+                    height: "420px",
+                    width: "300px",
+                    objectFit: "contain",
+                  }}
                 />
               </div>
               
