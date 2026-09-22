@@ -40,8 +40,8 @@ function testImageUrl(url: string): Promise<TestResult> {
       hostname: urlObj.hostname,
       path: urlObj.pathname + urlObj.search,
       headers: {
-        'Origin': 'https://camza.ch',
-        'Referer': 'https://camza.ch/brainforge',
+        'Origin': 'https://brainforge.camza.ch',
+        'Referer': 'https://brainforge.camza.ch/',
         'User-Agent': 'Mozilla/5.0 (compatible; BrainForge-ImageTest/1.0)',
       },
     };
@@ -52,7 +52,7 @@ function testImageUrl(url: string): Promise<TestResult> {
       
       // Check for CORS headers
       const corsHeader = response.headers['access-control-allow-origin'];
-      const hasCors = corsHeader === '*' || corsHeader === 'https://camza.ch';
+      const hasCors = corsHeader === '*' || corsHeader === 'https://brainforge.camza.ch' || corsHeader === 'https://camza.ch';
       
       // Consume response data to free up memory
       response.resume();

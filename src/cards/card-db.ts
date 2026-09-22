@@ -12,7 +12,7 @@ const INDEX_HOUSE = "houseIdx";
 let dbInstance: IDBDatabase | null = null;
 
 async function loadCardDatabase(): Promise<Card[]> {
-  const response = await fetch("/brainforge/card-db.bin");
+  const response = await fetch(`${import.meta.env.BASE_URL}card-db.bin`);
   if (!response.ok) {
     throw new Error(`Failed to load card database: ${response.statusText}`);
   }

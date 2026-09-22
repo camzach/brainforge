@@ -6,3 +6,4 @@ dist
 public/card-db.bin
 public/card-db.version.json
 packs
+filtered-cards.json
