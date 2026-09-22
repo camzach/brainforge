@@ -135,8 +135,6 @@ export function ChallengeScreen({ config, onFinish }: Props) {
 
               if (eligibleCards.length > 0) {
                 const distractor = pickRandom(eligibleCards);
-                console.log(usedValues, targetCard[zone], distractor[zone]);
-                console.log(zone, distractor);
                 usedCards.add(distractor.title);
                 if (zone === "power" || zone === "armor" || zone === "amber") {
                   const distractorValue = (distractor[
