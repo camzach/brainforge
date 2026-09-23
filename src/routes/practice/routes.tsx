@@ -31,12 +31,10 @@ export const practicePlayRoute = createRoute({
 
     if (!config) {
       return (
-        <div id="center">
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px", padding: "64px 24px" }}>
           <h2>Invalid practice configuration</h2>
-          <p>Please select an expansion and card types from the setup screen.</p>
-          <Link to="/practice/setup" style={{ textDecoration: "none" }}>
-            <button style={{ marginTop: "1rem" }}>← Return to Setup</button>
-          </Link>
+          <p style={{ color: "var(--text)" }}>Please select an expansion and card types from the setup screen.</p>
+          <Link to="/practice/setup" className="btn btn-primary">← Return to Setup</Link>
         </div>
       );
     }

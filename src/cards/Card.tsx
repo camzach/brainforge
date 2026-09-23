@@ -6,7 +6,7 @@ import {
   loadCardImage,
   type Zone,
 } from "./card-utils";
-import classNames from "classnames";
+import styles from "./Card.module.css";
 
 type Props = {
   card: Card;
@@ -32,12 +32,17 @@ export function Card({
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
 
+    const style = getComputedStyle(canvasRef.current);
+    const bgColor = style.getPropertyValue("--bg").trim();
+    const correctColor = style.getPropertyValue("--color-correct").trim();
+    const incorrectColor = style.getPropertyValue("--color-incorrect").trim();
+
     loadCardImage(card.slug, house)
       .then((image) => {
         ctx.drawImage(image, 0, 0, 300, 420);
 
         for (const zone of hiddenZones) {
-          ctx.fillStyle = "black";
+          ctx.fillStyle = bgColor;
           if (zone === "amber") {
             ctx.fill(FOUR_AEMBER);
           } else {
@@ -53,7 +58,7 @@ export function Card({
             if (isCorrect === undefined) continue;
             const path = getClipPath(card, zone);
             if (!path) continue;
-            ctx.strokeStyle = isCorrect ? "#22c55e" : "#ef4444";
+            ctx.strokeStyle = isCorrect ? correctColor : incorrectColor;
             ctx.lineWidth = 4;
             ctx.stroke(path.path);
           }
@@ -62,16 +67,18 @@ export function Card({
         setLoaded(true);
       })
       .catch(() => {
-        if (onImageError) {
-          onImageError();
-        }
+        if (onImageError) onImageError();
       });
   }, [card, hiddenZones, house, onImageError, showResults]);
 
+  const classList = [
+    styles.canvas,
+    !loaded ? styles.placeholder : "",
+  ].filter(Boolean).join(" ");
+
   return (
     <canvas
-      style={{ height: "420px", width: "300px" }}
-      className={classNames(!loaded && "no-card")}
+      className={classList}
       height="420px"
       width="300px"
       ref={canvasRef}

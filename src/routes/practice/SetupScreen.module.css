@@ -1,0 +1,231 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 40px 32px 80px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (max-width: 640px) {
+    padding: 28px 20px 64px;
+  }
+}
+
+.back {
+  margin-bottom: 32px;
+}
+
+.header {
+  margin-bottom: 36px;
+}
+
+.header h1 {
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--text);
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.sectionHint {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 6px;
+}
+
+/* ── Select ───────────────────────────────────────────────────────────────── */
+
+.select {
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  align-self: flex-start;
+  min-width: 220px;
+  transition: border-color 0.12s;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── Connected Button Group (Houses) ─────────────────────────────────────────── */
+
+.toggleGroup {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.toggle {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, color 0.12s, z-index 0.12s;
+  margin-left: -1px;
+  user-select: none;
+}
+
+.toggle:first-child {
+  margin-left: 0;
+  border-top-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.toggle:last-child {
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.toggle:hover {
+  border-color: var(--border-strong);
+  color: var(--text-h);
+  z-index: 1;
+}
+
+.toggle.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+  z-index: 2;
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  z-index: 3;
+}
+
+/* ── Checkboxes (Legacy/Fallback) ───────────────────────────────────────────── */
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-h);
+}
+
+.checkboxLabel input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+/* ── Toggle Buttons (Card types / Zones) ────────────────────────────────────── */
+
+.buttonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.buttonGroupLabel {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+  user-select: none;
+}
+
+.buttonGroupLabel:hover {
+  border-color: var(--border-strong);
+  color: var(--text-h);
+}
+
+.buttonGroupLabel.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.buttonGroupLabel:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Visually hide checkboxes but keep accessible */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+
+.footer {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footerHint {
+  font-size: 13px;
+  color: var(--text-dim);
+}

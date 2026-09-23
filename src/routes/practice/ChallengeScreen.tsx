@@ -18,6 +18,7 @@ import { queryCards } from "../../cards/card-db";
 import { loadCardImage } from "../../cards/card-utils";
 import { Card } from "../../cards/Card";
 import { Fragment } from "../../cards/Fragment";
+import styles from "./ChallengeScreen.module.css";
 
 type Props = {
   config: GameConfig;
@@ -51,8 +52,10 @@ export function ChallengeScreen({ config }: Props) {
   });
   const [correctCards, setCorrectCards] = useState<string[]>([]);
 
-  // Stable ref so loadNextCard can always read the latest correctCards
-  // without being re-created every time correctCards changes.
+  const totalCards = allCards?.length ?? 0;
+  const completedCards = correctCards.length;
+  const percent = totalCards > 0 ? (completedCards / totalCards) * 100 : 0;
+
   const correctCardsRef = useRef(correctCards);
   useEffect(() => {
     correctCardsRef.current = correctCards;
@@ -62,116 +65,128 @@ export function ChallengeScreen({ config }: Props) {
     setFinalScore(score);
   }, []);
 
-  const loadNextCard = useCallback((cards: CardType[]) => {
-    const incompleteCards = cards.filter(
-      (c) => !correctCardsRef.current.includes(c.title),
-    );
-
-    if (incompleteCards.length === 0) {
-      handleFinish(correctCardsRef.current.length);
-      return;
-    }
-
-    const targetCard = pickRandom(incompleteCards);
-    setCard(targetCard);
-
-    const targetHouseOrHouses = getCardHouse(targetCard, config.expansion);
-    const targetHouse: House =
-      config.house ??
-      (Array.isArray(targetHouseOrHouses)
-        ? pickRandom(targetHouseOrHouses)
-        : targetHouseOrHouses);
-
-    setCardHouse(targetHouse);
-
-    const cardsOfTargetType = cards.filter((c) => {
-      if (c.type !== targetCard.type) return false;
-      const distractorHouse = getCardHouse(c, config.expansion);
-      if (typeof distractorHouse === "string") {
-        return targetHouse === distractorHouse;
-      }
-      return Array.isArray(distractorHouse) && distractorHouse.includes(targetHouse);
-    });
-
-    const cardsOfTargetTypeAllHouses = cards.filter(
-      (c) => c.type === targetCard.type,
-    );
-
-    const newFragments: FragmentType[] = [];
-
-    for (const zone of config.zones[targetCard.type]) {
-      const usedCards = new Set<string>([targetCard.title]);
-      const usedValues = new Set<number | undefined>(
-        zone in targetCard
-          ? [targetCard[zone as keyof typeof targetCard] as number | undefined]
-          : [0],
+  const loadNextCard = useCallback(
+    (cards: CardType[]) => {
+      const incompleteCards = cards.filter(
+        (c) => !correctCardsRef.current.includes(c.title),
       );
 
-      const cardPool =
-        zone === "power" || zone === "armor" || zone === "amber"
-          ? cardsOfTargetTypeAllHouses
-          : cardsOfTargetType;
-
-      for (let i = 0; i < 3; i++) {
-        const eligibleCards = cardPool.filter((c) => {
-          if (usedCards.has(c.title)) return false;
-          if (zone === "power" || zone === "armor" || zone === "amber") {
-            const cardValue = c[zone] ?? 0;
-            if (usedValues.has(cardValue)) return false;
-          }
-          return true;
-        });
-
-        if (eligibleCards.length > 0) {
-          const distractor = pickRandom(eligibleCards);
-          usedCards.add(distractor.title);
-          if (zone === "power" || zone === "armor" || zone === "amber") {
-            const distractorValue = (distractor[
-              zone as keyof typeof distractor
-            ] ?? 0) as number;
-            usedValues.add(distractorValue);
-          }
-          const distractorHouseData = getCardHouse(distractor, config.expansion);
-          const distractorHouse: House = Array.isArray(distractorHouseData)
-            ? pickRandom(distractorHouseData)
-            : distractorHouseData;
-          newFragments.push({
-            id: makeId(),
-            zone,
-            card: distractor,
-            house: distractorHouse,
-            isCorrect: false,
-          });
-        }
+      if (incompleteCards.length === 0) {
+        handleFinish(correctCardsRef.current.length);
+        return;
       }
-      newFragments.push({
-        id: makeId(),
-        zone,
-        card: targetCard,
-        house: targetHouse,
-        isCorrect: true,
+
+      const targetCard = pickRandom(incompleteCards);
+      setCard(targetCard);
+
+      const targetHouseOrHouses = getCardHouse(targetCard, config.expansion);
+      const targetHouse: House =
+        config.house ??
+        (Array.isArray(targetHouseOrHouses)
+          ? pickRandom(targetHouseOrHouses)
+          : targetHouseOrHouses);
+
+      setCardHouse(targetHouse);
+
+      const cardsOfTargetType = cards.filter((c) => {
+        if (c.type !== targetCard.type) return false;
+        const distractorHouse = getCardHouse(c, config.expansion);
+        if (typeof distractorHouse === "string") {
+          return targetHouse === distractorHouse;
+        }
+        return (
+          Array.isArray(distractorHouse) &&
+          distractorHouse.includes(targetHouse)
+        );
       });
-    }
 
-    for (let i = newFragments.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i);
-      [newFragments[i], newFragments[j]] = [newFragments[j], newFragments[i]];
-    }
-    setFragments(newFragments);
+      const cardsOfTargetTypeAllHouses = cards.filter(
+        (c) => c.type === targetCard.type,
+      );
 
-    setSelections({
-      name: null,
-      traits: null,
-      power: null,
-      armor: null,
-      amber: null,
-      rules: null,
-    });
+      const newFragments: FragmentType[] = [];
 
-    setPhase("challenge");
-  }, [config.expansion, config.house, config.zones, handleFinish]);
+      for (const zone of config.zones[targetCard.type]) {
+        const usedCards = new Set<string>([targetCard.title]);
+        const usedValues = new Set<number | undefined>(
+          zone in targetCard
+            ? [
+                targetCard[zone as keyof typeof targetCard] as
+                  | number
+                  | undefined,
+              ]
+            : [0],
+        );
 
-  // Fetch the card pool once when the session starts, then preload all images.
+        const cardPool =
+          zone === "power" || zone === "armor" || zone === "amber"
+            ? cardsOfTargetTypeAllHouses
+            : cardsOfTargetType;
+
+        for (let i = 0; i < 3; i++) {
+          const eligibleCards = cardPool.filter((c) => {
+            if (usedCards.has(c.title)) return false;
+            if (zone === "power" || zone === "armor" || zone === "amber") {
+              const cardValue = c[zone] ?? 0;
+              if (usedValues.has(cardValue)) return false;
+            }
+            return true;
+          });
+
+          if (eligibleCards.length > 0) {
+            const distractor = pickRandom(eligibleCards);
+            usedCards.add(distractor.title);
+            if (zone === "power" || zone === "armor" || zone === "amber") {
+              const distractorValue = (distractor[
+                zone as keyof typeof distractor
+              ] ?? 0) as number;
+              usedValues.add(distractorValue);
+            }
+            const distractorHouseData = getCardHouse(
+              distractor,
+              config.expansion,
+            );
+            const distractorHouse: House = Array.isArray(distractorHouseData)
+              ? pickRandom(distractorHouseData)
+              : distractorHouseData;
+            newFragments.push({
+              id: makeId(),
+              zone,
+              card: distractor,
+              house: distractorHouse,
+              isCorrect: false,
+            });
+          }
+        }
+        newFragments.push({
+          id: makeId(),
+          zone,
+          card: targetCard,
+          house: targetHouse,
+          isCorrect: true,
+        });
+      }
+
+      for (let i = newFragments.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * i);
+        [newFragments[i], newFragments[j]] = [newFragments[j], newFragments[i]];
+      }
+      setFragments(newFragments);
+
+      setSelections({
+        name: null,
+        traits: null,
+        power: null,
+        armor: null,
+        amber: null,
+        rules: null,
+      });
+
+      setPhase("challenge");
+    },
+    [config.expansion, config.house, config.zones, handleFinish],
+  );
+
   useEffect(() => {
     queryCards({
       expansion: config.expansion,
@@ -181,10 +196,10 @@ export function ChallengeScreen({ config }: Props) {
       setAllCards(cards);
       loadNextCard(cards);
 
-      // Fire-and-forget: warm the image cache for every card in the pool.
       for (const c of cards) {
         const houseOrHouses = getCardHouse(c, config.expansion);
-        const house = config.house ??
+        const house =
+          config.house ??
           (Array.isArray(houseOrHouses) ? houseOrHouses[0] : houseOrHouses);
         loadCardImage(c.slug, house);
       }
@@ -245,16 +260,20 @@ export function ChallengeScreen({ config }: Props) {
 
   if (finalScore !== null) {
     return (
-      <div id="center">
+      <div className={styles.gameOver}>
         <h1>Game Over!</h1>
-        <div className="final-score">
-          <span className="score-label">Final Score</span>
-          <span className="score-value">{finalScore}</span>
+        <div className={`${styles.finalScore} surface-raised`}>
+          <span className={styles.scoreLabel}>Final Score</span>
+          <span className={styles.scoreValue}>
+            {finalScore} / {totalCards}
+          </span>
         </div>
-        <div className="button-group">
-          <button onClick={handleReplay}>Play Again</button>
-          <Link to="/practice/setup" className="btn-primary" style={{ textDecoration: "none" }}>
-            <button>New Setup</button>
+        <div className={styles.buttonGroup}>
+          <button className="btn btn-primary" onClick={handleReplay}>
+            Play Again
+          </button>
+          <Link to="/practice/setup" className="btn btn-secondary">
+            New Setup
           </Link>
         </div>
       </div>
@@ -263,8 +282,8 @@ export function ChallengeScreen({ config }: Props) {
 
   if (phase === "loading") {
     return (
-      <div id="center">
-        <h2>Loading card...</h2>
+      <div className={styles.loading}>
+        <h2>Loading cards…</h2>
       </div>
     );
   }
@@ -274,46 +293,66 @@ export function ChallengeScreen({ config }: Props) {
     const unassignedZones = zones.filter((z) => selections[z] === null);
 
     return (
-      <div id="center" className="challenge-container">
-        <div className="card-section">
-          <h2>Match the clipped regions</h2>
-          <Card card={card} house={cardHouse!} hiddenZones={zones} />
+      <div className={styles.challengePage}>
+        <div className={styles.progressContainer}>
+          <span className={styles.progressText}>
+            Progress: {completedCards} / {totalCards} cards{" "}
+          </span>
+          <div className={styles.progressTrack}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${percent}%` }}
+            />
+          </div>
         </div>
 
-        <div className="fragments-section">
-          <h3>Select One Per Category</h3>
-          <p className="instruction">
-            {unassignedZones.length > 0
-              ? `Select: ${unassignedZones.map((z) => ZONE_DISPLAY[z]).join(", ")}`
-              : "Ready to check!"}
-          </p>
-          <div className="fragments-grid">
-            {zones.map((zone) => {
-              const zoneFragments = fragments.filter((f) => f.zone === zone);
-              return (
-                <div key={zone} className="fragment-zone-group">
-                  <h4>{ZONE_DISPLAY[zone]}</h4>
-                  <div className="fragment-clips">
-                    {zoneFragments.map((fragment) => (
-                      <Fragment
-                        key={fragment.id}
-                        card={fragment.card}
-                        house={fragment.house}
-                        zone={fragment.zone}
-                        selected={
-                          selections[zone]?.includes(fragment.id) ?? false
-                        }
-                        onClick={() => handleClipClick(fragment.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+        <div className={styles.challenge}>
+          <div className={styles.cardSection}>
+            <h2>Match the clipped regions</h2>
+            <Card card={card} house={cardHouse!} hiddenZones={zones} />
           </div>
-          <button onClick={checkAnswers} disabled={unassignedZones.length > 0}>
-            Check Answers
-          </button>
+
+          <div className={styles.fragmentsPanel}>
+            <h3>Select One Per Category</h3>
+            <p className={styles.instruction}>
+              {unassignedZones.length > 0
+                ? `Still needed: ${unassignedZones.map((z) => ZONE_DISPLAY[z]).join(", ")}`
+                : "Ready to check!"}
+            </p>
+            <div className={`${styles.fragmentsScroll} surface`}>
+              {zones.map((zone) => {
+                const zoneFragments = fragments.filter((f) => f.zone === zone);
+                return (
+                  <div key={zone} className={styles.zoneGroup}>
+                    <span className={styles.zoneLabel}>
+                      {ZONE_DISPLAY[zone]}
+                    </span>
+                    <div className={styles.fragmentClips}>
+                      {zoneFragments.map((fragment) => (
+                        <Fragment
+                          key={fragment.id}
+                          card={fragment.card}
+                          house={fragment.house}
+                          zone={fragment.zone}
+                          selected={
+                            selections[zone]?.includes(fragment.id) ?? false
+                          }
+                          onClick={() => handleClipClick(fragment.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={checkAnswers}
+              disabled={unassignedZones.length > 0}
+            >
+              Check Answers
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -326,33 +365,48 @@ export function ChallengeScreen({ config }: Props) {
     const allCorrect = zones.every((z) => results[z]);
 
     return (
-      <div id="center">
-        <h2>{allCorrect ? "Perfect!" : "Not quite..."}</h2>
+      <div className={styles.page}>
+        <div className={styles.progressContainer}>
+          <span className={styles.progressText}>
+            Progress: {completedCards} / {totalCards} cards{" "}
+          </span>
+          <div className={styles.progressTrack}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+        </div>
+
+        <h2>{allCorrect ? "✓ Perfect!" : "Not quite…"}</h2>
         <Card
           card={card}
           house={cardHouse!}
           hiddenZones={[]}
           showResults={results}
         />
-        <div className="results-list">
+        <div className={styles.resultsList}>
           {zones.map((zone) => {
             const fragment = fragments.find(
               (f) => f.id === selections[zone as Zone],
             );
+            const correct = results[zone];
             return (
               <div
                 key={zone}
-                className={`result ${results[zone] ? "correct" : "incorrect"}`}
+                className={`${styles.result} ${correct ? styles.correct : styles.incorrect}`}
               >
-                <span className="result-zone">{ZONE_DISPLAY[zone]}: </span>
+                <span className={styles.resultZone}>{ZONE_DISPLAY[zone]}</span>
                 {fragment ? (
-                  <div className="result-fragment">
+                  <div className={styles.resultFragment}>
                     <Fragment
                       card={fragment.card}
                       house={fragment.house}
                       zone={zone}
                     />
-                    <span>{results[zone] ? "✓" : "✗"}</span>
+                    <span className={styles.resultIcon}>
+                      {correct ? "✓" : "✗"}
+                    </span>
                   </div>
                 ) : (
                   <span>Not answered ✗</span>
@@ -361,11 +415,19 @@ export function ChallengeScreen({ config }: Props) {
             );
           })}
         </div>
-        <div className="button-group">
+        <div className={styles.buttonGroup}>
           {allCorrect ? (
-            <button onClick={() => allCards && loadNextCard(allCards)}>Next Card</button>
+            <button
+              className="btn btn-primary"
+              onClick={() => allCards && loadNextCard(allCards)}
+            >
+              Next Card →
+            </button>
           ) : (
-            <button onClick={() => handleFinish(correctCards.length)}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => handleFinish(correctCards.length)}
+            >
               See Results
             </button>
           )}

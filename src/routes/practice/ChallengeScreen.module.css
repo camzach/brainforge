@@ -1,0 +1,250 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 24px 64px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Loading ──────────────────────────────────────────────────────────────── */
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 60vh;
+  color: var(--text);
+}
+
+/* ── Challenge layout ─────────────────────────────────────────────────────── */
+
+/* Outer wrapper — full width column so the row inside can center properly */
+.challengePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px 64px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.challenge {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cardSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.cardSection h2 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ── Fragments panel ──────────────────────────────────────────────────────── */
+
+.fragmentsPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  width: 340px;
+  flex-shrink: 0;
+
+  @media (max-width: 800px) {
+    width: 100%;
+    max-width: 560px;
+  }
+}
+
+.fragmentsPanel h3 {
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.instruction {
+  font-size: 13px;
+  color: var(--text-dim);
+  min-height: 18px;
+}
+
+.fragmentsScroll {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+  /* padding large enough that the 2px focus/hover ring on fragments isn't clipped */
+  padding: 14px 20px;
+  scrollbar-gutter: stable;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.zoneGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoneLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* padding+negative-margin so the hover ring isn't clipped by the scroll container */
+.fragmentClips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 3px;
+  margin: -3px;
+}
+
+/* ── Results ──────────────────────────────────────────────────────────────── */
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 340px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.result:last-child {
+  border-bottom: none;
+}
+
+.result.correct {
+  background: var(--color-correct-bg);
+}
+
+.result.incorrect {
+  background: var(--color-incorrect-bg);
+}
+
+.resultZone {
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.resultFragment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resultIcon {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.result.correct .resultIcon {
+  color: var(--color-correct);
+}
+
+.result.incorrect .resultIcon {
+  color: var(--color-incorrect);
+}
+
+/* ── Game over ────────────────────────────────────────────────────────────── */
+
+.gameOver {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: 56px 24px 80px;
+}
+
+.finalScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 40px 64px;
+}
+
+.scoreLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.scoreValue {
+  font-size: 80px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text-h);
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Progress Bar ─────────────────────────────────────────────────────────── */
+
+.progressContainer {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease-out;
+}
+
+.progressText {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+}

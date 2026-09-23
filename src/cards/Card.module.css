@@ -1,0 +1,11 @@
+.canvas {
+  display: block;
+  height: 420px;
+  width: 300px;
+  border-radius: var(--radius-sm);
+}
+
+.placeholder {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+}

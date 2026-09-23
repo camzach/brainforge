@@ -1,0 +1,29 @@
+.clip {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+  background: var(--bg-subtle);
+  display: block;
+  /* Area-normalised sizing: --max-w is computed per-fragment in Fragment.tsx */
+  max-width: var(--max-w, 160px);
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--aspect-ratio);
+}
+
+.clip:hover:not(.assigned):not(.selected) {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-border);
+  transform: scale(1.025);
+}
+
+.clip.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent);
+}
+
+.clip.assigned {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

@@ -12,6 +12,7 @@ import {
   encodePracticeSearch,
   type PracticeSearchParams,
 } from "./practice-utils";
+import styles from "./SetupScreen.module.css";
 
 function deriveCardTypes(
   typesByHouse: Map<House, Set<CardKind>>,
@@ -46,7 +47,6 @@ export function SetupScreen() {
     cardTypes.size > 0 &&
     Array.from(cardTypes).every((ct) => zones[ct].size > 0);
 
-  // Single query when expansion changes — fetches houses + type-by-house map.
   useEffect(() => {
     if (!expansion) return;
     getExpansionMeta(expansion).then(({ houses, typesByHouse: tbh }) => {
@@ -56,7 +56,6 @@ export function SetupScreen() {
     });
   }, [expansion]);
 
-  // Derive card types from cached data whenever house selection changes.
   useEffect(() => {
     setTargetCardTypes(deriveCardTypes(typesByHouse, house));
   }, [house, typesByHouse]);
@@ -103,126 +102,123 @@ export function SetupScreen() {
   };
 
   return (
-    <div id="center">
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "700px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1rem",
-        }}
-      >
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <button className="btn-secondary">← Back to Home</button>
-        </Link>
-        <div style={{ display: "flex", gap: "0.75rem" }}>
-          <Link to="/viewer" style={{ textDecoration: "none" }}>
-            <button
-              style={{
-                padding: "0.5rem 1rem",
-                background: "rgba(255, 255, 255, 0.1)",
-                border: "1px solid rgba(255, 255, 255, 0.3)",
-                borderRadius: "4px",
-                color: "white",
-                cursor: "pointer",
-              }}
-            >
-              Card Viewer
-            </button>
-          </Link>
+    <div className={styles.page}>
+      <div className={styles.back}>
+        <Link to="/" className="btn btn-ghost">← Back</Link>
+      </div>
+
+      <div className={styles.header}>
+        <h1>Challenge Setup</h1>
+        <p className={styles.subtitle}>Configure your practice session</p>
+      </div>
+
+      <div className={styles.form}>
+        <div className={styles.section}>
+          <span className={styles.sectionLabel}>Expansion</span>
+          <select
+            value={expansion || ""}
+            onChange={(e) => {
+              setExpansion((e.target.value as Expansion) || null);
+              setHouse(null);
+              setExpansionHouses([]);
+            }}
+            className={styles.select}
+          >
+            <option value="">— Select —</option>
+            {Object.keys(Expansions).map((exp) => (
+              <option key={exp} value={exp}>
+                {Expansions[exp as Expansion]}
+              </option>
+            ))}
+          </select>
         </div>
-      </div>
 
-      <h1>Fragment Challenge Setup</h1>
-      <p>Configure your practice set by matching clipped regions</p>
-
-      <div className="setup-section">
-        <h3>1. Select Expansion</h3>
-        <select
-          value={expansion || ""}
-          onChange={(e) => {
-            setExpansion((e.target.value as Expansion) || null);
-            setHouse(null);
-            setExpansionHouses([]);
-          }}
-          className="expansion-select"
-        >
-          <option value="">-- Select Expansion --</option>
-          {Object.keys(Expansions).map((exp) => (
-            <option key={exp} value={exp}>
-              {Expansions[exp as Expansion]}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {expansion && (
-        <div className="setup-section">
-          <h3>2. Select House (optional)</h3>
-          <div className="house-buttons">
-            <button
-              className={!house ? "selected" : ""}
-              onClick={() => setHouse(null)}
-            >
-              All Houses
-            </button>
-            {expansionHouses.map((h) => (
+        {expansion && (
+          <div className={styles.section}>
+            <span className={styles.sectionLabel}>
+              House
+              <span className={styles.sectionHint}>optional</span>
+            </span>
+            <div className={styles.toggleGroup}>
               <button
-                key={h}
-                className={house === h ? "selected" : ""}
-                onClick={() => setHouse(h)}
+                className={`${styles.toggle} ${!house ? styles.active : ""}`}
+                onClick={() => setHouse(null)}
               >
-                {h}
+                All
               </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {expansion && (
-        <div className="setup-section">
-          <h3>3. Select Card Types to Practice</h3>
-          <div className="zone-selectors">
-            {targetCardTypes.map((cardType) => (
-              <label key={cardType}>
-                <input
-                  type="checkbox"
-                  checked={cardTypes.has(cardType)}
-                  onChange={() => handleCardTypeToggle(cardType)}
-                />
-                {cardType}
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {expansion &&
-        Array.from(cardTypes).map((cardType) => (
-          <div key={cardType} className="setup-section">
-            <h3>Zones for {cardType}</h3>
-            <div className="zone-selectors">
-              {(Object.keys(cardTypeZoneMaps[cardType]) as Zone[]).map(
-                (zone) => (
-                  <label key={zone}>
-                    <input
-                      type="checkbox"
-                      checked={zones[cardType].has(zone)}
-                      onChange={() => handleZoneToggle(cardType, zone)}
-                    />
-                    {ZONE_DISPLAY[zone]}
-                  </label>
-                ),
-              )}
+              {expansionHouses.map((h) => (
+                <button
+                  key={h}
+                  className={`${styles.toggle} ${house === h ? styles.active : ""}`}
+                  onClick={() => setHouse(h)}
+                >
+                  {h}
+                </button>
+              ))}
             </div>
           </div>
-        ))}
+        )}
 
-      <button onClick={handleStart} disabled={!canStart}>
-        Start Challenge
-      </button>
+        {expansion && (
+          <div className={styles.section}>
+            <span className={styles.sectionLabel}>Card types</span>
+            <div className={styles.buttonGroup}>
+              {targetCardTypes.map((cardType) => (
+                <label
+                  key={cardType}
+                  className={`${styles.buttonGroupLabel} ${cardTypes.has(cardType) ? styles.active : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    className={styles.visuallyHidden}
+                    checked={cardTypes.has(cardType)}
+                    onChange={() => handleCardTypeToggle(cardType)}
+                  />
+                  {cardType}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {expansion &&
+          Array.from(cardTypes).map((cardType) => (
+            <div key={cardType} className={styles.section}>
+              <span className={styles.sectionLabel}>Zones — {cardType}</span>
+              <div className={styles.buttonGroup}>
+                {(Object.keys(cardTypeZoneMaps[cardType]) as Zone[]).map(
+                  (zone) => (
+                    <label
+                      key={zone}
+                      className={`${styles.buttonGroupLabel} ${zones[cardType].has(zone) ? styles.active : ""}`}
+                    >
+                      <input
+                        type="checkbox"
+                        className={styles.visuallyHidden}
+                        checked={zones[cardType].has(zone)}
+                        onChange={() => handleZoneToggle(cardType, zone)}
+                      />
+                      {ZONE_DISPLAY[zone]}
+                    </label>
+                  ),
+                )}
+              </div>
+            </div>
+          ))}
+      </div>
+
+      <div className={styles.footer}>
+        <button className="btn btn-primary" onClick={handleStart} disabled={!canStart}>
+          Start challenge
+        </button>
+        {!canStart && expansion && (
+          <span className={styles.footerHint}>
+            {cardTypes.size === 0
+              ? "Select at least one card type"
+              : "Select zones for each card type"}
+          </span>
+        )}
+      </div>
     </div>
   );
 }

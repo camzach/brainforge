@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import type { Card, Fragment } from "../types";
+import type { Card } from "../types";
 import { getClipPath, loadCardImage, type Zone } from "./card-utils";
-import classNames from "classnames";
+import styles from "./Fragment.module.css";
 
 const sketchpad = new OffscreenCanvas(1000, 1000);
 const sketchpadCtx = sketchpad.getContext("2d")!;
@@ -19,7 +19,6 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
   const [isVisible, setIsVisible] = useState(false);
   const path = getClipPath(card, zone);
 
-  // Set up IntersectionObserver to detect when canvas is visible
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -28,34 +27,28 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-            observer.disconnect(); // Stop observing once visible
+            observer.disconnect();
           }
         });
       },
-      {
-        rootMargin: "50px", // Start loading slightly before entering viewport
-      }
+      { rootMargin: "50px" },
     );
 
     observer.observe(canvasRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
+    return () => { observer.disconnect(); };
   }, []);
 
-  // Only load and render image when visible
   useEffect(() => {
     if (!canvasRef.current || !isVisible) return;
 
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
 
-    // Handle 0 pips case - show placeholder
     if (zone === "amber" && card.amber === 0) {
-      ctx.fillStyle = "#333";
+      const style = getComputedStyle(canvasRef.current);
+      ctx.fillStyle = style.getPropertyValue("--bg-subtle").trim();
       ctx.fillRect(0, 0, path?.bbox.size[0] || 50, path?.bbox.size[1] || 125);
-      ctx.fillStyle = "#666";
+      ctx.fillStyle = style.getPropertyValue("--text-dim").trim();
       ctx.font = "12px sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("0", (path?.bbox.size[0] || 50) / 2, (path?.bbox.size[1] || 125) / 2);
@@ -82,18 +75,31 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
     });
   }, [card, house, path, zone, isVisible]);
 
-  const aspectRatio = path && path.bbox.size[1] > 0
-    ? path.bbox.size[0] / path.bbox.size[1]
-    : 1;
+  const w = path?.bbox.size[0] ?? 1;
+  const h = path?.bbox.size[1] ?? 1;
+
+  // Target a consistent visual area (~9000px²) regardless of fragment shape.
+  // max-width = sqrt(targetArea * aspectRatio), clamped to a min so tiny
+  // fragments like amber pips aren't blown up too large.
+  const targetArea = 9500;
+  const maxW = Math.round(Math.sqrt(targetArea * (w / h)));
+
+  const classList = [
+    styles.clip,
+    selected ? styles.selected : "",
+  ].filter(Boolean).join(" ");
 
   return (
     <canvas
-      className={classNames("fragment-clip", selected && "selected")}
-      height={`${path?.bbox.size[1]}px`}
-      width={`${path?.bbox.size[0]}px`}
+      className={classList}
+      height={h}
+      width={w}
       ref={canvasRef}
       onClick={onClick}
-      style={{ '--aspect-ratio': aspectRatio } as React.CSSProperties}
+      style={{
+        "--aspect-ratio": `${w} / ${h}`,
+        "--max-w": `${maxW}px`,
+      } as React.CSSProperties}
     />
   );
 }

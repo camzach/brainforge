@@ -1,0 +1,98 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  padding: 72px 32px 80px;
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 640px) {
+    padding: 48px 20px 64px;
+    gap: 40px;
+  }
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 600px;
+  text-align: center;
+}
+
+.title {
+  color: var(--accent);
+}
+
+.tagline {
+  font-size: 17px;
+  color: var(--text);
+  line-height: 1.65;
+  max-width: 480px;
+  margin-top: 2px;
+
+  @media (max-width: 640px) {
+    font-size: 15px;
+  }
+}
+
+/* ── Feature grid ─────────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  width: 100%;
+  max-width: 780px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+
+  @media (max-width: 580px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 32px;
+  background: var(--bg);
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.card:hover {
+  background: var(--bg-subtle);
+}
+
+.cardLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.body p {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.actions {
+  margin-top: 4px;
+}
