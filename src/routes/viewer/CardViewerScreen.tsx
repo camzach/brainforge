@@ -1,12 +1,24 @@
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAllCards } from "../cards/card-db";
-import { Fragment } from "../cards/Fragment";
-import type { Card, CardKind, Expansion } from "../types";
-import { Expansions } from "../types";
-import { cardTypeZoneMaps, getCardHouse, ZONE_DISPLAY, type Zone } from "../cards/card-utils";
-import { getCardImageUrl } from "../cards/card-image-utils";
+import { getAllCards } from "../../cards/card-db";
+import { Fragment } from "../../cards/Fragment";
+import type { Card, CardKind, Expansion } from "../../types";
+import { Expansions } from "../../types";
+import {
+  cardTypeZoneMaps,
+  getCardHouse,
+  ZONE_DISPLAY,
+  type Zone,
+} from "../../cards/card-utils";
+import { getCardImageUrl } from "../../cards/card-image-utils";
 
-const CARD_TYPES: CardKind[] = ["Creature", "TokenCreature", "Action", "Artifact", "Upgrade"];
+const CARD_TYPES: CardKind[] = [
+  "Creature",
+  "TokenCreature",
+  "Action",
+  "Artifact",
+  "Upgrade",
+];
 
 const styles = {
   container: {
@@ -150,34 +162,37 @@ const styles = {
 
 export function CardViewerScreen() {
   const [allCards, setAllCards] = useState<Card[]>([]);
-  const [filteredCards, setFilteredCards] = useState<Card[]>([]);
   const [selectedExpansion, setSelectedExpansion] = useState<Expansion | "">("");
   const [selectedHouse, setSelectedHouse] = useState<string>("");
-  const [selectedCardTypes, setSelectedCardTypes] = useState<Set<CardKind>>(new Set());
+  const [selectedCardTypes, setSelectedCardTypes] = useState<Set<CardKind>>(
+    new Set(),
+  );
   const [availableHouses, setAvailableHouses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFragments, setShowFragments] = useState(false);
   const [hideErrorCards, setHideErrorCards] = useState(false);
-  const [cardImageErrors, setCardImageErrors] = useState<Set<string>>(new Set());
+  const [cardImageErrors, setCardImageErrors] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Helper function to get display house for a card
-  const getCardDisplayHouse = (card: Card): string => {
-    if (selectedExpansion) {
-      const house = getCardHouse(card, selectedExpansion);
+  const getCardDisplayHouse = (card: Card, expansion: Expansion | ""): string => {
+    if (expansion) {
+      const house = getCardHouse(card, expansion);
       if (typeof house === "string") return house;
       if (Array.isArray(house)) return house[0];
     }
-    
+
     if (typeof card.house === "string") return card.house;
     if (Array.isArray(card.house)) return card.house[0];
-    
+
     const firstExpansion = card.expansions?.[0];
     if (firstExpansion) {
       const house = card.house[firstExpansion];
       if (typeof house === "string") return house;
       if (Array.isArray(house)) return house[0];
     }
-    
+
     return "Unknown";
   };
 
@@ -186,7 +201,7 @@ export function CardViewerScreen() {
     getAllCards().then((cards) => {
       setAllCards(cards);
       setLoading(false);
-      
+
       // Extract unique houses
       const houses = new Set<string>();
       cards.forEach((card) => {
@@ -202,8 +217,8 @@ export function CardViewerScreen() {
     });
   }, []);
 
-  // Filter cards based on selected criteria
-  useEffect(() => {
+  // Compute filtered cards directly during render
+  const filteredCards = (() => {
     let filtered = allCards;
 
     // Filter by expansion
@@ -238,19 +253,17 @@ export function CardViewerScreen() {
     }
 
     // Sort by house then by name
-    filtered.sort((a, b) => {
-      const houseA = getCardDisplayHouse(a);
-      const houseB = getCardDisplayHouse(b);
-      
+    return [...filtered].sort((a, b) => {
+      const houseA = getCardDisplayHouse(a, selectedExpansion);
+      const houseB = getCardDisplayHouse(b, selectedExpansion);
+
       if (houseA !== houseB) {
         return houseA.localeCompare(houseB);
       }
-      
+
       return a.title.localeCompare(b.title);
     });
-
-    setFilteredCards(filtered);
-  }, [allCards, selectedExpansion, selectedHouse, selectedCardTypes, hideErrorCards, cardImageErrors]);
+  })();
 
   const handleImageError = (cardSlug: string) => {
     setCardImageErrors((prev) => new Set(prev).add(cardSlug));
@@ -283,15 +296,24 @@ export function CardViewerScreen() {
 
   return (
     <div style={styles.container}>
+      <div style={{ marginBottom: "1rem" }}>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <button style={{ padding: "0.5rem 1rem" }}>← Back to Game</button>
+        </Link>
+      </div>
       <h1 style={styles.title}>Card Viewer</h1>
-      
+
       <div style={styles.filters}>
         <div style={styles.filterGroup}>
-          <label htmlFor="expansion-select" style={styles.filterLabel}>Expansion:</label>
+          <label htmlFor="expansion-select" style={styles.filterLabel}>
+            Expansion:
+          </label>
           <select
             id="expansion-select"
             value={selectedExpansion}
-            onChange={(e) => setSelectedExpansion(e.target.value as Expansion | "")}
+            onChange={(e) =>
+              setSelectedExpansion(e.target.value as Expansion | "")
+            }
             style={styles.select}
           >
             <option value="">All Expansions</option>
@@ -304,7 +326,9 @@ export function CardViewerScreen() {
         </div>
 
         <div style={styles.filterGroup}>
-          <label htmlFor="house-select" style={styles.filterLabel}>House:</label>
+          <label htmlFor="house-select" style={styles.filterLabel}>
+            House:
+          </label>
           <select
             id="house-select"
             value={selectedHouse}
@@ -360,13 +384,16 @@ export function CardViewerScreen() {
       </div>
 
       <div style={styles.resultsSummary}>
-        {!selectedExpansion && !selectedHouse && selectedCardTypes.size === 0 ? (
+        {!selectedExpansion &&
+        !selectedHouse &&
+        selectedCardTypes.size === 0 ? (
           <div style={styles.warningBox}>
             <p style={styles.warningTitle}>
               ⚠️ Please select at least one filter to view cards
             </p>
             <p style={styles.warningText}>
-              Loading all cards at once can cause browser lag. Select an expansion, house, or card type to begin.
+              Loading all cards at once can cause browser lag. Select an
+              expansion, house, or card type to begin.
             </p>
           </div>
         ) : (
@@ -375,60 +402,67 @@ export function CardViewerScreen() {
       </div>
 
       <div style={styles.cardsGrid}>
-        {(selectedExpansion || selectedHouse || selectedCardTypes.size > 0) && filteredCards.map((card, index) => {
-          const house = getCardDisplayHouse(card);
-          const zones = getCardFragmentZones(card);
+        {(selectedExpansion ||
+          selectedHouse ||
+          selectedCardTypes.size > 0) &&
+          filteredCards.map((card, index) => {
+            const house = getCardDisplayHouse(card, selectedExpansion);
+            const zones = getCardFragmentZones(card);
 
-          return (
-            <div key={`${card.slug}-${index}`} style={styles.cardItem}>
-              <div style={styles.cardPreview}>
-                <img
-                  src={getCardImageUrl(card.slug, house)}
-                  alt={card.title}
-                  loading="lazy"
-                  onError={() => handleImageError(card.slug)}
-                  style={{
-                    height: "420px",
-                    width: "300px",
-                    objectFit: "contain",
-                  }}
-                />
-              </div>
-              
-              <div style={styles.cardInfo}>
-                <h3 style={styles.cardTitle}>{card.title}</h3>
-                <p style={styles.cardMeta}>
-                  <span style={styles.cardType}>{card.type}</span>
-                  {" • "}
-                  <span style={styles.cardHouse}>{house}</span>
-                </p>
-                {card.power !== undefined && (
-                  <p style={styles.cardStat}>Power: {card.power}</p>
-                )}
-                {card.armor !== undefined && (
-                  <p style={styles.cardStat}>Armor: {card.armor}</p>
-                )}
-                {card.amber !== undefined && (
-                  <p style={styles.cardStat}>Amber: {card.amber}</p>
-                )}
-              </div>
-
-              {showFragments && (
-                <div style={styles.fragmentsContainer}>
-                  <h4 style={styles.fragmentsTitle}>Fragments ({zones.length})</h4>
-                  <div style={styles.fragmentsGrid}>
-                    {zones.map((zone) => (
-                      <div key={zone} style={styles.fragmentItem}>
-                        <div style={styles.fragmentLabel}>{ZONE_DISPLAY[zone]}</div>
-                        <Fragment card={card} house={house} zone={zone} />
-                      </div>
-                    ))}
-                  </div>
+            return (
+              <div key={`${card.slug}-${index}`} style={styles.cardItem}>
+                <div style={styles.cardPreview}>
+                  <img
+                    src={getCardImageUrl(card.slug, house)}
+                    alt={card.title}
+                    loading="lazy"
+                    onError={() => handleImageError(card.slug)}
+                    style={{
+                      height: "420px",
+                      width: "300px",
+                      objectFit: "contain",
+                    }}
+                  />
                 </div>
-              )}
-            </div>
-          );
-        })}
+
+                <div style={styles.cardInfo}>
+                  <h3 style={styles.cardTitle}>{card.title}</h3>
+                  <p style={styles.cardMeta}>
+                    <span style={styles.cardType}>{card.type}</span>
+                    {" • "}
+                    <span style={styles.cardHouse}>{house}</span>
+                  </p>
+                  {card.power !== undefined && (
+                    <p style={styles.cardStat}>Power: {card.power}</p>
+                  )}
+                  {card.armor !== undefined && (
+                    <p style={styles.cardStat}>Armor: {card.armor}</p>
+                  )}
+                  {card.amber !== undefined && (
+                    <p style={styles.cardStat}>Amber: {card.amber}</p>
+                  )}
+                </div>
+
+                {showFragments && (
+                  <div style={styles.fragmentsContainer}>
+                    <h4 style={styles.fragmentsTitle}>
+                      Fragments ({zones.length})
+                    </h4>
+                    <div style={styles.fragmentsGrid}>
+                      {zones.map((zone) => (
+                        <div key={zone} style={styles.fragmentItem}>
+                          <div style={styles.fragmentLabel}>
+                            {ZONE_DISPLAY[zone]}
+                          </div>
+                          <Fragment card={card} house={house} zone={zone} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
       </div>
     </div>
   );

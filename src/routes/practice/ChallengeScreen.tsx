@@ -1,34 +1,35 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   cardTypeZoneMaps,
   getCardHouse,
   makeId,
   ZONE_DISPLAY,
   type Zone,
-} from "../cards/card-utils";
+} from "../../cards/card-utils";
 import {
   type Card as CardType,
   pickRandom,
   type Fragment as FragmentType,
   type GameConfig,
-} from "../types";
-
-import { getCardsByExpansion, openCardDB } from "../cards/card-db";
-import { Card } from "../cards/Card";
-import { Fragment } from "../cards/Fragment";
+} from "../../types";
+import { getCardsByExpansion, openCardDB } from "../../cards/card-db";
+import { Card } from "../../cards/Card";
+import { Fragment } from "../../cards/Fragment";
 
 type Props = {
   config: GameConfig;
-  onFinish: (score: number) => void;
 };
 
 type Phase = "loading" | "challenge" | "results";
 
-export function ChallengeScreen({ config, onFinish }: Props) {
+export function ChallengeScreen({ config }: Props) {
   const [card, setCard] = useState<CardType | null>(null);
   const [cardHouse, setCardHouse] = useState<string | null>(config.house);
   const [fragments, setFragments] = useState<FragmentType[]>([]);
   const [phase, setPhase] = useState<Phase>("loading");
+  const [finalScore, setFinalScore] = useState<number | null>(null);
+
   const [selections, setSelections] = useState<Record<Zone, string | null>>({
     name: null,
     traits: null,
@@ -46,6 +47,10 @@ export function ChallengeScreen({ config, onFinish }: Props) {
     rules: false,
   });
   const [correctCards, setCorrectCards] = useState<string[]>([]);
+
+  const handleFinish = useCallback((score: number) => {
+    setFinalScore(score);
+  }, []);
 
   const loadNextCard = useCallback(() => {
     openCardDB().then(() => {
@@ -71,7 +76,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
           );
 
           if (incompleteCards.length === 0) {
-            onFinish(correctCards.length);
+            handleFinish(correctCards.length);
             return;
           }
 
@@ -101,7 +106,9 @@ export function ChallengeScreen({ config, onFinish }: Props) {
             return distractorHouse.includes(targetHouse);
           });
 
-          const cardsOfTargetTypeAllHouses = cards.filter((c) => c.type === targetCard.type);
+          const cardsOfTargetTypeAllHouses = cards.filter(
+            (c) => c.type === targetCard.type,
+          );
 
           const newFragments: FragmentType[] = [];
 
@@ -117,9 +124,10 @@ export function ChallengeScreen({ config, onFinish }: Props) {
                 : [0],
             );
 
-            const cardPool = (zone === "power" || zone === "armor" || zone === "amber") 
-              ? cardsOfTargetTypeAllHouses 
-              : cardsOfTargetType;
+            const cardPool =
+              zone === "power" || zone === "armor" || zone === "amber"
+                ? cardsOfTargetTypeAllHouses
+                : cardsOfTargetType;
 
             for (let i = 0; i < 3; i++) {
               const eligibleCards = cardPool.filter((c) => {
@@ -142,9 +150,12 @@ export function ChallengeScreen({ config, onFinish }: Props) {
                   ] ?? 0) as number;
                   usedValues.add(distractorValue);
                 }
-                const distractorHouseData = getCardHouse(distractor, config.expansion);
-                const distractorHouse = Array.isArray(distractorHouseData) 
-                  ? pickRandom(distractorHouseData) 
+                const distractorHouseData = getCardHouse(
+                  distractor,
+                  config.expansion,
+                );
+                const distractorHouse = Array.isArray(distractorHouseData)
+                  ? pickRandom(distractorHouseData)
                   : distractorHouseData;
                 newFragments.push({
                   id: makeId(),
@@ -174,6 +185,16 @@ export function ChallengeScreen({ config, onFinish }: Props) {
           }
           setFragments(newFragments);
 
+          // Reset zone selections
+          setSelections({
+            name: null,
+            traits: null,
+            power: null,
+            armor: null,
+            amber: null,
+            rules: null,
+          });
+
           setPhase("challenge");
         });
     });
@@ -183,12 +204,13 @@ export function ChallengeScreen({ config, onFinish }: Props) {
     config.house,
     config.zones,
     correctCards,
-    onFinish,
+    handleFinish,
   ]);
 
-  // This effect is intended to run only once, hence the empty deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => loadNextCard(), []);
+  useEffect(() => {
+    loadNextCard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleClipClick = useCallback(
     (fragmentId: string) => {
@@ -232,6 +254,31 @@ export function ChallengeScreen({ config, onFinish }: Props) {
     setResults(newResults);
     setPhase("results");
   }, [card?.type, card?.title, config.zones, selections, fragments]);
+
+  const handleReplay = () => {
+    setCorrectCards([]);
+    setFinalScore(null);
+    setPhase("loading");
+    loadNextCard();
+  };
+
+  if (finalScore !== null) {
+    return (
+      <div id="center">
+        <h1>Game Over!</h1>
+        <div className="final-score">
+          <span className="score-label">Final Score</span>
+          <span className="score-value">{finalScore}</span>
+        </div>
+        <div className="button-group">
+          <button onClick={handleReplay}>Play Again</button>
+          <Link to="/practice/setup" className="btn-primary" style={{ textDecoration: "none" }}>
+            <button>New Setup</button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (phase === "loading") {
     return (
@@ -290,6 +337,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
       </div>
     );
   }
+
   if (phase === "results" && card) {
     const zones = Object.keys(cardTypeZoneMaps[card.type]).filter((z) =>
       config.zones[card.type].has(z as Zone),
@@ -336,7 +384,7 @@ export function ChallengeScreen({ config, onFinish }: Props) {
           {allCorrect ? (
             <button onClick={loadNextCard}>Next Card</button>
           ) : (
-            <button onClick={() => onFinish(correctCards.length)}>
+            <button onClick={() => handleFinish(correctCards.length)}>
               See Results
             </button>
           )}
@@ -344,4 +392,6 @@ export function ChallengeScreen({ config, onFinish }: Props) {
       </div>
     );
   }
+
+  return null;
 }

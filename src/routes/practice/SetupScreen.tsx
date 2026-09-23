@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
-import type { Expansion, CardKind, GameConfig } from "../types";
-import { Expansions } from "../types";
+import { Link, useNavigate } from "@tanstack/react-router";
+import type { Expansion, CardKind } from "../../types";
+import { Expansions } from "../../types";
 import {
   cardTypeZoneMaps,
   getCardHouse,
   ZONE_DISPLAY,
   type Zone,
-} from "../cards/card-utils";
-import { getCardsByExpansion, openCardDB } from "../cards/card-db";
+} from "../../cards/card-utils";
+import { getCardsByExpansion, openCardDB } from "../../cards/card-db";
+import {
+  encodePracticeSearch,
+  type PracticeSearchParams,
+} from "./practice-utils";
 
-type Props = {
-  onStart: (config: GameConfig) => void;
-};
-
-export function SetupScreen({ onStart }: Props) {
+export function SetupScreen() {
+  const navigate = useNavigate();
   const [expansion, setExpansion] = useState<Expansion | null>(null);
   const [expansionHouses, setExpansionHouses] = useState<string[]>([]);
   const [targetCardTypes, setTargetCardTypes] = useState<CardKind[]>([]);
@@ -111,13 +113,53 @@ export function SetupScreen({ onStart }: Props) {
 
   const handleStart = () => {
     if (!expansion || !canStart) return;
-    onStart({ expansion, house, cardTypes, zones });
+    const practiceSearch: PracticeSearchParams = encodePracticeSearch({
+      expansion,
+      house,
+      cardTypes,
+      zones,
+    });
+    navigate({
+      to: "/practice/play",
+      search: practiceSearch,
+    });
   };
 
   return (
     <div id="center">
-      <h1>BrainForge</h1>
-      <p>Learn KeyForge cards by matching clipped regions</p>
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "700px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1rem",
+        }}
+      >
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <button className="btn-secondary">← Back to Home</button>
+        </Link>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          <Link to="/viewer" style={{ textDecoration: "none" }}>
+            <button
+              style={{
+                padding: "0.5rem 1rem",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "4px",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Card Viewer
+            </button>
+          </Link>
+        </div>
+      </div>
+
+      <h1>Fragment Challenge Setup</h1>
+      <p>Configure your practice set by matching clipped regions</p>
 
       <div className="setup-section">
         <h3>1. Select Expansion</h3>
