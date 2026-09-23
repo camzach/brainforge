@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getAllCards } from "../../cards/card-db";
+import { getExpansionMeta, queryCards } from "../../cards/card-db";
 import { Fragment } from "../../cards/Fragment";
-import type { Card, CardKind, Expansion } from "../../types";
-import { Expansions } from "../../types";
+import type { Card, CardKind, Expansion, House } from "../../types";
+import { Expansions, HOUSES } from "../../types";
 import {
   cardTypeZoneMaps,
   getCardHouse,
@@ -161,19 +161,75 @@ const styles = {
 };
 
 export function CardViewerScreen() {
-  const [allCards, setAllCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<Card[]>([]);
   const [selectedExpansion, setSelectedExpansion] = useState<Expansion | "">("");
-  const [selectedHouse, setSelectedHouse] = useState<string>("");
+  const [selectedHouse, setSelectedHouse] = useState<House | "">("");
   const [selectedCardTypes, setSelectedCardTypes] = useState<Set<CardKind>>(
     new Set(),
   );
-  const [availableHouses, setAvailableHouses] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [expansionHouses, setExpansionHouses] = useState<House[] | null>(null);
+  const [loading, setLoading] = useState(false);
   const [showFragments, setShowFragments] = useState(false);
   const [hideErrorCards, setHideErrorCards] = useState(false);
   const [cardImageErrors, setCardImageErrors] = useState<Set<string>>(
     new Set(),
   );
+
+  const availableHouses = expansionHouses ?? [...HOUSES].sort();
+
+  // Update available houses when expansion changes
+  useEffect(() => {
+    let isCurrent = true;
+    if (selectedExpansion) {
+      getExpansionMeta(selectedExpansion).then(({ houses }) => {
+        if (!isCurrent) return;
+        setExpansionHouses(houses);
+        setSelectedHouse((prev) => (prev && !houses.includes(prev) ? "" : prev));
+      });
+    }
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedExpansion]);
+
+  const handleExpansionChange = (newExp: Expansion | "") => {
+    setSelectedExpansion(newExp);
+    if (!newExp) {
+      setExpansionHouses(null);
+    }
+  };
+
+  // Query database when filters change
+  useEffect(() => {
+    let isCurrent = true;
+    const hasFilter =
+      Boolean(selectedExpansion) ||
+      Boolean(selectedHouse) ||
+      selectedCardTypes.size > 0;
+
+    if (!hasFilter) {
+      return;
+    }
+
+    queryCards({
+      expansion: selectedExpansion || undefined,
+      house: selectedHouse || undefined,
+      type: selectedCardTypes.size > 0 ? Array.from(selectedCardTypes) : undefined,
+    })
+      .then((results) => {
+        if (!isCurrent) return;
+        setCards(results);
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedExpansion, selectedHouse, selectedCardTypes]);
 
   // Helper function to get display house for a card
   const getCardDisplayHouse = (card: Card, expansion: Expansion | ""): string => {
@@ -196,64 +252,20 @@ export function CardViewerScreen() {
     return "Unknown";
   };
 
-  // Load all cards on mount
-  useEffect(() => {
-    getAllCards().then((cards) => {
-      setAllCards(cards);
-      setLoading(false);
+  const hasFilter =
+    Boolean(selectedExpansion) ||
+    Boolean(selectedHouse) ||
+    selectedCardTypes.size > 0;
 
-      // Extract unique houses
-      const houses = new Set<string>();
-      cards.forEach((card) => {
-        if (typeof card.house === "string") {
-          houses.add(card.house);
-        } else if (Array.isArray(card.house)) {
-          card.house.forEach((h) => houses.add(h));
-        } else {
-          Object.values(card.house).flat().forEach((h) => houses.add(h));
-        }
-      });
-      setAvailableHouses(Array.from(houses).sort());
-    });
-  }, []);
-
-  // Compute filtered cards directly during render
-  const filteredCards = (() => {
-    let filtered = allCards;
-
-    // Filter by expansion
-    if (selectedExpansion) {
-      filtered = filtered.filter((card) => {
-        if (!card.expansions) return false;
-        return card.expansions.includes(selectedExpansion);
-      });
+  const displayedCards = (() => {
+    if (!hasFilter) {
+      return [];
     }
-
-    // Filter by house
-    if (selectedHouse) {
-      filtered = filtered.filter((card) => {
-        if (typeof card.house === "string") {
-          return card.house === selectedHouse;
-        } else if (Array.isArray(card.house)) {
-          return card.house.includes(selectedHouse);
-        } else {
-          return Object.values(card.house).flat().includes(selectedHouse);
-        }
-      });
-    }
-
-    // Filter by card types
-    if (selectedCardTypes.size > 0) {
-      filtered = filtered.filter((card) => selectedCardTypes.has(card.type));
-    }
-
-    // Show only cards with image errors
+    let list = cards;
     if (hideErrorCards) {
-      filtered = filtered.filter((card) => cardImageErrors.has(card.slug));
+      list = list.filter((card) => cardImageErrors.has(card.slug));
     }
-
-    // Sort by house then by name
-    return [...filtered].sort((a, b) => {
+    return [...list].sort((a, b) => {
       const houseA = getCardDisplayHouse(a, selectedExpansion);
       const houseB = getCardDisplayHouse(b, selectedExpansion);
 
@@ -270,6 +282,7 @@ export function CardViewerScreen() {
   };
 
   const toggleCardType = (type: CardKind) => {
+    setLoading(true);
     const newTypes = new Set(selectedCardTypes);
     if (newTypes.has(type)) {
       newTypes.delete(type);
@@ -284,15 +297,6 @@ export function CardViewerScreen() {
     if (!zoneMap) return [];
     return Object.keys(zoneMap) as Zone[];
   };
-
-  if (loading) {
-    return (
-      <div style={styles.container}>
-        <h1>Card Viewer</h1>
-        <p>Loading cards...</p>
-      </div>
-    );
-  }
 
   return (
     <div style={styles.container}>
@@ -311,9 +315,10 @@ export function CardViewerScreen() {
           <select
             id="expansion-select"
             value={selectedExpansion}
-            onChange={(e) =>
-              setSelectedExpansion(e.target.value as Expansion | "")
-            }
+            onChange={(e) => {
+              setLoading(true);
+              handleExpansionChange(e.target.value as Expansion | "");
+            }}
             style={styles.select}
           >
             <option value="">All Expansions</option>
@@ -332,7 +337,10 @@ export function CardViewerScreen() {
           <select
             id="house-select"
             value={selectedHouse}
-            onChange={(e) => setSelectedHouse(e.target.value)}
+            onChange={(e) => {
+              setLoading(true);
+              setSelectedHouse(e.target.value as House | "");
+            }}
             style={styles.select}
           >
             <option value="">All Houses</option>
@@ -392,20 +400,22 @@ export function CardViewerScreen() {
               ⚠️ Please select at least one filter to view cards
             </p>
             <p style={styles.warningText}>
-              Loading all cards at once can cause browser lag. Select an
-              expansion, house, or card type to begin.
+              Select an expansion, house, or card type to query matching cards from the database.
             </p>
           </div>
+        ) : loading ? (
+          <p>Loading cards...</p>
         ) : (
-          <p>Showing {filteredCards.length} cards</p>
+          <p>Showing {displayedCards.length} cards</p>
         )}
       </div>
 
       <div style={styles.cardsGrid}>
-        {(selectedExpansion ||
-          selectedHouse ||
-          selectedCardTypes.size > 0) &&
-          filteredCards.map((card, index) => {
+        {!loading &&
+          (selectedExpansion ||
+            selectedHouse ||
+            selectedCardTypes.size > 0) &&
+          displayedCards.map((card, index) => {
             const house = getCardDisplayHouse(card, selectedExpansion);
             const zones = getCardFragmentZones(card);
 

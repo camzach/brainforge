@@ -47,7 +47,7 @@ export function HomeScreen() {
               study high-res card art, and test fragment extraction.
             </p>
             <ul className="landing-features">
-              <li>📚 Fast local IndexedDB with 2,500+ cards</li>
+              <li>📚 SQLite database with 2,500+ cards</li>
               <li>🔎 Filter by expansion, house, and card type</li>
               <li>✂️ Visual zone clipping inspection</li>
             </ul>

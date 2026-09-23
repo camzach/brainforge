@@ -20,7 +20,7 @@ export const practicePlayRoute = createRoute({
   validateSearch: (search: Record<string, unknown>): PracticeSearchParams => {
     return {
       exp: (search.exp as Expansion) || undefined,
-      house: (search.house as string) || undefined,
+      house: (search.house as PracticeSearchParams["house"]) || undefined,
       types: (search.types as string) || undefined,
       zones: (search.zones as string) || undefined,
     };

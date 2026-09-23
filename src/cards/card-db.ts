@@ -1,153 +1,215 @@
-import { decode } from "@msgpack/msgpack";
-import type { Card, CardKind, Expansion } from "../types";
+import { createSQLiteHTTPPool, type SQLiteHTTPPool } from "sqlite-wasm-http";
+import type { Card, CardKind, Expansion, House } from "../types";
+import {
+  EXPANSION_TO_ID,
+  HOUSE_TO_ID,
+  ID_TO_EXPANSION,
+  ID_TO_HOUSE,
+} from "../types";
 
-const DB_NAME = "card-db";
-const DB_VERSION = 4;
-const STORE_NAME = "cards";
+type SQLBindable = string | number | bigint | Uint8Array | null | undefined;
 
-const INDEX_CARD_TYPE = "cardType";
-const INDEX_EXPANSION = "expansionIdx";
-const INDEX_HOUSE = "houseIdx";
-
-let dbInstance: IDBDatabase | null = null;
-
-async function loadCardDatabase(): Promise<Card[]> {
-  const response = await fetch(`${import.meta.env.BASE_URL}card-db.bin`);
-  if (!response.ok) {
-    throw new Error(`Failed to load card database: ${response.statusText}`);
-  }
-  const buffer = await response.arrayBuffer();
-  const cards = decode(new Uint8Array(buffer)) as Card[];
-  return cards;
+let poolPromise: Promise<SQLiteHTTPPool> | null = null;
+function getRemoteDbUrl(): string {
+  const baseUrl = import.meta.env.BASE_URL;
+  const dbPath = `${baseUrl}card-db.sqlite`.replace(/\/+/g, "/");
+  return new URL(dbPath, window.location.href).href;
 }
 
-export async function openCardDB(): Promise<IDBDatabase> {
-  if (dbInstance) {
-    return dbInstance;
-  }
-
-  const cards = await loadCardDatabase();
-
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onerror = () => reject(request.error);
-
-    request.onsuccess = () => {
-      dbInstance = request.result;
-      resolve(dbInstance);
-    };
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if (db.objectStoreNames.contains(STORE_NAME)) {
-        db.deleteObjectStore(STORE_NAME);
-      }
-      const store = db.createObjectStore(STORE_NAME, { keyPath: "id" });
-      store.createIndex(INDEX_CARD_TYPE, "cardType", { unique: false });
-      store.createIndex(INDEX_EXPANSION, "expansionIdx", {
-        unique: false,
-        multiEntry: true,
+export async function openCardDB(): Promise<SQLiteHTTPPool> {
+  if (!poolPromise) {
+    poolPromise = (async () => {
+      const pool = await createSQLiteHTTPPool({
+        workers: 1,
+        httpOptions: {
+          maxPageSize: 1024,
+          cacheSize: 4096,
+        },
       });
-      store.createIndex(INDEX_HOUSE, "houseIdx", {
-        unique: false,
-        multiEntry: true,
-      });
-
-      store.clear();
-
-      let id = 0;
-      for (const card of cards) {
-        let houseIdx;
-        if (typeof card.house === "string") {
-          houseIdx = [card.house];
-        } else if (Array.isArray(card.house)) {
-          houseIdx = card.house;
-        } else {
-          houseIdx = Object.values(card.house).flat();
-        }
-
-        store.add({
-          id: id++,
-          houseIdx,
-          expansionIdx: card.expansions,
-          ...card,
-        });
-      }
-    };
-  });
+      await pool.open(getRemoteDbUrl());
+      return pool;
+    })();
+  }
+  return poolPromise;
 }
 
-export async function getAllCards(): Promise<Card[]> {
-  const db = await openCardDB();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.getAll();
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+type RawCardRow = {
+  slug: string;
+  title: string;
+  type: string;
+  amber: number;
+  power: number | null;
+  armor: number | null;
 }
 
-export async function getCardsByType(cardType: CardKind): Promise<Card[]> {
-  const db = await openCardDB();
+function constructCard(
+  cardRow: RawCardRow,
+  printings: { expansion: Expansion; house: House }[],
+): Card {
+  const expMap = new Map<Expansion, Set<House>>();
+  for (const p of printings) {
+    if (!expMap.has(p.expansion)) {
+      expMap.set(p.expansion, new Set());
+    }
+    expMap.get(p.expansion)!.add(p.house);
+  }
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const index = store.index(INDEX_CARD_TYPE);
-    const request = index.getAll(cardType);
+  const expansions = Array.from(expMap.keys());
+  let houseValue: Card["house"];
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+  if (expansions.length === 1) {
+    const housesInExp = Array.from(expMap.get(expansions[0])!);
+    houseValue = housesInExp.length === 1 ? housesInExp[0] : housesInExp;
+  } else {
+    const houseMap: Partial<Record<Expansion, House | House[]>> = {};
+    for (const [exp, houses] of expMap.entries()) {
+      const houseArr = Array.from(houses);
+      houseMap[exp] = houseArr.length === 1 ? houseArr[0] : houseArr;
+    }
+    houseValue = houseMap;
+  }
+
+  return {
+    title: cardRow.title,
+    slug: cardRow.slug,
+    type: cardRow.type as CardKind,
+    amber: cardRow.amber,
+    power: cardRow.power ?? undefined,
+    armor: cardRow.armor ?? undefined,
+    house: houseValue,
+    expansions,
+  };
 }
 
-export async function getCardsByExpansion(
-  expansion: Expansion,
+export type QueryCardsFilter = {
+  expansion?: Expansion;
+  house?: House;
+  type?: CardKind | CardKind[];
+  search?: string;
+  slug?: string;
+}
+
+export async function queryCards(
+  filter: QueryCardsFilter = {},
 ): Promise<Card[]> {
-  const db = await openCardDB();
+  const pool = await openCardDB();
+  const conditions: string[] = [];
+  const params: Record<string, SQLBindable> = {};
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const index = store.index(INDEX_EXPANSION);
-    const request = index.getAll(expansion);
+  if (filter.expansion) {
+    const expId = EXPANSION_TO_ID[filter.expansion];
+    if (!expId) return [];
+    conditions.push("p.expansion_id = $expansion_id");
+    params.$expansion_id = expId;
+  }
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+  if (filter.house) {
+    const houseId = HOUSE_TO_ID[filter.house];
+    if (!houseId) return [];
+    conditions.push("p.house_id = $house_id");
+    params.$house_id = houseId;
+  }
+
+  if (filter.type) {
+    if (Array.isArray(filter.type)) {
+      if (filter.type.length === 0) return [];
+      const placeholders = filter.type.map((_, i) => `$type_${i}`);
+      conditions.push(`c.type IN (${placeholders.join(", ")})`);
+      filter.type.forEach((t, i) => {
+        params[`$type_${i}`] = t;
+      });
+    } else {
+      conditions.push("c.type = $type");
+      params.$type = filter.type;
+    }
+  }
+
+  if (filter.slug) {
+    conditions.push("c.slug = $slug");
+    params.$slug = filter.slug;
+  }
+
+  if (filter.search) {
+    conditions.push("c.title LIKE $search");
+    params.$search = `%${filter.search}%`;
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  const sql = `
+    SELECT DISTINCT c.slug, c.title, c.type, c.amber, c.power, c.armor, p.expansion_id, p.house_id
+    FROM card_printings p
+    JOIN cards c ON c.slug = p.card_slug
+    ${whereClause}
+    ORDER BY c.title ASC
+  `;
+
+  type CombinedRow = RawCardRow & { house_id: number; expansion_id: number };
+  const rowsResult = await pool.exec(sql, params, { rowMode: "object" });
+  const rows = (rowsResult as unknown as { row: CombinedRow }[]).map(
+    (r) => r.row,
+  );
+
+  const cardMap = new Map<
+    string,
+    { card: RawCardRow; printings: { expansion: Expansion; house: House }[] }
+  >();
+
+  for (const row of rows) {
+    if (!cardMap.has(row.slug)) {
+      cardMap.set(row.slug, {
+        card: {
+          slug: row.slug,
+          title: row.title,
+          type: row.type,
+          amber: row.amber,
+          power: row.power,
+          armor: row.armor,
+        },
+        printings: [],
+      });
+    }
+    const exp = ID_TO_EXPANSION[row.expansion_id];
+    const h = ID_TO_HOUSE[row.house_id];
+    if (exp && h) {
+      cardMap.get(row.slug)!.printings.push({ expansion: exp, house: h });
+    }
+  }
+
+  return Array.from(cardMap.values()).map(({ card, printings }) =>
+    constructCard(card, printings),
+  );
 }
 
-export async function getCardByTitle(title: string): Promise<Card | undefined> {
-  const db = await openCardDB();
+export async function getExpansionMeta(
+  expansion: Expansion,
+): Promise<{ houses: House[]; typesByHouse: Map<House, Set<CardKind>> }> {
+  const expId = EXPANSION_TO_ID[expansion];
+  if (!expId) return { houses: [], typesByHouse: new Map() };
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.getAll();
+  const pool = await openCardDB();
+  const rowsResult = await pool.exec(
+    `SELECT DISTINCT p.house_id, c.type
+     FROM card_printings p
+     JOIN cards c ON c.slug = p.card_slug
+     WHERE p.expansion_id = $expId`,
+    { $expId: expId },
+    { rowMode: "object" },
+  );
 
-    request.onsuccess = () => {
-      const allCards = request.result as Card[];
-      resolve(allCards.find((c) => c.title === title));
-    };
-    request.onerror = () => reject(request.error);
-  });
-}
+  const rows = (
+    rowsResult as unknown as { row: { house_id: number; type: string } }[]
+  ).map((r) => r.row);
 
-export async function getCardsByHouse(house: string): Promise<Card[]> {
-  const db = await openCardDB();
+  const typesByHouse = new Map<House, Set<CardKind>>();
+  for (const row of rows) {
+    const house = ID_TO_HOUSE[row.house_id];
+    if (!house) continue;
+    if (!typesByHouse.has(house)) typesByHouse.set(house, new Set());
+    typesByHouse.get(house)!.add(row.type as CardKind);
+  }
 
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE_NAME, "readonly");
-    const store = transaction.objectStore(STORE_NAME);
-    const index = store.index(INDEX_HOUSE);
-    const request = index.getAll(house);
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+  const houses = Array.from(typesByHouse.keys()).sort();
+  return { houses, typesByHouse };
 }

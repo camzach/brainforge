@@ -1,25 +1,37 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { Expansion, CardKind } from "../../types";
+import type { Expansion, CardKind, House } from "../../types";
 import { Expansions } from "../../types";
 import {
   cardTypeZoneMaps,
-  getCardHouse,
   ZONE_DISPLAY,
   type Zone,
 } from "../../cards/card-utils";
-import { getCardsByExpansion, openCardDB } from "../../cards/card-db";
+import { getExpansionMeta } from "../../cards/card-db";
 import {
   encodePracticeSearch,
   type PracticeSearchParams,
 } from "./practice-utils";
 
+function deriveCardTypes(
+  typesByHouse: Map<House, Set<CardKind>>,
+  house: House | null,
+): CardKind[] {
+  const types = house
+    ? (typesByHouse.get(house) ?? new Set<CardKind>())
+    : new Set<CardKind>(Array.from(typesByHouse.values()).flatMap((s) => Array.from(s)));
+  return Array.from(types)
+    .filter((t) => t in cardTypeZoneMaps)
+    .sort();
+}
+
 export function SetupScreen() {
   const navigate = useNavigate();
   const [expansion, setExpansion] = useState<Expansion | null>(null);
-  const [expansionHouses, setExpansionHouses] = useState<string[]>([]);
+  const [expansionHouses, setExpansionHouses] = useState<House[]>([]);
+  const [typesByHouse, setTypesByHouse] = useState<Map<House, Set<CardKind>>>(new Map());
   const [targetCardTypes, setTargetCardTypes] = useState<CardKind[]>([]);
-  const [house, setHouse] = useState<string | null>(null);
+  const [house, setHouse] = useState<House | null>(null);
   const [cardTypes, setCardTypes] = useState<Set<CardKind>>(new Set());
   const [zones, setZones] = useState<Record<CardKind, Set<Zone>>>({
     Creature: new Set(),
@@ -34,55 +46,20 @@ export function SetupScreen() {
     cardTypes.size > 0 &&
     Array.from(cardTypes).every((ct) => zones[ct].size > 0);
 
+  // Single query when expansion changes — fetches houses + type-by-house map.
   useEffect(() => {
-    if (!expansion) {
-      return;
-    }
-    openCardDB()
-      .then(() => getCardsByExpansion(expansion))
-      .then((cards) => {
-        const dedupedHouses = new Set<string>();
-        cards.forEach((c) => {
-          const h = getCardHouse(c, expansion);
-          if (Array.isArray(h)) {
-            h.forEach((_h) => dedupedHouses.add(_h));
-          } else {
-            dedupedHouses.add(h);
-          }
-        });
-        setExpansionHouses(Array.from(dedupedHouses).sort());
-      });
+    if (!expansion) return;
+    getExpansionMeta(expansion).then(({ houses, typesByHouse: tbh }) => {
+      setExpansionHouses(houses);
+      setTypesByHouse(tbh);
+      setTargetCardTypes(deriveCardTypes(tbh, null));
+    });
   }, [expansion]);
 
+  // Derive card types from cached data whenever house selection changes.
   useEffect(() => {
-    if (!expansion) {
-      return;
-    }
-    openCardDB()
-      .then(() => getCardsByExpansion(expansion))
-      .then((cards) =>
-        house === null
-          ? cards
-          : cards.filter((c) => {
-              const cardHouse = getCardHouse(c, expansion);
-              if (typeof cardHouse === "string") {
-                return cardHouse === house;
-              }
-              return cardHouse.includes(house);
-            }),
-      )
-      .then((cards) => {
-        const dedupedTypes = new Set<CardKind>();
-        cards.forEach((c) => {
-          dedupedTypes.add(c.type);
-        });
-        setTargetCardTypes(
-          Array.from(dedupedTypes)
-            .filter((t) => t in cardTypeZoneMaps)
-            .sort(),
-        );
-      });
-  }, [expansion, house]);
+    setTargetCardTypes(deriveCardTypes(typesByHouse, house));
+  }, [house, typesByHouse]);
 
   const handleCardTypeToggle = (cardType: CardKind) => {
     setCardTypes((prev) => {

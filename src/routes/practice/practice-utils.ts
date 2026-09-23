@@ -1,5 +1,8 @@
-import type { CardKind, Expansion, GameConfig } from "../../types";
+import type { CardKind, Expansion, GameConfig, House } from "../../types";
+import { HOUSES } from "../../constants";
 import { cardTypeZoneMaps, type Zone } from "../../cards/card-utils";
+
+const VALID_HOUSES = new Set<string>(HOUSES);
 
 /**
  * Practice search params schema
@@ -7,7 +10,7 @@ import { cardTypeZoneMaps, type Zone } from "../../cards/card-utils";
  */
 export type PracticeSearchParams = {
   exp?: Expansion;
-  house?: string;
+  house?: House;
   types?: string;
   zones?: string;
 };
@@ -86,9 +89,11 @@ export function decodePracticeSearch(
     return null;
   }
 
+  const validHouse = search.house && VALID_HOUSES.has(search.house) ? (search.house as House) : null;
+
   return {
     expansion: search.exp,
-    house: search.house || null,
+    house: validHouse,
     cardTypes,
     zones,
   };

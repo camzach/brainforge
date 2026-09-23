@@ -1,4 +1,4 @@
-import type { Card, CardKind, Expansion } from "../types";
+import type { Card, CardKind, Expansion, House } from "../types";
 import { getCardImageUrl } from "./card-image-utils";
 
 export type Zone = "amber" | "rules" | "power" | "armor" | "traits" | "name";
@@ -195,15 +195,6 @@ export const cardTypeZoneMaps: Record<
   },
 };
 
-// export function getPipsRect(amber: number): Path2D {
-//   const baseWidth = 20;
-//   const width = amber * baseWidth + 10;
-//   return {
-//     pos: [10, 60],
-//     size: [width, 50],
-//   };
-// }
-
 export function getClipPath(
   card: Card,
   zone: Zone,
@@ -237,11 +228,14 @@ export function makeId() {
   );
 }
 
-export function getCardHouse(card: Card, expansion: Expansion) {
-  if (typeof card.house === "object" && !Array.isArray(card.house)) {
-    return card.house[expansion];
+export function getCardHouse(
+  card: Card,
+  expansion: Expansion,
+): House | House[] {
+  if (typeof card.house === "string" || Array.isArray(card.house)) {
+    return card.house;
   }
-  return card.house;
+  return card.house[expansion] ?? [];
 }
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();

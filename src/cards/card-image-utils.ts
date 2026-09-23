@@ -1,4 +1,4 @@
-import type { Card, Expansion } from "../types";
+import type { Card, Expansion, House } from "../types";
 
 export function normalizeHouseForUrl(house: string): string {
   let normalized = house.toLowerCase();
@@ -24,33 +24,25 @@ export function getCardImageUrl(
   return `${base}${normalizedHouse}/${slug}.png`;
 }
 
-export function getCardHouses(card: Card): string[] {
-  const houses = new Set<string>();
-
+export function getCardHouses(card: Card, expansion?: Expansion): House[] {
   if (typeof card.house === "string") {
-    houses.add(card.house);
-  } else if (Array.isArray(card.house)) {
-    card.house.forEach((h) => houses.add(h));
-  } else if (typeof card.house === "object") {
-    // It's an object with expansion keys
-    Object.values(card.house).forEach((h) => {
-      if (typeof h === "string") {
-        houses.add(h);
-      } else if (Array.isArray(h)) {
-        h.forEach((house) => houses.add(house));
-      }
-    });
+    return [card.house];
   }
-
+  if (Array.isArray(card.house)) {
+    return card.house;
+  }
+  if (expansion && card.house[expansion]) {
+    const h = card.house[expansion]!;
+    return Array.isArray(h) ? h : [h];
+  }
+  const houses = new Set<House>();
+  Object.values(card.house).forEach((h) => {
+    if (typeof h === "string") {
+      houses.add(h);
+    } else if (Array.isArray(h)) {
+      h.forEach((house) => houses.add(house));
+    }
+  });
   return Array.from(houses);
 }
 
-export function getCardHouse(
-  card: Card,
-  expansion: Expansion,
-): string | string[] {
-  if (typeof card.house === "object" && !Array.isArray(card.house)) {
-    return card.house[expansion];
-  }
-  return card.house;
-}

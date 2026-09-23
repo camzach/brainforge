@@ -3,7 +3,7 @@ import path from 'path';
 import https from 'https';
 import http from 'http';
 import { fileURLToPath } from 'url';
-import { decode } from '@msgpack/msgpack';
+import Database from 'better-sqlite3';
 import { getCardImageUrl, getCardHouses } from '../src/cards/card-image-utils.js';
 import type { Card } from '../src/types.js';
 
@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 
 // Configuration
 const CARD_IMAGE_BASEURL = process.env.VITE_CARD_IMAGE_BASEURL || 'https://keyforge-card-images.s3-us-west-2.amazonaws.com/';
-const CARD_DB_PATH = path.join(__dirname, '../public/card-db.bin');
+const CARD_DB_PATH = path.join(__dirname, '../public/card-db.sqlite');
 
 type TestResult = {
   success: boolean;
@@ -84,11 +84,74 @@ function testImageUrl(url: string): Promise<TestResult> {
   });
 }
 
+import { ID_TO_EXPANSION, ID_TO_HOUSE, type Expansion, type House } from '../src/constants.js';
+
+type CardRow = {
+  title: string;
+  slug: string;
+  type: Card['type'];
+  amber: number;
+  power: number | null;
+  armor: number | null;
+}
+
+type PrintingRow = {
+  expansion_id: number;
+  house_id: number;
+  card_slug: string;
+}
+
 // Load all cards from the built card database
 function loadAllCards(): Card[] {
-  const buffer = fs.readFileSync(CARD_DB_PATH);
-  const cards = decode(new Uint8Array(buffer)) as Card[];
-  return cards;
+  const db = new Database(CARD_DB_PATH);
+  const cardRows = db.prepare('SELECT title, slug, type, amber, power, armor FROM cards').all() as CardRow[];
+  const printingRows = db.prepare('SELECT expansion_id, house_id, card_slug FROM card_printings').all() as PrintingRow[];
+  db.close();
+
+  const printingsByCard = new Map<string, { expansion: Expansion; house: House }[]>();
+  for (const p of printingRows) {
+    const exp = ID_TO_EXPANSION[p.expansion_id];
+    const h = ID_TO_HOUSE[p.house_id];
+    if (!exp || !h) continue;
+
+    if (!printingsByCard.has(p.card_slug)) {
+      printingsByCard.set(p.card_slug, []);
+    }
+    printingsByCard.get(p.card_slug)!.push({ expansion: exp, house: h });
+  }
+
+  return cardRows.map((card) => {
+    const printings = printingsByCard.get(card.slug) || [];
+    const expMap = new Map<Expansion, Set<House>>();
+    for (const p of printings) {
+      if (!expMap.has(p.expansion)) expMap.set(p.expansion, new Set());
+      expMap.get(p.expansion)!.add(p.house);
+    }
+    const expansions = Array.from(expMap.keys());
+    let houseValue: Card['house'];
+    if (expansions.length === 1) {
+      const houses = Array.from(expMap.get(expansions[0])!);
+      houseValue = houses.length === 1 ? houses[0] : houses;
+    } else {
+      const houseMap: Partial<Record<Expansion, House | House[]>> = {};
+      for (const [e, hs] of expMap.entries()) {
+        const arr = Array.from(hs);
+        houseMap[e] = arr.length === 1 ? arr[0] : arr;
+      }
+      houseValue = houseMap;
+    }
+
+    return {
+      title: card.title,
+      slug: card.slug,
+      type: card.type,
+      amber: card.amber,
+      power: card.power ?? undefined,
+      armor: card.armor ?? undefined,
+      house: houseValue,
+      expansions,
+    };
+  });
 }
 
 // Main test function
