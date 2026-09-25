@@ -1,4 +1,4 @@
-import { createSQLiteHTTPPool, type SQLiteHTTPPool } from "sqlite-wasm-http";
+import sqlite3InitModule from "@sqlite.org/sqlite-wasm";
 import type { Card, CardKind, Expansion, House } from "../types";
 import {
   EXPANSION_TO_ID,
@@ -7,30 +7,75 @@ import {
   ID_TO_HOUSE,
 } from "../types";
 
-type SQLBindable = string | number | bigint | Uint8Array | null | undefined;
+const LOCAL_STORAGE_CHECKSUM_KEY = "brainforge:card-db:checksum";
 
-let poolPromise: Promise<SQLiteHTTPPool> | null = null;
-function getRemoteDbUrl(): string {
-  const baseUrl = import.meta.env.BASE_URL;
-  const dbPath = `${baseUrl}card-db.sqlite`.replace(/\/+/g, "/");
-  return new URL(dbPath, window.location.href).href;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SqliteDB = any;
+
+let dbPromise: Promise<SqliteDB> | null = null;
+
+async function fetchDbBytes(): Promise<ArrayBuffer> {
+  const baseUrl = import.meta.env.BASE_URL || "/";
+  const versionUrl = `${baseUrl}card-db.version.json`.replace(/\/+/g, "/");
+  const sqliteUrl = `${baseUrl}card-db.sqlite`.replace(/\/+/g, "/");
+
+  let checksumParam = "";
+  try {
+    const versionRes = await fetch(versionUrl, { cache: "no-cache" });
+    if (versionRes.ok) {
+      const versionData = await versionRes.json();
+      const currentChecksum = versionData.checksum;
+      const storedChecksum = localStorage.getItem(LOCAL_STORAGE_CHECKSUM_KEY);
+
+      if (currentChecksum) {
+        if (storedChecksum && storedChecksum !== currentChecksum) {
+          console.log(
+            `Database version changed (${storedChecksum} -> ${currentChecksum}). Invalidating cache.`,
+          );
+        }
+        localStorage.setItem(LOCAL_STORAGE_CHECKSUM_KEY, currentChecksum);
+        checksumParam = `?v=${currentChecksum}`;
+      }
+    }
+  } catch (err) {
+    console.warn("Could not check card-db version metadata:", err);
+  }
+
+  const fetchUrl = `${sqliteUrl}${checksumParam}`;
+  const fetchOptions: RequestInit = checksumParam ? {} : { cache: "no-cache" };
+  const res = await fetch(fetchUrl, fetchOptions);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch card database from ${fetchUrl}: ${res.statusText}`);
+  }
+  return res.arrayBuffer();
 }
 
-export async function openCardDB(): Promise<SQLiteHTTPPool> {
-  if (!poolPromise) {
-    poolPromise = (async () => {
-      const pool = await createSQLiteHTTPPool({
-        workers: 1,
-        httpOptions: {
-          maxPageSize: 1024,
-          cacheSize: 4096,
-        },
-      });
-      await pool.open(getRemoteDbUrl());
-      return pool;
+export async function openCardDB(): Promise<SqliteDB> {
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const [sqlite3, dbFile] = await Promise.all([
+        sqlite3InitModule(),
+        fetchDbBytes(),
+      ]);
+
+      const db = new sqlite3.oo1.DB();
+      const bytes = new Uint8Array(dbFile);
+      const pData = sqlite3.wasm.allocFromTypedArray(bytes);
+
+      sqlite3.capi.sqlite3_deserialize(
+        db,
+        "main",
+        pData,
+        bytes.byteLength,
+        bytes.byteLength,
+        sqlite3.capi.SQLITE_DESERIALIZE_FREEONCLOSE |
+          sqlite3.capi.SQLITE_DESERIALIZE_RESIZEABLE,
+      );
+
+      return db;
     })();
   }
-  return poolPromise;
+  return dbPromise;
 }
 
 type RawCardRow = {
@@ -40,7 +85,7 @@ type RawCardRow = {
   amber: number;
   power: number | null;
   armor: number | null;
-}
+};
 
 function constructCard(
   cardRow: RawCardRow,
@@ -87,27 +132,27 @@ export type QueryCardsFilter = {
   type?: CardKind | CardKind[];
   search?: string;
   slug?: string;
-}
+};
 
 export async function queryCards(
   filter: QueryCardsFilter = {},
 ): Promise<Card[]> {
-  const pool = await openCardDB();
+  const db = await openCardDB();
   const conditions: string[] = [];
-  const params: Record<string, SQLBindable> = {};
+  const bind: Record<string, string | number> = {};
 
   if (filter.expansion) {
     const expId = EXPANSION_TO_ID[filter.expansion];
     if (!expId) return [];
     conditions.push("p.expansion_id = $expansion_id");
-    params.$expansion_id = expId;
+    bind.$expansion_id = expId;
   }
 
   if (filter.house) {
     const houseId = HOUSE_TO_ID[filter.house];
     if (!houseId) return [];
     conditions.push("p.house_id = $house_id");
-    params.$house_id = houseId;
+    bind.$house_id = houseId;
   }
 
   if (filter.type) {
@@ -116,22 +161,22 @@ export async function queryCards(
       const placeholders = filter.type.map((_, i) => `$type_${i}`);
       conditions.push(`c.type IN (${placeholders.join(", ")})`);
       filter.type.forEach((t, i) => {
-        params[`$type_${i}`] = t;
+        bind[`$type_${i}`] = t;
       });
     } else {
       conditions.push("c.type = $type");
-      params.$type = filter.type;
+      bind.$type = filter.type;
     }
   }
 
   if (filter.slug) {
     conditions.push("c.slug = $slug");
-    params.$slug = filter.slug;
+    bind.$slug = filter.slug;
   }
 
   if (filter.search) {
     conditions.push("c.title LIKE $search");
-    params.$search = `%${filter.search}%`;
+    bind.$search = `%${filter.search}%`;
   }
 
   const whereClause =
@@ -146,10 +191,12 @@ export async function queryCards(
   `;
 
   type CombinedRow = RawCardRow & { house_id: number; expansion_id: number };
-  const rowsResult = await pool.exec(sql, params, { rowMode: "object" });
-  const rows = (rowsResult as unknown as { row: CombinedRow }[]).map(
-    (r) => r.row,
-  );
+  const rows = db.exec({
+    sql,
+    bind,
+    rowMode: "object",
+    returnValue: "resultRows",
+  }) as CombinedRow[];
 
   const cardMap = new Map<
     string,
@@ -188,19 +235,16 @@ export async function getExpansionMeta(
   const expId = EXPANSION_TO_ID[expansion];
   if (!expId) return { houses: [], typesByHouse: new Map() };
 
-  const pool = await openCardDB();
-  const rowsResult = await pool.exec(
-    `SELECT DISTINCT p.house_id, c.type
+  const db = await openCardDB();
+  const rows = db.exec({
+    sql: `SELECT DISTINCT p.house_id, c.type
      FROM card_printings p
      JOIN cards c ON c.slug = p.card_slug
      WHERE p.expansion_id = $expId`,
-    { $expId: expId },
-    { rowMode: "object" },
-  );
-
-  const rows = (
-    rowsResult as unknown as { row: { house_id: number; type: string } }[]
-  ).map((r) => r.row);
+    bind: { $expId: expId },
+    rowMode: "object",
+    returnValue: "resultRows",
+  }) as { house_id: number; type: string }[];
 
   const typesByHouse = new Map<House, Set<CardKind>>();
   for (const row of rows) {
