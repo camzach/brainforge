@@ -1,0 +1,693 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PUZZLE DIRECTORY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.navTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-size: 17px;
+}
+
+/* ── Controls bar ─────────────────────────────────────────────────────────── */
+
+.controlsBar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--bg-subtle);
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.searchBox input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--sans);
+  box-sizing: border-box;
+  transition: border-color 0.12s;
+}
+
+.searchBox input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.searchBox input::placeholder {
+  color: var(--text-dim);
+}
+
+.filtersRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterItem label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.filterItem select {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+/* ── Puzzle grid ──────────────────────────────────────────────────────────── */
+
+.puzzleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.puzzleCard {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  transition:
+    transform var(--transition),
+    border-color var(--transition);
+}
+
+.puzzleCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-border);
+}
+
+.puzzleCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.puzzleDate {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.puzzleTitle {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-h);
+  font-family: var(--display);
+}
+
+.puzzleCardDesc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.puzzleCardGoal {
+  background: var(--bg);
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.puzzleCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.puzzleTags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.houseTagBadge,
+.hintsBadge {
+  font-size: 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+}
+
+.noPuzzlesMessage {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 16px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+}
+
+/* ── Difficulty tags ──────────────────────────────────────────────────────── */
+
+.difficultyTag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.difficultyTag.easy {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.difficultyTag.medium {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.difficultyTag.hard {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+.difficultyTag.expert {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid var(--color-error-border);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PUZZLE DETAIL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+
+.detailWrap {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detailTopBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.detailTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-h);
+  font-family: var(--display);
+  flex: 1;
+}
+
+.detailGoal {
+  font-size: 13px;
+  color: var(--text);
+  background: var(--accent-bg);
+  border-left: 3px solid var(--accent);
+  padding: 4px 10px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  flex: 2;
+}
+
+/* ── Game state chip ──────────────────────────────────────────────────────── */
+
+.stripChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* ── Board ────────────────────────────────────────────────────────────────── */
+
+.board {
+  /* Card size tokens — change --card-thumb-height to resize everything. */
+  --card-thumb-width: 65px;
+  --card-thumb-height: calc(var(--card-thumb-width) * 7 / 5);
+  --card-zoom-scale: 4;
+  --card-zoom-height: calc(var(--card-thumb-height) * var(--card-zoom-scale));
+  --card-zoom-width: calc(var(--card-zoom-height) * 5 / 7);
+
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boardRow {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex: 1;
+  overflow: hidden;
+
+  > * {
+    flex: 1;
+
+    &:nth-child(2) {
+      flex: none;
+    }
+  }
+}
+
+.boardZone {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  min-width: 0;
+}
+
+.zoneName {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+}
+
+/* ── Card row ─────────────────────────────────────────────────────────────── */
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+
+  .cardThumb {
+    scroll-snap-align: start;
+    flex: none;
+  }
+}
+
+/* ── Card thumb ───────────────────────────────────────────────────────────── */
+
+.cardSkeleton {
+  height: var(--card-thumb-height);
+  width: var(--card-thumb-width);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+}
+
+.cardThumb {
+  height: var(--card-thumb-height);
+  width: var(--card-thumb-width);
+  position: relative;
+  cursor: default;
+  display: grid;
+  place-items: center;
+
+  > img,
+  > .cardMain > img {
+    height: var(--card-thumb-height);
+    width: var(--card-thumb-width);
+    border-radius: var(--radius);
+  }
+}
+
+.cardExhausted {
+  transform: rotate(90deg);
+  margin-inline: calc((var(--card-thumb-height) - var(--card-thumb-width)) / 2);
+}
+
+.cardThumbBadges {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  width: var(--card-thumb-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.cardThumbBadge {
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  img {
+    width: 1.5ch;
+    height: 1.5ch;
+    object-fit: contain;
+  }
+}
+
+/* ── Card upgrades & underneath stacks ───────────────────────────────────── */
+
+.upgradeStack {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  img {
+    position: absolute;
+    --upIdx: calc(sibling-count() - sibling-index() + 1);
+    top: calc(-1 * var(--upIdx) * 12px);
+    left: 0;
+    height: var(--card-thumb-height);
+    width: var(--card-thumb-width);
+  }
+}
+
+.underneathStack {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  img {
+    position: absolute;
+    --fanIdx: calc(sibling-count() - sibling-index() + 1);
+    top: calc(var(--fanIdx) * 3px);
+    left: calc(var(--fanIdx) * 3px);
+    height: var(--card-thumb-height);
+    width: var(--card-thumb-width);
+  }
+}
+
+.cardMain {
+  position: relative;
+}
+
+.cardStackCount {
+  position: absolute;
+  top: -6px;
+  right: -1px;
+  background: var(--accent);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+/* ── Card popovers ────────────────────────────────────────────────────────── */
+
+.cardZoomPopover img {
+  height: var(--card-zoom-height);
+  width: var(--card-zoom-width);
+  flex: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-elevated);
+  display: block;
+}
+
+.cardZoomPopover {
+  background: none;
+  border: none;
+  position-area: span-bottom span-all;
+  position-try-fallbacks:
+    span-bottom span-right,
+    span-bottom span-left;
+  pointer-events: none;
+
+  &:popover-open {
+    opacity: 1;
+    scale: 1;
+    transition:
+      opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+      scale 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+
+    @starting-style {
+      opacity: 0;
+      scale: 0.33;
+    }
+  }
+}
+
+/* Stack fan: card tray showing all stacked cards side-by-side */
+.cardStackFan {
+  --fan-pad: 8px;
+  --fan-border: 1px;
+  --fan-gap: 8px;
+  --fan-card-step: calc(var(--card-zoom-width) + var(--fan-gap));
+  --fan-chrome: calc(2 * (var(--fan-pad) + var(--fan-border)));
+  --fan-inner-budget: calc(90vw - var(--fan-chrome));
+
+  padding: var(--fan-pad);
+  border: var(--fan-border) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  box-shadow: var(--shadow-elevated);
+
+  &:popover-open {
+    display: flex;
+    gap: var(--fan-gap);
+    flex-wrap: wrap;
+    width: max-content;
+    max-width: calc(
+      round(
+          down,
+          calc(var(--fan-inner-budget) + var(--fan-gap)),
+          var(--fan-card-step)
+        ) -
+        var(--fan-gap) + var(--fan-chrome)
+    );
+  }
+}
+
+/* ── Side divider ─────────────────────────────────────────────────────────── */
+
+.sideDivider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.sideDividerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.sideDividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Player stats (in divider) ────────────────────────────────────────────── */
+
+.aemberIcon {
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.playerStats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.keyPip {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+}
+
+.keyForged {
+  border-color: transparent;
+}
+
+/* ── Hints ────────────────────────────────────────────────────────────────── */
+
+.bottomRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.collapsible {
+  flex: 1;
+  min-width: 200px;
+}
+
+.collapseBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hintItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hintToggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 12px;
+  font-family: var(--sans);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hintToggle:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.hintText {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ── Solution ─────────────────────────────────────────────────────────────── */
+
+.solutionBlock {
+  flex: 2;
+  min-width: 240px;
+}
+
+.btnSolutionToggle {
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success);
+  color: var(--color-success);
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--sans);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.btnSolutionToggle.revealed {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.solutionContent {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.solutionOverview {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.solutionSteps {
+  margin: 0 0 8px 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.solutionSteps li {
+  line-height: 1.5;
+}
+
+.solutionExplanation {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 4px;
+}

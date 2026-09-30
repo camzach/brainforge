@@ -1,3 +1,5 @@
+@import "./reset.css";
+
 /* ── Fonts ────────────────────────────────────────────────────────────────── */
 
 @import url("https://fonts.cdnfonts.com/css/teuton-normal");
@@ -7,27 +9,27 @@
 
 :root {
   /* Background */
-  --bg: #16130F;
+  --bg: #16130f;
   /* Surface / card bg */
-  --bg-subtle: #211D18;
+  --bg-subtle: #211d18;
   /* Text primary */
-  --text: #F4F1EA;
+  --text: #f4f1ea;
   /* Text heading */
-  --text-h: #F4F1EA;
+  --text-h: #f4f1ea;
   /* Text muted */
-  --text-dim: #948C7E;
+  --text-dim: #948c7e;
   /* Border/divider */
-  --border: #3A342C;
+  --border: #3a342c;
   --border-strong: #5a4f42;
   /* Code bg — slightly lighter surface */
   --code-bg: #2a2520;
   /* Primary accent */
-  --accent: #F2D93B;
-  --accent-hover: #D4B622;
+  --accent: #f2d93b;
+  --accent-hover: #d4b622;
   --accent-bg: rgba(242, 217, 59, 0.1);
   --accent-border: rgba(242, 217, 59, 0.3);
   /* Secondary accent */
-  --accent-secondary: #B23A2E;
+  --accent-secondary: #b23a2e;
   /* Semantic feedback */
   --color-success: #4ade80;
   --color-success-bg: rgba(74, 222, 128, 0.07);
@@ -68,16 +70,6 @@
   @media (max-width: 1024px) {
     font-size: 16px;
   }
-}
-
-/* ── Resets ───────────────────────────────────────────────────────────────── */
-
-body {
-  margin: 0;
-}
-
-p {
-  margin: 0;
 }
 
 /* ── Layout ───────────────────────────────────────────────────────────────── */

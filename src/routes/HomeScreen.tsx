@@ -44,6 +44,22 @@ export function HomeScreen() {
           </div>
         </div>
 
+        {/* <div className={styles.card}> */}
+        {/*   <span className={styles.cardLabel}>Puzzles</span> */}
+        {/*   <div className={styles.body}> */}
+        {/*     <h2>Tactical Puzzles</h2> */}
+        {/*     <p> */}
+        {/*       Curated board states and lethal sequencing challenges. Calculate */}
+        {/*       steals, optimise reap sequences, and forge the game-winning key. */}
+        {/*     </p> */}
+        {/*   </div> */}
+        {/*   <div className={styles.actions}> */}
+        {/*     <Link to="/puzzles" className="btn btn-primary"> */}
+        {/*       Browse puzzles */}
+        {/*     </Link> */}
+        {/*   </div> */}
+        {/* </div> */}
+
         <div className={styles.card}>
           <span className={styles.cardLabel}>Browse</span>
           <div className={styles.body}>
