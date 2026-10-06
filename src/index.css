@@ -29,15 +29,28 @@
   /* Secondary accent */
   --accent-secondary: #B23A2E;
   /* Semantic feedback */
-  --color-correct: #4ade80;
-  --color-correct-bg: rgba(74, 222, 128, 0.07);
-  --color-incorrect: #f87171;
-  --color-incorrect-bg: rgba(248, 113, 113, 0.07);
+  --color-success: #4ade80;
+  --color-success-bg: rgba(74, 222, 128, 0.07);
+  --color-success-border: rgba(74, 222, 128, 0.4);
+  --color-warning: #fb923c;
+  --color-warning-bg: rgba(251, 146, 60, 0.15);
+  --color-warning-border: rgba(251, 146, 60, 0.4);
+  --color-error: #f87171;
+  --color-error-bg: rgba(248, 113, 113, 0.07);
+  --color-error-border: rgba(248, 113, 113, 0.4);
+  /* Shadow */
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.6);
 
+  /* Border radius */
   --radius-sm: 4px;
   --radius: 6px;
+  --radius-full: 9999px;
 
+  /* Common transition speed */
+  --transition: 0.12s;
+
+  /* Fonts */
   --display: "Teuton Normal", system-ui, sans-serif;
   --sans: "Avenir Next", system-ui, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
@@ -77,7 +90,6 @@ p {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
 /* ── Typography ───────────────────────────────────────────────────────────── */
@@ -143,9 +155,9 @@ code {
   border: 1px solid transparent;
   cursor: pointer;
   transition:
-    background 0.12s,
-    border-color 0.12s,
-    color 0.12s;
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
   white-space: nowrap;
   text-decoration: none;
   user-select: none;
@@ -192,15 +204,13 @@ code {
 /* ── Surface ──────────────────────────────────────────────────────────────── */
 
 /* Use border-only by default; shadow is reserved for floating/elevated things */
-.surface {
+.surface,
+.surface-raised {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
 .surface-raised {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
   box-shadow: var(--shadow);
 }

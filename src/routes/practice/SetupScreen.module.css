@@ -1,12 +1,10 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: 0;
   padding: 40px 32px 80px;
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
-  box-sizing: border-box;
 
   @media (max-width: 640px) {
     padding: 28px 20px 64px;
@@ -35,7 +33,6 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -79,7 +76,7 @@
   cursor: pointer;
   align-self: flex-start;
   min-width: 220px;
-  transition: border-color 0.12s;
+  transition: border-color var(--transition);
 }
 
 .select:focus {
@@ -87,26 +84,53 @@
   border-color: var(--accent);
 }
 
-/* ── Connected Button Group (Houses) ─────────────────────────────────────────── */
+/* ── Shared toggle-button base ────────────────────────────────────────────── */
+/*
+ * .toggle  — connected segmented control (no gaps between items)
+ * .buttonGroupLabel — standalone pill toggles with gaps between items
+ * Both share the same visual language; only layout context differs.
+ */
 
+.toggle,
+.buttonGroupLabel {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    color var(--transition);
+  user-select: none;
+}
+
+.toggle:hover,
+.buttonGroupLabel:hover {
+  border-color: var(--border-strong);
+  color: var(--text-h);
+}
+
+.toggle.active,
+.buttonGroupLabel.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Connected group: flush borders + rounded ends only */
 .toggleGroup {
   display: flex;
   flex-wrap: wrap;
 }
 
 .toggle {
-  padding: 5px 12px;
-  font-size: 13px;
-  font-weight: 400;
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
   border-radius: 0;
-  cursor: pointer;
-  transition: border-color 0.12s, background 0.12s, color 0.12s, z-index 0.12s;
   margin-left: -1px;
-  user-select: none;
+  z-index: 0;
 }
 
 .toggle:first-child {
@@ -121,16 +145,10 @@
 }
 
 .toggle:hover {
-  border-color: var(--border-strong);
-  color: var(--text-h);
   z-index: 1;
 }
 
 .toggle.active {
-  background: var(--accent-bg);
-  border-color: var(--accent);
-  color: var(--accent);
-  font-weight: 500;
   z-index: 2;
 }
 
@@ -138,6 +156,22 @@
   outline: 2px solid var(--accent);
   outline-offset: -2px;
   z-index: 3;
+}
+
+/* Gapped group: rounded on all corners */
+.buttonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.buttonGroupLabel {
+  border-radius: var(--radius-sm);
+}
+
+.buttonGroupLabel:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 /* ── Checkboxes (Legacy/Fallback) ───────────────────────────────────────────── */
@@ -162,45 +196,6 @@
   width: 14px;
   height: 14px;
   cursor: pointer;
-}
-
-/* ── Toggle Buttons (Card types / Zones) ────────────────────────────────────── */
-
-.buttonGroup {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.buttonGroupLabel {
-  padding: 5px 12px;
-  font-size: 13px;
-  font-weight: 400;
-  font-family: var(--sans);
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: border-color 0.12s, background 0.12s, color 0.12s;
-  user-select: none;
-}
-
-.buttonGroupLabel:hover {
-  border-color: var(--border-strong);
-  color: var(--text-h);
-}
-
-.buttonGroupLabel.active {
-  background: var(--accent-bg);
-  border-color: var(--accent);
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.buttonGroupLabel:has(input:focus-visible) {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
 }
 
 /* Visually hide checkboxes but keep accessible */
