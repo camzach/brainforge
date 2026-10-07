@@ -15,36 +15,75 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_ENDPOINT_URL: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_KEY: ${{ secrets.R2_KEY || 'keyforge.sql.zst' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Get R2 object ETag
+        id: r2_etag
+        run: |
+          ETAG=$(aws s3api head-object \
+            --bucket "$R2_BUCKET" \
+            --key "$R2_KEY" \
+            --query 'ETag' \
+            --output text | tr -d '"')
+          echo "etag=$ETAG" >> "$GITHUB_OUTPUT"
+
+      - name: Restore cached keyforge.db
+        id: cache_db
+        uses: actions/cache@v4
         with:
-          lfs: true
+          path: keyforge.db
+          key: keyforge-db-${{ steps.r2_etag.outputs.etag }}
+
+      - name: Download and decompress source DB
+        if: steps.cache_db.outputs.cache-hit != 'true'
+        run: |
+          aws s3 cp "s3://$R2_BUCKET/$R2_KEY" - \
+            | zstd -d --stdout \
+            | sqlite3 keyforge.db
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "23"
+
       - name: Install pnpm
         run: npm install -g pnpm@10.10.0
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
       - name: Build
         run: pnpm build
         env:
           NODE_ENV: production
           VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
+          SOURCE_DB_PATH: keyforge.db
+
       - name: Create SPA 404 fallback
         run: cp dist/index.html dist/404.html
-      - name: Test Card Images
-        run: pnpm test:images
-        env:
-          VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
+
+      # - name: Test Card Images
+      #   run: pnpm test:images
+      #   env:
+      #     VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: "dist"
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

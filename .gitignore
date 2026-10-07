@@ -3,7 +3,8 @@ dist
 .env
 
 # Generated card database bundles (created at build time)
+keyforge.db
+keyforge.sql
+keyforge.sql.zst
 public/card-db.sqlite
 public/card-db.version.json
-packs
-filtered-cards.json
