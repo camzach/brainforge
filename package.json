@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:cards": "degit --force keyteki/keyteki/master-vault-data/packs packs && tsx scripts/build-cards.ts",
+    "build:cards": "tsx scripts/build-cards.ts",
     "test:images": "tsx scripts/test-card-images.ts"
   },
   "dependencies": {
@@ -34,7 +34,6 @@
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-sqlite3": "^13.0.3",
-    "degit": "^3.6.1",
     "eslint": "^10.2.0",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
