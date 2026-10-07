@@ -1,4 +1,4 @@
-import sqlite3InitModule from "@sqlite.org/sqlite-wasm";
+import sqlite3InitModule, { type Database } from "@sqlite.org/sqlite-wasm";
 import type { Card, CardKind, Expansion, House } from "../types";
 import {
   EXPANSION_TO_ID,
@@ -9,10 +9,7 @@ import {
 
 const LOCAL_STORAGE_CHECKSUM_KEY = "brainforge:card-db:checksum";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SqliteDB = any;
-
-let dbPromise: Promise<SqliteDB> | null = null;
+let dbPromise: Promise<Database> | null = null;
 
 async function fetchDbBytes(): Promise<ArrayBuffer> {
   const baseUrl = import.meta.env.BASE_URL || "/";
@@ -45,12 +42,14 @@ async function fetchDbBytes(): Promise<ArrayBuffer> {
   const fetchOptions: RequestInit = checksumParam ? {} : { cache: "no-cache" };
   const res = await fetch(fetchUrl, fetchOptions);
   if (!res.ok) {
-    throw new Error(`Failed to fetch card database from ${fetchUrl}: ${res.statusText}`);
+    throw new Error(
+      `Failed to fetch card database from ${fetchUrl}: ${res.statusText}`,
+    );
   }
   return res.arrayBuffer();
 }
 
-export async function openCardDB(): Promise<SqliteDB> {
+export async function openCardDB(): Promise<Database> {
   if (!dbPromise) {
     dbPromise = (async () => {
       const [sqlite3, dbFile] = await Promise.all([
@@ -124,6 +123,24 @@ function constructCard(
     house: houseValue,
     expansions,
   };
+}
+
+export async function countCards(): Promise<number> {
+  const db = await openCardDB();
+  return Number(db.selectValue("SELECT COUNT(*) FROM cards"));
+}
+
+export async function getCardByIndex(index: number): Promise<Card | null> {
+  const db = await openCardDB();
+  const offset = Math.floor(index);
+  const slug = db.selectValue(
+    "SELECT slug FROM cards ORDER BY slug ASC LIMIT 1 OFFSET ?",
+    [offset],
+  ) as string | undefined;
+
+  if (!slug) return null;
+  const cards = await queryCards({ slug });
+  return cards[0] ?? null;
 }
 
 export type QueryCardsFilter = {

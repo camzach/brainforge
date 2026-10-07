@@ -1,0 +1,320 @@
+/* ── Keyfordle Screen ──────────────────────────────────────────────────────── */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px 24px 80px;
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 640px) {
+    padding: 24px 16px 48px;
+    gap: 20px;
+  }
+}
+
+.back {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.title {
+  color: var(--accent);
+  text-align: center;
+}
+
+/* ── Stats Banner ─────────────────────────────────────────────────────────── */
+
+.statsBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 680px;
+  box-sizing: border-box;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.statValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+/* ── Guess Histogram ──────────────────────────────────────────────────────── */
+
+.histogramCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 24px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 680px;
+  box-sizing: border-box;
+}
+
+.histogramHeading {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.histogramRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.histogramIndex {
+  width: 20px;
+  text-align: right;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.histogramTrack {
+  flex: 1;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+
+.histogramFill {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  background: var(--border-strong);
+  color: var(--text-h);
+  padding: 0 8px;
+  font-weight: 600;
+  font-size: 12px;
+  box-sizing: border-box;
+  border-radius: var(--radius-sm);
+  transition: width 0.3s ease-out;
+}
+
+.histogramFillCurrent {
+  background: var(--color-success);
+  color: var(--bg);
+}
+
+/* ── Outcome Messages ─────────────────────────────────────────────────────── */
+
+.messageSolved {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  padding: 12px 18px;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 680px;
+  box-sizing: border-box;
+}
+
+.messageGivenUp {
+  color: var(--color-error);
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  padding: 12px 18px;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 680px;
+  box-sizing: border-box;
+}
+
+.errorMessage {
+  color: var(--color-error);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ── Guess Form & Controls ────────────────────────────────────────────────── */
+
+.guessForm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 680px;
+}
+
+.guessInput {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 14px;
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.guessInput:focus {
+  border-color: var(--accent);
+}
+
+.btnGiveUp {
+  background: transparent;
+  color: var(--color-error);
+  border-color: var(--color-error-border);
+}
+
+.btnGiveUp:hover:not(:disabled) {
+  background: var(--color-error-bg);
+  border-color: var(--color-error);
+}
+
+/* ── Guesses Table ────────────────────────────────────────────────────────── */
+
+.tableWrapper {
+  width: 100%;
+  max-width: 1000px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-subtle);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 14px;
+}
+
+.table th {
+  padding: 12px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Card Title & Letters ─────────────────────────────────────────────────── */
+
+.cellTitle {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.letterList {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.letterTile {
+  display: inline-block;
+  min-width: 18px;
+  height: 26px;
+  line-height: 26px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  padding: 0 3px;
+  box-sizing: border-box;
+}
+
+.spaceTile {
+  min-width: 10px;
+  background: transparent;
+}
+
+/* ── Status Cells & Badges ────────────────────────────────────────────────── */
+
+.statusCorrect {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.statusPartial {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.statusIncorrect {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.statusCorrectSolid {
+  background: var(--color-success);
+  color: var(--bg);
+}
+
+.statusPartialSolid {
+  background: var(--color-warning);
+  color: var(--bg);
+}
+
+.statusIncorrectSolid {
+  background: var(--border-strong);
+  color: var(--text);
+}
+
+.arrow {
+  margin-left: 4px;
+  font-weight: bold;
+}

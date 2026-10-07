@@ -13,6 +13,22 @@ export function HomeScreen() {
 
       <div className={styles.grid}>
         <div className={styles.card}>
+          <span className={styles.cardLabel}>Daily</span>
+          <div className={styles.body}>
+            <h2>Keyfordle</h2>
+            <p>
+              Guess the mystery KeyForge card of the day! Get clues on houses,
+              stats, expansions, and title letters with every guess.
+            </p>
+          </div>
+          <div className={styles.actions}>
+            <Link to="/keyfordle" className="btn btn-primary">
+              Play Keyfordle
+            </Link>
+          </div>
+        </div>
+
+        <div className={styles.card}>
           <span className={styles.cardLabel}>Practice</span>
           <div className={styles.body}>
             <h2>Challenge Mode</h2>
