@@ -12,7 +12,8 @@
 
 /* ── Challenge layout ─────────────────────────────────────────────────────── */
 
-/* Outer wrapper — full width column so the row inside can center properly */
+/* Shared column layout used by both the challenge page and results page */
+.page,
 .challengePage {
   display: flex;
   flex-direction: column;

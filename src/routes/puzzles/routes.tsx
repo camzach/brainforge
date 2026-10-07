@@ -1,8 +1,18 @@
 import { createRoute } from "@tanstack/react-router";
+import { lazy } from "react";
 import { rootRoute } from "../root";
-import { PuzzleDirectoryScreen } from "./PuzzleDirectoryScreen";
-import { PuzzleDetailScreen } from "./PuzzleDetailScreen";
 import { puzzleModules } from "./puzzles";
+
+const PuzzleDirectoryScreen = lazy(() =>
+  import("./PuzzleDirectoryScreen").then((m) => ({
+    default: m.PuzzleDirectoryScreen,
+  }))
+);
+const PuzzleDetailScreen = lazy(() =>
+  import("./PuzzleDetailScreen").then((m) => ({
+    default: m.PuzzleDetailScreen,
+  }))
+);
 
 async function loadAll() {
   const modules = await Promise.all(Object.values(puzzleModules).map((m) => m()));
