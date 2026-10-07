@@ -1,12 +1,18 @@
 import { createRoute, Link, useSearch } from "@tanstack/react-router";
+import { lazy } from "react";
 import { rootRoute } from "../root";
-import { SetupScreen } from "./SetupScreen";
-import { ChallengeScreen } from "./ChallengeScreen";
 import {
   decodePracticeSearch,
   type PracticeSearchParams,
 } from "./practice-utils";
 import type { Expansion } from "../../types";
+
+const SetupScreen = lazy(() =>
+  import("./SetupScreen").then((m) => ({ default: m.SetupScreen }))
+);
+const ChallengeScreen = lazy(() =>
+  import("./ChallengeScreen").then((m) => ({ default: m.ChallengeScreen }))
+);
 
 export const practiceSetupRoute = createRoute({
   getParentRoute: () => rootRoute,
