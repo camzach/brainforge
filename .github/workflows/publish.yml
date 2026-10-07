@@ -33,6 +33,8 @@ jobs:
         env:
           NODE_ENV: production
           VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
+      - name: Create SPA 404 fallback
+        run: cp dist/index.html dist/404.html
       - name: Test Card Images
         run: pnpm test:images
         env:
