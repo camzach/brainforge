@@ -80,7 +80,7 @@
 }
 
 .histogramHeading {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -121,9 +121,8 @@
   padding: 0 8px;
   font-weight: 600;
   font-size: 12px;
-  box-sizing: border-box;
   border-radius: var(--radius-sm);
-  transition: width 0.3s ease-out;
+  transition: width 0.3s ease-out; /* intentionally slower than --transition for visual effect */
 }
 
 .histogramFillCurrent {
@@ -133,32 +132,26 @@
 
 /* ── Outcome Messages ─────────────────────────────────────────────────────── */
 
-.messageSolved {
-  color: var(--color-success);
+.outcomeMessage {
   font-weight: 600;
   font-size: 18px;
   text-align: center;
   padding: 12px 18px;
-  background: var(--color-success-bg);
-  border: 1px solid var(--color-success-border);
   border-radius: var(--radius);
   width: 100%;
   max-width: 680px;
-  box-sizing: border-box;
+}
+
+.messageSolved {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
 }
 
 .messageGivenUp {
   color: var(--color-error);
-  font-weight: 600;
-  font-size: 18px;
-  text-align: center;
-  padding: 12px 18px;
   background: var(--color-error-bg);
   border: 1px solid var(--color-error-border);
-  border-radius: var(--radius);
-  width: 100%;
-  max-width: 680px;
-  box-sizing: border-box;
 }
 
 .errorMessage {
@@ -186,7 +179,6 @@
 
 .guessInput {
   width: 100%;
-  box-sizing: border-box;
   padding: 10px 14px;
   font-family: var(--sans);
   font-size: 15px;
@@ -216,7 +208,7 @@
   border-radius: var(--radius-sm);
   max-height: 260px;
   overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .suggestionItem {
@@ -243,7 +235,7 @@
   border-color: var(--color-error);
 }
 
-/* ── Guesses Table ────────────────────────────────────────────────────────── */
+/* ── Desktop: Guesses Table ───────────────────────────────────────────────── */
 
 .tableWrapper {
   width: 100%;
@@ -254,6 +246,10 @@
   background: var(--bg-subtle);
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+
+  @media (max-width: 640px) {
+    display: none;
+  }
 }
 
 .table {
@@ -285,35 +281,84 @@
   border-bottom: none;
 }
 
-/* ── Card Title & Letters ─────────────────────────────────────────────────── */
-
 .cellTitle {
   text-align: left;
   white-space: nowrap;
 }
 
+/* ── Mobile: Guess Cards ──────────────────────────────────────────────────── */
+
+.guessList {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 1000px;
+
+  @media (max-width: 640px) {
+    display: flex;
+  }
+}
+
+.guessRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.guessCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  min-width: 80px;
+  flex: 1;
+  text-align: center;
+}
+
+.guessCellTitle {
+  flex-basis: 100%;
+}
+
+.cellLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ── Card Title & Letters ─────────────────────────────────────────────────── */
+
 .letterList {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   gap: 2px;
   align-items: center;
+
+  .guessCellTitle & {
+    font-size: 1.5em;
+  }
 }
 
 .letterTile {
-  display: inline-block;
-  min-width: 18px;
-  height: 26px;
-  line-height: 26px;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4em;
+  height: 2em;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 1em;
   border-radius: var(--radius-sm);
-  padding: 0 3px;
-  box-sizing: border-box;
-}
-
-.spaceTile {
-  min-width: 10px;
-  background: transparent;
+  padding: 0 0.25em;
 }
 
 /* ── Status Cells & Badges ────────────────────────────────────────────────── */

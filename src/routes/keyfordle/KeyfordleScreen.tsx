@@ -65,15 +65,15 @@ function compareNumeric(
   targetVal: number | undefined,
   guessVal: number | undefined,
 ): { status: MatchStatus; arrow?: "↑" | "↓" } {
-  const t = targetVal ?? 0;
-  const g = guessVal ?? 0;
-
-  if (t === g) {
+  if (targetVal === undefined || guessVal === undefined) {
+    return { status: targetVal === guessVal ? "correct" : "incorrect" };
+  }
+  if (targetVal === guessVal) {
     return { status: "correct" };
   }
   return {
     status: "incorrect",
-    arrow: g < t ? "↑" : "↓",
+    arrow: guessVal < targetVal ? "↑" : "↓",
   };
 }
 
@@ -409,13 +409,13 @@ export function KeyfordleScreen() {
       )}
 
       {isSolved ? (
-        <div className={styles.messageSolved}>
+        <div className={`${styles.outcomeMessage} ${styles.messageSolved}`}>
           🎉 You got it in {guesses.length}{" "}
           {guesses.length === 1 ? "guess" : "guesses"}! The card was{" "}
           {targetCard.title}.
         </div>
       ) : givenUp ? (
-        <div className={styles.messageGivenUp}>
+        <div className={`${styles.outcomeMessage} ${styles.messageGivenUp}`}>
           💀 You gave up! The card was {targetCard.title}.
         </div>
       ) : (
@@ -472,98 +472,121 @@ export function KeyfordleScreen() {
       {errorMsg && <div className={styles.errorMessage}>{errorMsg}</div>}
 
       {guesses.length > 0 && (
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Card</th>
-                <th>House(s)</th>
-                <th>Type</th>
-                <th>Power</th>
-                <th>Armor</th>
-                <th>Æmber</th>
-                <th>Expansion(s)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {guesses.map((guess) => {
-                const houses = getCardHouses(guess);
-                const houseMatch = compareSets(targetHouses, houses);
-                const typeMatch: MatchStatus =
-                  guess.type === targetCard.type ? "correct" : "incorrect";
-                const powerComparison = compareNumeric(
-                  targetCard.power,
-                  guess.power,
-                );
-                const armorComparison = compareNumeric(
-                  targetCard.armor,
-                  guess.armor,
-                );
-                const amberComparison = compareNumeric(
-                  targetCard.amber,
-                  guess.amber,
-                );
-                const expMatch = compareSets(targetExpansions, guess.expansions);
+        <>
+          {/* Desktop: table */}
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>Card</th>
+                  <th>House(s)</th>
+                  <th>Type</th>
+                  <th>Power</th>
+                  <th>Armor</th>
+                  <th>Æmber</th>
+                  <th>Expansion(s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {guesses.map((guess) => {
+                  const houses = getCardHouses(guess);
+                  const houseMatch = compareSets(targetHouses, houses);
+                  const typeMatch: MatchStatus =
+                    guess.type === targetCard.type ? "correct" : "incorrect";
+                  const powerComparison = compareNumeric(targetCard.power, guess.power);
+                  const armorComparison = compareNumeric(targetCard.armor, guess.armor);
+                  const amberComparison = compareNumeric(targetCard.amber, guess.amber);
+                  const expMatch = compareSets(targetExpansions, guess.expansions);
 
-                return (
-                  <tr key={guess.slug}>
-                    <td className={styles.cellTitle}>
-                      <div className={styles.letterList}>
-                        {compareLetters(targetCard.title, guess.title).map(
-                          (lm, idx) => (
+                  return (
+                    <tr key={guess.slug}>
+                      <td className={styles.cellTitle}>
+                        <div className={styles.letterList}>
+                          {compareLetters(targetCard.title, guess.title).map((lm, idx) => (
                             <span
                               key={idx}
-                              className={`${styles.letterTile} ${
-                                lm.char === " "
-                                  ? styles.spaceTile
-                                  : getTileStatusClass(lm.status)
-                              }`}
+                              className={`${styles.letterTile} ${getTileStatusClass(lm.status)}`}
                             >
                               {lm.char === " " ? "\u00A0" : lm.char}
                             </span>
-                          ),
-                        )}
-                      </div>
-                    </td>
-                    <td className={getCellStatusClass(houseMatch)}>
-                      {houses.join(", ")}
-                    </td>
-                    <td className={getCellStatusClass(typeMatch)}>
-                      {guess.type}
-                    </td>
-                    <td className={getCellStatusClass(powerComparison.status)}>
-                      {guess.power ?? "-"}
-                      {powerComparison.arrow && (
-                        <span className={styles.arrow}>
-                          ({powerComparison.arrow})
+                          ))}
+                        </div>
+                      </td>
+                      <td className={getCellStatusClass(houseMatch)}>{houses.join(", ")}</td>
+                      <td className={getCellStatusClass(typeMatch)}>{guess.type}</td>
+                      <td className={getCellStatusClass(powerComparison.status)}>
+                        <span>{guess.power ?? "-"}{powerComparison.arrow && <span className={styles.arrow}> ({powerComparison.arrow})</span>}</span>
+                      </td>
+                      <td className={getCellStatusClass(armorComparison.status)}>
+                        <span>{guess.armor ?? "-"}{armorComparison.arrow && <span className={styles.arrow}> ({armorComparison.arrow})</span>}</span>
+                      </td>
+                      <td className={getCellStatusClass(amberComparison.status)}>
+                        <span>{guess.amber ?? 0}{amberComparison.arrow && <span className={styles.arrow}> ({amberComparison.arrow})</span>}</span>
+                      </td>
+                      <td className={getCellStatusClass(expMatch)}>{guess.expansions.join(", ")}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: flex cards */}
+          <div className={styles.guessList}>
+            {guesses.map((guess) => {
+              const houses = getCardHouses(guess);
+              const houseMatch = compareSets(targetHouses, houses);
+              const typeMatch: MatchStatus =
+                guess.type === targetCard.type ? "correct" : "incorrect";
+              const powerComparison = compareNumeric(targetCard.power, guess.power);
+              const armorComparison = compareNumeric(targetCard.armor, guess.armor);
+              const amberComparison = compareNumeric(targetCard.amber, guess.amber);
+              const expMatch = compareSets(targetExpansions, guess.expansions);
+
+              return (
+                <div key={guess.slug} className={styles.guessRow}>
+                  <div className={`${styles.guessCell} ${styles.guessCellTitle}`}>
+                    <span className={styles.cellLabel}>Card</span>
+                    <div className={styles.letterList}>
+                      {compareLetters(targetCard.title, guess.title).map((lm, idx) => (
+                        <span
+                          key={idx}
+                          className={`${styles.letterTile} ${getTileStatusClass(lm.status)}`}
+                        >
+                          {lm.char === " " ? "\u00A0" : lm.char}
                         </span>
-                      )}
-                    </td>
-                    <td className={getCellStatusClass(armorComparison.status)}>
-                      {guess.armor ?? "-"}
-                      {armorComparison.arrow && (
-                        <span className={styles.arrow}>
-                          ({armorComparison.arrow})
-                        </span>
-                      )}
-                    </td>
-                    <td className={getCellStatusClass(amberComparison.status)}>
-                      {guess.amber ?? 0}
-                      {amberComparison.arrow && (
-                        <span className={styles.arrow}>
-                          ({amberComparison.arrow})
-                        </span>
-                      )}
-                    </td>
-                    <td className={getCellStatusClass(expMatch)}>
-                      {guess.expansions.join(", ")}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className={`${styles.guessCell} ${getCellStatusClass(houseMatch)}`}>
+                    <span className={styles.cellLabel}>House(s)</span>
+                    {houses.join(", ")}
+                  </div>
+                  <div className={`${styles.guessCell} ${getCellStatusClass(typeMatch)}`}>
+                    <span className={styles.cellLabel}>Type</span>
+                    {guess.type}
+                  </div>
+                  <div className={`${styles.guessCell} ${getCellStatusClass(powerComparison.status)}`}>
+                    <span className={styles.cellLabel}>Power</span>
+                    <span>{guess.power ?? "-"}{powerComparison.arrow && <span className={styles.arrow}> ({powerComparison.arrow})</span>}</span>
+                  </div>
+                  <div className={`${styles.guessCell} ${getCellStatusClass(armorComparison.status)}`}>
+                    <span className={styles.cellLabel}>Armor</span>
+                    <span>{guess.armor ?? "-"}{armorComparison.arrow && <span className={styles.arrow}> ({armorComparison.arrow})</span>}</span>
+                  </div>
+                  <div className={`${styles.guessCell} ${getCellStatusClass(amberComparison.status)}`}>
+                    <span className={styles.cellLabel}>Æmber</span>
+                    <span>{guess.amber ?? 0}{amberComparison.arrow && <span className={styles.arrow}> ({amberComparison.arrow})</span>}</span>
+                  </div>
+                  <div className={`${styles.guessCell} ${getCellStatusClass(expMatch)}`}>
+                    <span className={styles.cellLabel}>Expansion(s)</span>
+                    {guess.expansions.join(", ")}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
