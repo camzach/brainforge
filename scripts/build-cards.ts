@@ -217,6 +217,25 @@ function readExpansionFile(filename: string): { name: string; cards: KeytekiCard
   return JSON.parse(content);
 }
 
+function normalizeTitle(title: string): string {
+  return title
+    .replace(/Æ/g, "AE")
+    .replace(/æ/g, "ae")
+    .replace(/[""]/g, '"')
+    .replace(/'/g, "'")
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+}
+
+function generateSlug(title: string): string {
+  return normalizeTitle(title)
+    .split(/\s+/)
+    .map((part) => part.replace(/[^a-z0-9]/g, ""))
+    .filter((part) => part.length > 0)
+    .join("-");
+}
+
 function transformCard(keytekiCard: KeytekiCard, expansionCode: string): TransformedAppearance | null {
   if (SKIP_TYPES.has(keytekiCard.type)) {
     return null;
@@ -230,13 +249,7 @@ function transformCard(keytekiCard: KeytekiCard, expansionCode: string): Transfo
     return null;
   }
 
-  const slug = keytekiCard.name
-    .toLowerCase()
-    .replace(/æ/g, "ae")
-    .split(/\s+/)
-    .map((part) => part.replace(/[^a-z0-9]/g, ""))
-    .filter((part) => part.length > 0)
-    .join("-");
+  const slug = generateSlug(keytekiCard.name);
 
   const expansion = EXPANSION_MAP[expansionCode];
   if (!expansion) {
@@ -502,6 +515,7 @@ function main() {
     CREATE TABLE cards (
       slug TEXT PRIMARY KEY,
       title TEXT NOT NULL,
+      title_normalized TEXT NOT NULL,
       type TEXT NOT NULL,
       amber INTEGER NOT NULL DEFAULT 0,
       power INTEGER,
@@ -519,13 +533,14 @@ function main() {
     CREATE INDEX idx_printings_card ON card_printings(card_slug);
     CREATE INDEX idx_printings_house ON card_printings(house_id);
     CREATE INDEX idx_cards_title ON cards(title);
+    CREATE INDEX idx_cards_title_normalized ON cards(title_normalized);
     CREATE INDEX idx_cards_type ON cards(type);
     CREATE INDEX idx_cards_slug_type ON cards(slug, type);
   `);
 
   const insertCard = db.prepare(`
-    INSERT INTO cards (slug, title, type, amber, power, armor)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO cards (slug, title, title_normalized, type, amber, power, armor)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
   const insertPrinting = db.prepare(`
@@ -540,6 +555,7 @@ function main() {
       insertCard.run(
         card.slug,
         card.title,
+        normalizeTitle(card.title),
         card.type,
         card.amber ?? 0,
         card.power ?? null,

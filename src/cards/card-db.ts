@@ -7,6 +7,17 @@ import {
   ID_TO_HOUSE,
 } from "../types";
 
+function normalizeTitle(title: string): string {
+  return title
+    .replace(/Æ/g, "AE")
+    .replace(/æ/g, "ae")
+    .replace(/[""]/g, '"')
+    .replace(/'/g, "'")
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+}
+
 const LOCAL_STORAGE_CHECKSUM_KEY = "brainforge:card-db:checksum";
 
 let dbPromise: Promise<Database> | null = null;
@@ -148,6 +159,7 @@ export type QueryCardsFilter = {
   house?: House;
   type?: CardKind | CardKind[];
   search?: string;
+  exactSearch?: string;
   slug?: string;
 };
 
@@ -192,8 +204,13 @@ export async function queryCards(
   }
 
   if (filter.search) {
-    conditions.push("c.title LIKE $search");
-    bind.$search = `%${filter.search}%`;
+    conditions.push("c.title_normalized LIKE $search");
+    bind.$search = `%${normalizeTitle(filter.search)}%`;
+  }
+
+  if (filter.exactSearch) {
+    conditions.push("c.title_normalized = $exactSearch");
+    bind.$exactSearch = normalizeTitle(filter.exactSearch);
   }
 
   const whereClause =

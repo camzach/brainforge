@@ -201,6 +201,7 @@ export function KeyfordleScreen() {
   const [stats, setStats] = useState<GameStats>(() => loadStats());
   const [currentGuess, setCurrentGuess] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { guesses, givenUp } = dailyState;
@@ -239,16 +240,13 @@ export function KeyfordleScreen() {
     const term = currentGuess.trim();
     if (!term) return;
 
-    const results = await queryCards({ search: term });
+    const results = await queryCards({ exactSearch: term });
     if (results.length === 0) {
       setErrorMsg(`No card found matching "${term}"`);
       return;
     }
 
-    // Try exact title match first, otherwise take the first match
-    const matchedCard =
-      results.find((c) => c.title.toLowerCase() === term.toLowerCase()) ??
-      results[0];
+    const matchedCard = results[0];
 
     setErrorMsg(null);
     setCurrentGuess("");
@@ -428,18 +426,36 @@ export function KeyfordleScreen() {
           }}
           className={styles.guessForm}
         >
-          <input
-            list="card-suggestions"
-            value={currentGuess}
-            placeholder="Type card name..."
-            onChange={(e) => setCurrentGuess(e.target.value)}
-            className={styles.guessInput}
-          />
-          <datalist id="card-suggestions">
-            {suggestions.map((title) => (
-              <option key={title} value={title} />
-            ))}
-          </datalist>
+          <div className={styles.inputWrapper}>
+            <input
+              value={currentGuess}
+              placeholder="Type card name..."
+              onChange={(e) => {
+                setCurrentGuess(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              className={styles.guessInput}
+              autoComplete="off"
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul className={styles.suggestionList}>
+                {suggestions.map((title) => (
+                  <li
+                    key={title}
+                    className={styles.suggestionItem}
+                    onMouseDown={() => {
+                      setCurrentGuess(title);
+                      setShowSuggestions(false);
+                    }}
+                  >
+                    {title}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <button type="submit" className="btn btn-primary">
             SUBMIT
           </button>
