@@ -178,9 +178,15 @@
   max-width: 680px;
 }
 
-.guessInput {
+.inputWrapper {
   flex: 1;
   min-width: 220px;
+  position: relative;
+}
+
+.guessInput {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 14px;
   font-family: var(--sans);
   font-size: 15px;
@@ -194,6 +200,36 @@
 
 .guessInput:focus {
   border-color: var(--accent);
+}
+
+.suggestionList {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  max-height: 260px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.suggestionItem {
+  padding: 8px 14px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.suggestionItem:hover,
+.suggestionItem:active {
+  background: var(--bg);
+  color: var(--accent);
 }
 
 .btnGiveUp {
