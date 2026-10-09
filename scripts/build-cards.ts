@@ -509,11 +509,14 @@ function main() {
   db.pragma("journal_mode = DELETE");
 
   // Create Schema:
-  // 1. cards (primary key slug)
-  // 2. card_printings WITHOUT ROWID (primary key expansion_id, house_id, card_slug)
+  // 1. cards (integer primary key; slug is a unique lookup key)
+  // 2. card_printings WITHOUT ROWID (primary key expansion_id, house_id, card_id)
+  // The table is small enough that scans are cheap, so only indexes the
+  // queries actually benefit from are kept (each one costs download size).
   db.exec(`
     CREATE TABLE cards (
-      slug TEXT PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
       title TEXT NOT NULL,
       title_normalized TEXT NOT NULL,
       type TEXT NOT NULL,
@@ -525,17 +528,12 @@ function main() {
     CREATE TABLE card_printings (
       expansion_id INTEGER NOT NULL,
       house_id INTEGER NOT NULL,
-      card_slug TEXT NOT NULL,
-      PRIMARY KEY (expansion_id, house_id, card_slug),
-      FOREIGN KEY (card_slug) REFERENCES cards(slug)
+      card_id INTEGER NOT NULL,
+      PRIMARY KEY (expansion_id, house_id, card_id),
+      FOREIGN KEY (card_id) REFERENCES cards(id)
     ) WITHOUT ROWID;
 
-    CREATE INDEX idx_printings_card ON card_printings(card_slug);
-    CREATE INDEX idx_printings_house ON card_printings(house_id);
-    CREATE INDEX idx_cards_title ON cards(title);
-    CREATE INDEX idx_cards_title_normalized ON cards(title_normalized);
-    CREATE INDEX idx_cards_type ON cards(type);
-    CREATE INDEX idx_cards_slug_type ON cards(slug, type);
+    CREATE INDEX idx_printings_card ON card_printings(card_id);
   `);
 
   const insertCard = db.prepare(`
@@ -544,7 +542,7 @@ function main() {
   `);
 
   const insertPrinting = db.prepare(`
-    INSERT INTO card_printings (expansion_id, house_id, card_slug)
+    INSERT INTO card_printings (expansion_id, house_id, card_id)
     VALUES (?, ?, ?)
   `);
 
@@ -552,14 +550,16 @@ function main() {
 
   const populate = db.transaction(() => {
     for (const card of sortedCards) {
-      insertCard.run(
-        card.slug,
-        card.title,
-        normalizeTitle(card.title),
-        card.type,
-        card.amber ?? 0,
-        card.power ?? null,
-        card.armor ?? null,
+      const cardId = Number(
+        insertCard.run(
+          card.slug,
+          card.title,
+          normalizeTitle(card.title),
+          card.type,
+          card.amber ?? 0,
+          card.power ?? null,
+          card.armor ?? null,
+        ).lastInsertRowid,
       );
 
       const expMap = cardPrintingsMap.get(card.slug);
@@ -576,7 +576,7 @@ function main() {
               console.warn(`No ID found for house: ${h}`);
               continue;
             }
-            insertPrinting.run(expId, houseId, card.slug);
+            insertPrinting.run(expId, houseId, cardId);
           }
         }
       }

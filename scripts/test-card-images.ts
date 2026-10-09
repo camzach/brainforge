@@ -105,7 +105,9 @@ type PrintingRow = {
 function loadAllCards(): Card[] {
   const db = new Database(CARD_DB_PATH);
   const cardRows = db.prepare('SELECT title, slug, type, amber, power, armor FROM cards').all() as CardRow[];
-  const printingRows = db.prepare('SELECT expansion_id, house_id, card_slug FROM card_printings').all() as PrintingRow[];
+  const printingRows = db.prepare(
+    'SELECT p.expansion_id, p.house_id, c.slug AS card_slug FROM card_printings p JOIN cards c ON c.id = p.card_id',
+  ).all() as PrintingRow[];
   db.close();
 
   const printingsByCard = new Map<string, { expansion: Expansion; house: House }[]>();

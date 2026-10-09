@@ -219,7 +219,7 @@ export async function queryCards(
   const sql = `
     SELECT DISTINCT c.slug, c.title, c.type, c.amber, c.power, c.armor, p.expansion_id, p.house_id
     FROM card_printings p
-    JOIN cards c ON c.slug = p.card_slug
+    JOIN cards c ON c.id = p.card_id
     ${whereClause}
     ORDER BY c.title ASC
   `;
@@ -273,7 +273,7 @@ export async function getExpansionMeta(
   const rows = db.exec({
     sql: `SELECT DISTINCT p.house_id, c.type
      FROM card_printings p
-     JOIN cards c ON c.slug = p.card_slug
+     JOIN cards c ON c.id = p.card_id
      WHERE p.expansion_id = $expId`,
     bind: { $expId: expId },
     rowMode: "object",
