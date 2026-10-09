@@ -1,8 +1,12 @@
-import { use, useCallback, useEffect, useState } from "react";
+import { Suspense, use, useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { countCards, getCardByIndex, queryCards } from "../../cards/card-db";
+import type { Card } from "../../types";
+import { getCardHouses } from "../../cards/card-image-utils";
 
 import styles from "./KeyfordleScreen.module.css";
+
+type GameMode = "daily" | "infinite";
 
 function getDailyDateKey(): string {
   const now = new Date();
@@ -20,7 +24,7 @@ function getDailyDateKey(): string {
   return `${year}-${month}-${day}`;
 }
 
-async function getDailyCard(dateKey = getDailyDateKey()) {
+async function getDailyCard(dateKey = getDailyDateKey()): Promise<Card> {
   const uint8Buffer = new TextEncoder().encode(dateKey);
   const hash = await crypto.subtle.digest("SHA-256", uint8Buffer);
   const seed = new DataView(hash).getUint32(0);
@@ -40,10 +44,27 @@ async function getDailyCard(dateKey = getDailyDateKey()) {
   return card;
 }
 
-const cardPromise = getDailyCard();
+async function getRandomCard(excludeSlug?: string): Promise<Card> {
+  const count = await countCards();
+  if (count <= 1) {
+    const card = await getCardByIndex(0);
+    if (!card) throw new Error("Failed to get a random card");
+    return card;
+  }
 
-import type { Card } from "../../types";
-import { getCardHouses } from "../../cards/card-image-utils";
+  let card: Card | null = null;
+  for (let i = 0; i < 5; i++) {
+    const n = Math.floor(Math.random() * count);
+    card = await getCardByIndex(n);
+    if (card && card.slug !== excludeSlug) {
+      return card;
+    }
+  }
+
+  return card || (await getCardByIndex(0))!;
+}
+
+const dailyCardPromise = getDailyCard();
 
 type MatchStatus = "correct" | "partial" | "incorrect";
 
@@ -191,25 +212,56 @@ function saveDailyState(dateKey: string, state: DailyState) {
   }
 }
 
-export function KeyfordleScreen() {
-  const targetCard = use(cardPromise);
-  const dateKey = getDailyDateKey();
+function getCellStatusClass(status: MatchStatus) {
+  switch (status) {
+    case "correct":
+      return styles.statusCorrect;
+    case "partial":
+      return styles.statusPartial;
+    case "incorrect":
+      return styles.statusIncorrect;
+  }
+}
 
-  const [dailyState, setDailyState] = useState<DailyState>(() =>
-    loadDailyState(dateKey),
-  );
-  const [stats, setStats] = useState<GameStats>(() => loadStats());
+function getTileStatusClass(status: MatchStatus) {
+  switch (status) {
+    case "correct":
+      return styles.statusCorrectSolid;
+    case "partial":
+      return styles.statusPartialSolid;
+    case "incorrect":
+      return styles.statusIncorrectSolid;
+  }
+}
+
+type KeyfordleGameViewProps = {
+  mode: GameMode;
+  targetCard: Card;
+  state: DailyState;
+  onGuess: (card: Card) => void;
+  onGiveUp: () => void;
+  onPlayAgain?: () => void;
+  stats?: GameStats;
+};
+
+function KeyfordleGameView({
+  mode,
+  targetCard,
+  state,
+  onGuess,
+  onGiveUp,
+  onPlayAgain,
+  stats,
+}: KeyfordleGameViewProps) {
+  const { guesses, givenUp } = state;
   const [currentGuess, setCurrentGuess] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const { guesses, givenUp } = dailyState;
-
   useEffect(() => {
     const term = currentGuess.trim();
     if (term.length < 2) {
-      setSuggestions([]);
       return;
     }
 
@@ -250,127 +302,51 @@ export function KeyfordleScreen() {
 
     setErrorMsg(null);
     setCurrentGuess("");
+    setSuggestions([]);
 
     if (guesses.some((g) => g.slug === matchedCard.slug)) {
       setErrorMsg(`"${matchedCard.title}" has already been guessed`);
       return;
     }
 
-    const nextGuesses = [matchedCard, ...guesses];
-    const nextState: DailyState = { ...dailyState, guesses: nextGuesses };
-    setDailyState(nextState);
-    saveDailyState(dateKey, nextState);
-
-    if (matchedCard.slug === targetCard.slug) {
-      setStats((prev) => {
-        if (prev.lastPlayedDate === dateKey) return prev;
-
-        const guessCount = nextGuesses.length;
-        const newWins = prev.wins + 1;
-        const newPlayed = prev.played + 1;
-        const newStreak = prev.currentStreak + 1;
-        const newMaxStreak = Math.max(prev.maxStreak, newStreak);
-        const newDistribution = {
-          ...prev.guessDistribution,
-          [guessCount]: (prev.guessDistribution[guessCount] || 0) + 1,
-        };
-
-        const updated: GameStats = {
-          played: newPlayed,
-          wins: newWins,
-          currentStreak: newStreak,
-          maxStreak: newMaxStreak,
-          guessDistribution: newDistribution,
-          lastPlayedDate: dateKey,
-        };
-        saveStats(updated);
-        return updated;
-      });
-    }
-  }, [currentGuess, dailyState, dateKey, guesses, isGameOver, targetCard.slug]);
-
-  const handleGiveUp = useCallback(() => {
-    if (isGameOver) return;
-
-    const nextState: DailyState = { ...dailyState, givenUp: true };
-    setDailyState(nextState);
-    saveDailyState(dateKey, nextState);
-
-    setStats((prev) => {
-      if (prev.lastPlayedDate === dateKey) return prev;
-
-      const updated: GameStats = {
-        played: prev.played + 1,
-        wins: prev.wins,
-        currentStreak: 0,
-        maxStreak: prev.maxStreak,
-        guessDistribution: prev.guessDistribution,
-        lastPlayedDate: dateKey,
-      };
-      saveStats(updated);
-      return updated;
-    });
-  }, [dailyState, dateKey, isGameOver]);
-
-  const getCellStatusClass = (status: MatchStatus) => {
-    switch (status) {
-      case "correct":
-        return styles.statusCorrect;
-      case "partial":
-        return styles.statusPartial;
-      case "incorrect":
-        return styles.statusIncorrect;
-    }
-  };
-
-  const getTileStatusClass = (status: MatchStatus) => {
-    switch (status) {
-      case "correct":
-        return styles.statusCorrectSolid;
-      case "partial":
-        return styles.statusPartialSolid;
-      case "incorrect":
-        return styles.statusIncorrectSolid;
-    }
-  };
+    onGuess(matchedCard);
+  }, [currentGuess, guesses, isGameOver, onGuess]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.back}>
-        <Link to="/" className="btn btn-ghost">
-          ← Back
-        </Link>
-      </div>
+    <div className={styles.gameWrapper}>
+      {/* Stats bar (Daily mode only) */}
+      {mode === "daily" && stats && (
+        <div className={styles.statsBar}>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Played</span>
+            <span className={styles.statValue}>{stats.played}</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Wins</span>
+            <span className={styles.statValue}>{stats.wins}</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Win %</span>
+            <span className={styles.statValue}>
+              {stats.played > 0
+                ? Math.round((stats.wins / stats.played) * 100)
+                : 0}
+              %
+            </span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Streak</span>
+            <span className={styles.statValue}>{stats.currentStreak}</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Max Streak</span>
+            <span className={styles.statValue}>{stats.maxStreak}</span>
+          </div>
+        </div>
+      )}
 
-      <h1 className={styles.title}>Keyfordle</h1>
-
-      <div className={styles.statsBar}>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Played</span>
-          <span className={styles.statValue}>{stats.played}</span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Wins</span>
-          <span className={styles.statValue}>{stats.wins}</span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Win %</span>
-          <span className={styles.statValue}>
-            {stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0}%
-          </span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Streak</span>
-          <span className={styles.statValue}>{stats.currentStreak}</span>
-        </div>
-        <div className={styles.statItem}>
-          <span className={styles.statLabel}>Max Streak</span>
-          <span className={styles.statValue}>{stats.maxStreak}</span>
-        </div>
-      </div>
-
-      {/* Guess Histogram */}
-      {isGameOver && stats.wins > 0 && (
+      {/* Guess Histogram (Daily mode only) */}
+      {mode === "daily" && stats && isGameOver && stats.wins > 0 && (
         <div className={styles.histogramCard}>
           <div className={styles.histogramHeading}>Guess Distribution</div>
           {(() => {
@@ -395,7 +371,9 @@ export function KeyfordleScreen() {
                       className={`${styles.histogramFill} ${
                         isCurrentWin ? styles.histogramFillCurrent : ""
                       }`}
-                      style={{ width: count > 0 ? `${Math.max(pct, 8)}%` : "0%" }}
+                      style={{
+                        width: count > 0 ? `${Math.max(pct, 8)}%` : "0%",
+                      }}
                     >
                       {count > 0 ? count : ""}
                     </div>
@@ -408,6 +386,7 @@ export function KeyfordleScreen() {
         </div>
       )}
 
+      {/* Outcome message */}
       {isSolved ? (
         <div className={`${styles.outcomeMessage} ${styles.messageSolved}`}>
           🎉 You got it in {guesses.length}{" "}
@@ -431,7 +410,11 @@ export function KeyfordleScreen() {
               value={currentGuess}
               placeholder="Type card name..."
               onChange={(e) => {
-                setCurrentGuess(e.target.value);
+                const val = e.target.value;
+                setCurrentGuess(val);
+                if (val.trim().length < 2) {
+                  setSuggestions([]);
+                }
                 setShowSuggestions(true);
               }}
               onFocus={() => setShowSuggestions(true)}
@@ -447,6 +430,7 @@ export function KeyfordleScreen() {
                     className={styles.suggestionItem}
                     onMouseDown={() => {
                       setCurrentGuess(title);
+                      setSuggestions([]);
                       setShowSuggestions(false);
                     }}
                   >
@@ -461,12 +445,25 @@ export function KeyfordleScreen() {
           </button>
           <button
             type="button"
-            onClick={handleGiveUp}
+            onClick={onGiveUp}
             className={`btn ${styles.btnGiveUp}`}
           >
             GIVE UP
           </button>
         </form>
+      )}
+
+      {/* Play Again (Infinite mode only) */}
+      {mode === "infinite" && isGameOver && onPlayAgain && (
+        <div className={styles.playAgainWrapper}>
+          <button
+            type="button"
+            onClick={onPlayAgain}
+            className="btn btn-primary"
+          >
+            Play Again
+          </button>
+        </div>
       )}
 
       {errorMsg && <div className={styles.errorMessage}>{errorMsg}</div>}
@@ -493,37 +490,81 @@ export function KeyfordleScreen() {
                   const houseMatch = compareSets(targetHouses, houses);
                   const typeMatch: MatchStatus =
                     guess.type === targetCard.type ? "correct" : "incorrect";
-                  const powerComparison = compareNumeric(targetCard.power, guess.power);
-                  const armorComparison = compareNumeric(targetCard.armor, guess.armor);
-                  const amberComparison = compareNumeric(targetCard.amber, guess.amber);
-                  const expMatch = compareSets(targetExpansions, guess.expansions);
+                  const powerComparison = compareNumeric(
+                    targetCard.power,
+                    guess.power,
+                  );
+                  const armorComparison = compareNumeric(
+                    targetCard.armor,
+                    guess.armor,
+                  );
+                  const amberComparison = compareNumeric(
+                    targetCard.amber,
+                    guess.amber,
+                  );
+                  const expMatch = compareSets(
+                    targetExpansions,
+                    guess.expansions,
+                  );
 
                   return (
                     <tr key={guess.slug}>
                       <td className={styles.cellTitle}>
                         <div className={styles.letterList}>
-                          {compareLetters(targetCard.title, guess.title).map((lm, idx) => (
-                            <span
-                              key={idx}
-                              className={`${styles.letterTile} ${getTileStatusClass(lm.status)}`}
-                            >
-                              {lm.char === " " ? "\u00A0" : lm.char}
-                            </span>
-                          ))}
+                          {compareLetters(targetCard.title, guess.title).map(
+                            (lm, idx) => (
+                              <span
+                                key={idx}
+                                className={`${styles.letterTile} ${getTileStatusClass(lm.status)}`}
+                              >
+                                {lm.char === " " ? "\u00A0" : lm.char}
+                              </span>
+                            ),
+                          )}
                         </div>
                       </td>
-                      <td className={getCellStatusClass(houseMatch)}>{houses.join(", ")}</td>
-                      <td className={getCellStatusClass(typeMatch)}>{guess.type}</td>
+                      <td className={getCellStatusClass(houseMatch)}>
+                        {houses.join(", ")}
+                      </td>
+                      <td className={getCellStatusClass(typeMatch)}>
+                        {guess.type}
+                      </td>
                       <td className={getCellStatusClass(powerComparison.status)}>
-                        <span>{guess.power ?? "-"}{powerComparison.arrow && <span className={styles.arrow}> ({powerComparison.arrow})</span>}</span>
+                        <span>
+                          {guess.power ?? "-"}
+                          {powerComparison.arrow && (
+                            <span className={styles.arrow}>
+                              {" "}
+                              ({powerComparison.arrow})
+                            </span>
+                          )}
+                        </span>
                       </td>
                       <td className={getCellStatusClass(armorComparison.status)}>
-                        <span>{guess.armor ?? "-"}{armorComparison.arrow && <span className={styles.arrow}> ({armorComparison.arrow})</span>}</span>
+                        <span>
+                          {guess.armor ?? "-"}
+                          {armorComparison.arrow && (
+                            <span className={styles.arrow}>
+                              {" "}
+                              ({armorComparison.arrow})
+                            </span>
+                          )}
+                        </span>
                       </td>
                       <td className={getCellStatusClass(amberComparison.status)}>
-                        <span>{guess.amber ?? 0}{amberComparison.arrow && <span className={styles.arrow}> ({amberComparison.arrow})</span>}</span>
+                        <span>
+                          {guess.amber ?? 0}
+                          {amberComparison.arrow && (
+                            <span className={styles.arrow}>
+                              {" "}
+                              ({amberComparison.arrow})
+                            </span>
+                          )}
+                        </span>
                       </td>
-                      <td className={getCellStatusClass(expMatch)}>{guess.expansions.join(", ")}</td>
+                      <td className={getCellStatusClass(expMatch)}>
+                        {guess.expansions.join(", ")}
+                      </td>
                     </tr>
                   );
                 })}
@@ -538,47 +579,96 @@ export function KeyfordleScreen() {
               const houseMatch = compareSets(targetHouses, houses);
               const typeMatch: MatchStatus =
                 guess.type === targetCard.type ? "correct" : "incorrect";
-              const powerComparison = compareNumeric(targetCard.power, guess.power);
-              const armorComparison = compareNumeric(targetCard.armor, guess.armor);
-              const amberComparison = compareNumeric(targetCard.amber, guess.amber);
+              const powerComparison = compareNumeric(
+                targetCard.power,
+                guess.power,
+              );
+              const armorComparison = compareNumeric(
+                targetCard.armor,
+                guess.armor,
+              );
+              const amberComparison = compareNumeric(
+                targetCard.amber,
+                guess.amber,
+              );
               const expMatch = compareSets(targetExpansions, guess.expansions);
 
               return (
                 <div key={guess.slug} className={styles.guessRow}>
-                  <div className={`${styles.guessCell} ${styles.guessCellTitle}`}>
+                  <div
+                    className={`${styles.guessCell} ${styles.guessCellTitle}`}
+                  >
                     <span className={styles.cellLabel}>Card</span>
                     <div className={styles.letterList}>
-                      {compareLetters(targetCard.title, guess.title).map((lm, idx) => (
-                        <span
-                          key={idx}
-                          className={`${styles.letterTile} ${getTileStatusClass(lm.status)}`}
-                        >
-                          {lm.char === " " ? "\u00A0" : lm.char}
-                        </span>
-                      ))}
+                      {compareLetters(targetCard.title, guess.title).map(
+                        (lm, idx) => (
+                          <span
+                            key={idx}
+                            className={`${styles.letterTile} ${getTileStatusClass(lm.status)}`}
+                          >
+                            {lm.char === " " ? "\u00A0" : lm.char}
+                          </span>
+                        ),
+                      )}
                     </div>
                   </div>
-                  <div className={`${styles.guessCell} ${getCellStatusClass(houseMatch)}`}>
+                  <div
+                    className={`${styles.guessCell} ${getCellStatusClass(houseMatch)}`}
+                  >
                     <span className={styles.cellLabel}>House(s)</span>
                     {houses.join(", ")}
                   </div>
-                  <div className={`${styles.guessCell} ${getCellStatusClass(typeMatch)}`}>
+                  <div
+                    className={`${styles.guessCell} ${getCellStatusClass(typeMatch)}`}
+                  >
                     <span className={styles.cellLabel}>Type</span>
                     {guess.type}
                   </div>
-                  <div className={`${styles.guessCell} ${getCellStatusClass(powerComparison.status)}`}>
+                  <div
+                    className={`${styles.guessCell} ${getCellStatusClass(powerComparison.status)}`}
+                  >
                     <span className={styles.cellLabel}>Power</span>
-                    <span>{guess.power ?? "-"}{powerComparison.arrow && <span className={styles.arrow}> ({powerComparison.arrow})</span>}</span>
+                    <span>
+                      {guess.power ?? "-"}
+                      {powerComparison.arrow && (
+                        <span className={styles.arrow}>
+                          {" "}
+                          ({powerComparison.arrow})
+                        </span>
+                      )}
+                    </span>
                   </div>
-                  <div className={`${styles.guessCell} ${getCellStatusClass(armorComparison.status)}`}>
+                  <div
+                    className={`${styles.guessCell} ${getCellStatusClass(armorComparison.status)}`}
+                  >
                     <span className={styles.cellLabel}>Armor</span>
-                    <span>{guess.armor ?? "-"}{armorComparison.arrow && <span className={styles.arrow}> ({armorComparison.arrow})</span>}</span>
+                    <span>
+                      {guess.armor ?? "-"}
+                      {armorComparison.arrow && (
+                        <span className={styles.arrow}>
+                          {" "}
+                          ({armorComparison.arrow})
+                        </span>
+                      )}
+                    </span>
                   </div>
-                  <div className={`${styles.guessCell} ${getCellStatusClass(amberComparison.status)}`}>
+                  <div
+                    className={`${styles.guessCell} ${getCellStatusClass(amberComparison.status)}`}
+                  >
                     <span className={styles.cellLabel}>Æmber</span>
-                    <span>{guess.amber ?? 0}{amberComparison.arrow && <span className={styles.arrow}> ({amberComparison.arrow})</span>}</span>
+                    <span>
+                      {guess.amber ?? 0}
+                      {amberComparison.arrow && (
+                        <span className={styles.arrow}>
+                          {" "}
+                          ({amberComparison.arrow})
+                        </span>
+                      )}
+                    </span>
                   </div>
-                  <div className={`${styles.guessCell} ${getCellStatusClass(expMatch)}`}>
+                  <div
+                    className={`${styles.guessCell} ${getCellStatusClass(expMatch)}`}
+                  >
                     <span className={styles.cellLabel}>Expansion(s)</span>
                     {guess.expansions.join(", ")}
                   </div>
@@ -588,6 +678,214 @@ export function KeyfordleScreen() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function DailyKeyfordleCard({
+  stats,
+  setStats,
+  dailyState,
+  setDailyState,
+  dateKey,
+}: {
+  stats: GameStats;
+  setStats: React.Dispatch<React.SetStateAction<GameStats>>;
+  dailyState: DailyState;
+  setDailyState: React.Dispatch<React.SetStateAction<DailyState>>;
+  dateKey: string;
+}) {
+  const targetCard = use(dailyCardPromise);
+
+  const handleGuess = useCallback(
+    (matchedCard: Card) => {
+      const nextGuesses = [matchedCard, ...dailyState.guesses];
+      const nextState: DailyState = { ...dailyState, guesses: nextGuesses };
+      setDailyState(nextState);
+      saveDailyState(dateKey, nextState);
+
+      if (matchedCard.slug === targetCard.slug) {
+        setStats((prev) => {
+          if (prev.lastPlayedDate === dateKey) return prev;
+
+          const guessCount = nextGuesses.length;
+          const newWins = prev.wins + 1;
+          const newPlayed = prev.played + 1;
+          const newStreak = prev.currentStreak + 1;
+          const newMaxStreak = Math.max(prev.maxStreak, newStreak);
+          const newDistribution = {
+            ...prev.guessDistribution,
+            [guessCount]: (prev.guessDistribution[guessCount] || 0) + 1,
+          };
+
+          const updated: GameStats = {
+            played: newPlayed,
+            wins: newWins,
+            currentStreak: newStreak,
+            maxStreak: newMaxStreak,
+            guessDistribution: newDistribution,
+            lastPlayedDate: dateKey,
+          };
+          saveStats(updated);
+          return updated;
+        });
+      }
+    },
+    [dailyState, dateKey, setDailyState, setStats, targetCard.slug],
+  );
+
+  const handleGiveUp = useCallback(() => {
+    const nextState: DailyState = { ...dailyState, givenUp: true };
+    setDailyState(nextState);
+    saveDailyState(dateKey, nextState);
+
+    setStats((prev) => {
+      if (prev.lastPlayedDate === dateKey) return prev;
+
+      const updated: GameStats = {
+        played: prev.played + 1,
+        wins: prev.wins,
+        currentStreak: 0,
+        maxStreak: prev.maxStreak,
+        guessDistribution: prev.guessDistribution,
+        lastPlayedDate: dateKey,
+      };
+      saveStats(updated);
+      return updated;
+    });
+  }, [dailyState, dateKey, setDailyState, setStats]);
+
+  return (
+    <KeyfordleGameView
+      key={dateKey}
+      mode="daily"
+      targetCard={targetCard}
+      state={dailyState}
+      onGuess={handleGuess}
+      onGiveUp={handleGiveUp}
+      stats={stats}
+    />
+  );
+}
+
+function InfiniteKeyfordleCard({
+  infiniteCardPromise,
+  infiniteState,
+  setInfiniteState,
+  onPlayAgain,
+}: {
+  infiniteCardPromise: Promise<Card>;
+  infiniteState: DailyState;
+  setInfiniteState: React.Dispatch<React.SetStateAction<DailyState>>;
+  onPlayAgain: () => void;
+}) {
+  const targetCard = use(infiniteCardPromise);
+
+  const handleGuess = useCallback(
+    (matchedCard: Card) => {
+      const nextGuesses = [matchedCard, ...infiniteState.guesses];
+      const nextState: DailyState = { ...infiniteState, guesses: nextGuesses };
+      setInfiniteState(nextState);
+    },
+    [infiniteState, setInfiniteState],
+  );
+
+  const handleGiveUp = useCallback(() => {
+    const nextState: DailyState = { ...infiniteState, givenUp: true };
+    setInfiniteState(nextState);
+  }, [infiniteState, setInfiniteState]);
+
+  return (
+    <KeyfordleGameView
+      key={targetCard.slug}
+      mode="infinite"
+      targetCard={targetCard}
+      state={infiniteState}
+      onGuess={handleGuess}
+      onGiveUp={handleGiveUp}
+      onPlayAgain={onPlayAgain}
+    />
+  );
+}
+
+export function KeyfordleScreen() {
+  const dateKey = getDailyDateKey();
+
+  const [mode, setMode] = useState<GameMode>("daily");
+  const [dailyState, setDailyState] = useState<DailyState>(() =>
+    loadDailyState(dateKey),
+  );
+  const [stats, setStats] = useState<GameStats>(() => loadStats());
+  const [infiniteState, setInfiniteState] = useState<DailyState>({
+    guesses: [],
+    givenUp: false,
+  });
+  const [infiniteCardPromise, setInfiniteCardPromise] = useState<Promise<Card>>(
+    () => getRandomCard(),
+  );
+
+  const handlePlayAgain = useCallback(() => {
+    setInfiniteCardPromise((prevPromise) =>
+      prevPromise
+        .then((prevCard) => getRandomCard(prevCard.slug))
+        .catch(() => getRandomCard()),
+    );
+    setInfiniteState({ guesses: [], givenUp: false });
+  }, []);
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.back}>
+        <Link to="/" className="btn btn-ghost">
+          ← Back
+        </Link>
+      </div>
+
+      <h1 className={styles.title}>Keyfordle</h1>
+
+      <div
+        className={styles.modeToggleGroup}
+        role="tablist"
+        aria-label="Game Mode"
+      >
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "daily"}
+          className={`${styles.modeToggle} ${mode === "daily" ? styles.modeToggleActive : ""}`}
+          onClick={() => setMode("daily")}
+        >
+          Daily
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === "infinite"}
+          className={`${styles.modeToggle} ${mode === "infinite" ? styles.modeToggleActive : ""}`}
+          onClick={() => setMode("infinite")}
+        >
+          Infinite
+        </button>
+      </div>
+
+      <Suspense fallback={<div className={styles.loading}>Loading card...</div>}>
+        {mode === "daily" ? (
+          <DailyKeyfordleCard
+            stats={stats}
+            setStats={setStats}
+            dailyState={dailyState}
+            setDailyState={setDailyState}
+            dateKey={dateKey}
+          />
+        ) : (
+          <InfiniteKeyfordleCard
+            infiniteCardPromise={infiniteCardPromise}
+            infiniteState={infiniteState}
+            setInfiniteState={setInfiniteState}
+            onPlayAgain={handlePlayAgain}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

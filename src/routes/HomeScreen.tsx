@@ -29,11 +29,11 @@ export function HomeScreen() {
         </div>
 
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Daily</span>
+          <span className={styles.cardLabel}>Daily & Infinite</span>
           <div className={styles.body}>
             <h2>Keyfordle</h2>
             <p>
-              Guess the mystery KeyForge card of the day! Get clues on houses,
+              Guess the mystery KeyForge card! Get clues on houses,
               stats, expansions, and title letters with every guess.
             </p>
           </div>

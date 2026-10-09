@@ -27,6 +27,90 @@
   text-align: center;
 }
 
+/* ── Mode Toggle ──────────────────────────────────────────────────────────── */
+
+.modeToggleGroup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modeToggle {
+  padding: 6px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--sans);
+  background: var(--bg-subtle);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    color var(--transition);
+  user-select: none;
+}
+
+.modeToggle:first-child {
+  border-top-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
+  border-right: none;
+}
+
+.modeToggle:last-child {
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.modeToggle:hover {
+  color: var(--text-h);
+  border-color: var(--border-strong);
+}
+
+.modeToggleActive {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.modeToggleActive:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.modeToggle:first-child.modeToggleActive {
+  border-right: 1px solid var(--accent);
+}
+
+.modeToggle:last-child.modeToggleActive {
+  border-left: 1px solid var(--accent);
+}
+
+.gameWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+
+  @media (max-width: 640px) {
+    gap: 20px;
+  }
+}
+
+.loading {
+  color: var(--text-dim);
+  font-size: 15px;
+  padding: 32px 0;
+}
+
+.playAgainWrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 /* ── Stats Banner ─────────────────────────────────────────────────────────── */
 
 .statsBar {
