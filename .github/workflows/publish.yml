@@ -21,7 +21,7 @@ jobs:
       AWS_DEFAULT_REGION: auto
       AWS_ENDPOINT_URL: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
-      R2_KEY: ${{ secrets.R2_KEY || 'keyforge.sql.zst' }}
+      R2_KEY: ${{ secrets.R2_KEY || 'keyforge.db.zst' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,17 +43,20 @@ jobs:
           path: keyforge.db
           key: keyforge-db-${{ steps.r2_etag.outputs.etag }}
 
-      - name: Download and decompress source DB
+      - name: Download source DB
         if: steps.cache_db.outputs.cache-hit != 'true'
-        run: |
-          aws s3 cp "s3://$R2_BUCKET/$R2_KEY" - \
-            | zstd -d --stdout \
-            | sqlite3 keyforge.db
+        run: aws s3 cp "s3://$R2_BUCKET/$R2_KEY" - | zstd -d -o keyforge.db
+
+      - name: Restore cached card images
+        uses: actions/cache@v4
+        with:
+          path: public/card-images
+          key: card-images-${{ steps.r2_etag.outputs.etag }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "23"
+          node-version: "24"
 
       - name: Install pnpm
         run: npm install -g pnpm@10.10.0
@@ -65,16 +68,10 @@ jobs:
         run: pnpm build
         env:
           NODE_ENV: production
-          VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
           SOURCE_DB_PATH: keyforge.db
 
       - name: Create SPA 404 fallback
         run: cp dist/index.html dist/404.html
-
-      # - name: Test Card Images
-      #   run: pnpm test:images
-      #   env:
-      #     VITE_CARD_IMAGE_BASEURL: ${{ vars.VITE_CARD_IMAGE_BASEURL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
