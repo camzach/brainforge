@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Card } from "../types";
+import type { Card, Expansion } from "../types";
 import { getClipPath, loadCardImage, type Zone } from "./card-utils";
 import styles from "./Fragment.module.css";
 
@@ -9,12 +9,13 @@ const sketchpadCtx = sketchpad.getContext("2d")!;
 type Props = {
   card: Card;
   house: string;
+  expansion?: Expansion;
   zone: Zone;
   selected?: boolean;
   onClick?: () => void;
 };
 
-export function Fragment({ card, house, zone, selected, onClick }: Props) {
+export function Fragment({ card, house, expansion, zone, selected, onClick }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const path = getClipPath(card, zone);
@@ -57,7 +58,7 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
 
     if (!path) return;
 
-    loadCardImage(card.slug, house).then((image) => {
+    loadCardImage(card, house, expansion).then((image) => {
       sketchpadCtx.save();
       sketchpadCtx.clearRect(0, 0, 1000, 1000);
       sketchpadCtx.clip(path.path);
@@ -73,7 +74,7 @@ export function Fragment({ card, house, zone, selected, onClick }: Props) {
         ...path.bbox.size,
       );
     });
-  }, [card, house, path, zone, isVisible]);
+  }, [card, house, expansion, path, zone, isVisible]);
 
   const w = path?.bbox.size[0] ?? 1;
   const h = path?.bbox.size[1] ?? 1;

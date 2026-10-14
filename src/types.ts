@@ -16,6 +16,12 @@ export type HouseData =
   | House[]
   | Partial<Record<Expansion, House | House[]>>;
 
+export type CardPrinting = {
+  expansion: Expansion;
+  house: House;
+  imageFile: string | null;
+};
+
 export type Card = {
   type: CardKind;
   title: string;
@@ -25,6 +31,7 @@ export type Card = {
   amber?: number;
   house: HouseData;
   expansions: Expansion[];
+  printings: CardPrinting[];
 };
 
 export function pickRandom<T>(array: T[]): T {

@@ -1,7 +1,8 @@
 import classNames from "classnames";
 import React, { Suspense, use, useId, useRef } from "react";
-import { getCardHouses, getCardImageUrl } from "../../cards/card-image-utils";
+import { getCardImageUrl } from "../../cards/card-image-utils";
 import { queryCards } from "../../cards/card-db";
+import type { Card } from "../../types";
 import styles from "./puzzles.module.css";
 import type { KeyforgePuzzle } from "./types";
 
@@ -9,50 +10,34 @@ type CardInPlay = NonNullable<
   NonNullable<KeyforgePuzzle["setup"]["friendly"]["battleline"]>[number]
 >;
 
-// ─── House singleton ──────────────────────────────────────────────────────────
-// Caches slug → house lookups for the lifetime of the page. Any component can
-// seed it with a known house (skipping the DB round-trip) or let it lazy-load.
+// ─── Card singleton ──────────────────────────────────────────────────────────
+// Caches slug → Card lookups for the lifetime of the page.
 
-const houseCache = new Map<string, Promise<string>>();
+const cardCache = new Map<string, Promise<Card | undefined>>();
 
-function getHousePromise(slug: string, knownHouse?: string): Promise<string> {
-  if (knownHouse) {
-    // Seed the cache so subsequent renders of the same slug skip the lookup.
-    if (!houseCache.has(slug)) {
-      houseCache.set(slug, Promise.resolve(knownHouse));
-    }
-    return Promise.resolve(knownHouse);
-  }
-  if (!houseCache.has(slug)) {
-    houseCache.set(
+function getCardPromise(slug: string): Promise<Card | undefined> {
+  if (!cardCache.has(slug)) {
+    cardCache.set(
       slug,
-      queryCards({ slug }).then(
-        (results) => getCardHouses(results[0])[0] ?? "",
-      ),
+      queryCards({ slug }).then((results) => results[0]),
     );
   }
-  return houseCache.get(slug)!;
+  return cardCache.get(slug)!;
 }
 
 // ─── CardThumb ────────────────────────────────────────────────────────────────
 
 export type CardThumbProps = {
   card: CardInPlay | string;
-  /** Known house for the card. If omitted, looked up via the DB singleton. */
-  house?: string;
   /** Unique per-instance id — same card slug can appear more than once in a
    * zone, so this can't just be the slug. e.g. `${slug}-${index}`. */
   id: string;
 };
 
-export function CardThumb({ card, house: knownHouse, id }: CardThumbProps) {
+export function CardThumb({ card, id }: CardThumbProps) {
   const slug = typeof card === "string" ? card : card.slug;
   const pc = typeof card === "string" ? null : card;
   const popoverRef = useRef<HTMLDivElement>(null);
-
-  // Seed the cache with the known house if provided, so CardImg children
-  // resolve immediately without a DB round-trip.
-  if (knownHouse) getHousePromise(slug, knownHouse);
 
   const uid = useId();
   const anchorName = `--card-${uid}`;
@@ -165,7 +150,7 @@ export function CardThumb({ card, house: knownHouse, id }: CardThumbProps) {
 }
 
 // ─── CardImg ──────────────────────────────────────────────────────────────────
-// Suspense-based image that resolves its house via the singleton.
+// Suspense-based image that resolves its card via the singleton.
 // Used in both the stacked layers and the fan popover.
 
 function CardImg({
@@ -176,8 +161,8 @@ function CardImg({
   className?: string;
 }) {
   const slug = typeof card === "string" ? card : card.slug;
-  const house = use(getHousePromise(slug));
-  const src = getCardImageUrl(slug, house);
+  const cardObj = use(getCardPromise(slug));
+  const src = cardObj ? getCardImageUrl(cardObj) : "";
   return (
     <img
       src={src}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Card } from "../types";
+import type { Card, Expansion } from "../types";
 import {
   FOUR_AEMBER,
   getClipPath,
@@ -11,6 +11,7 @@ import styles from "./Card.module.css";
 type Props = {
   card: Card;
   house: string;
+  expansion?: Expansion;
   hiddenZones?: Zone[];
   showResults?: Partial<Record<Zone, boolean>>;
   onImageError?: () => void;
@@ -19,6 +20,7 @@ type Props = {
 export function Card({
   card,
   house,
+  expansion,
   hiddenZones = [],
   showResults,
   onImageError,
@@ -37,7 +39,7 @@ export function Card({
     const correctColor = style.getPropertyValue("--color-correct").trim();
     const incorrectColor = style.getPropertyValue("--color-incorrect").trim();
 
-    loadCardImage(card.slug, house)
+    loadCardImage(card, house, expansion)
       .then((image) => {
         ctx.drawImage(image, 0, 0, 300, 420);
 
@@ -69,7 +71,7 @@ export function Card({
       .catch(() => {
         if (onImageError) onImageError();
       });
-  }, [card, hiddenZones, house, onImageError, showResults]);
+  }, [card, expansion, hiddenZones, house, onImageError, showResults]);
 
   const classList = [
     styles.canvas,

@@ -239,8 +239,12 @@ export function getCardHouse(
 }
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
-export function loadCardImage(slug: string, house: string) {
-  const src = getCardImageUrl(slug, house);
+export function loadCardImage(
+  card: Card,
+  house?: string,
+  expansion?: Expansion,
+): Promise<HTMLImageElement> {
+  const src = getCardImageUrl(card, house, expansion);
   const cachedPromise = imageCache.get(src);
   if (cachedPromise) {
     return cachedPromise;

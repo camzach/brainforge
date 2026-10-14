@@ -1,27 +1,26 @@
 import type { Card, Expansion, House } from "../types";
 
-export function normalizeHouseForUrl(house: string): string {
-  let normalized = house.toLowerCase();
-  if (normalized === "skybeast") {
-    normalized = "skyborn";
-  }
-  if (normalized === "revenant") {
-    normalized = "geistoid";
-  }
-  return normalized;
-}
-
+/**
+ * Picks the printing image that best matches the requested house/expansion
+ * (house match outranks expansion match), falling back to any printing with an
+ * image. Returns "" if the card has no image at all.
+ */
 export function getCardImageUrl(
-  slug: string,
-  house: string,
-  baseUrl?: string,
+  card: Card,
+  house?: string,
+  expansion?: Expansion,
 ): string {
-  const normalizedHouse = normalizeHouseForUrl(house);
-  const base =
-    baseUrl ||
-    import.meta.env.VITE_CARD_IMAGE_BASEURL ||
-    "https://keyforge-card-images.s3-us-west-2.amazonaws.com/";
-  return `${base}${normalizedHouse}/${slug}.png`;
+  const score = (p: Card["printings"][number]) =>
+    (p.house === house ? 2 : 0) + (p.expansion === expansion ? 1 : 0);
+
+  let best: Card["printings"][number] | undefined;
+  for (const p of card.printings) {
+    if (p.imageFile && (!best || score(p) > score(best))) best = p;
+  }
+
+  return best
+    ? `${import.meta.env.BASE_URL}card-images/${best.imageFile}`
+    : "";
 }
 
 export function getCardHouses(card: Card, expansion?: Expansion): House[] {
@@ -45,4 +44,3 @@ export function getCardHouses(card: Card, expansion?: Expansion): House[] {
   });
   return Array.from(houses);
 }
-
