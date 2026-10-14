@@ -201,7 +201,7 @@ export function ChallengeScreen({ config }: Props) {
         const house =
           config.house ??
           (Array.isArray(houseOrHouses) ? houseOrHouses[0] : houseOrHouses);
-        loadCardImage(c.slug, house);
+        loadCardImage(c, house, config.expansion);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -309,7 +309,12 @@ export function ChallengeScreen({ config }: Props) {
         <div className={styles.challenge}>
           <div className={styles.cardSection}>
             <h2>Match the clipped regions</h2>
-            <Card card={card} house={cardHouse!} hiddenZones={zones} />
+            <Card
+              card={card}
+              house={cardHouse!}
+              expansion={config.expansion}
+              hiddenZones={zones}
+            />
           </div>
 
           <div className={styles.fragmentsPanel}>
@@ -333,6 +338,7 @@ export function ChallengeScreen({ config }: Props) {
                           key={fragment.id}
                           card={fragment.card}
                           house={fragment.house}
+                          expansion={config.expansion}
                           zone={fragment.zone}
                           selected={
                             selections[zone]?.includes(fragment.id) ?? false
@@ -382,6 +388,7 @@ export function ChallengeScreen({ config }: Props) {
         <Card
           card={card}
           house={cardHouse!}
+          expansion={config.expansion}
           hiddenZones={[]}
           showResults={results}
         />
@@ -402,6 +409,7 @@ export function ChallengeScreen({ config }: Props) {
                     <Fragment
                       card={fragment.card}
                       house={fragment.house}
+                      expansion={config.expansion}
                       zone={zone}
                     />
                     <span className={styles.resultIcon}>

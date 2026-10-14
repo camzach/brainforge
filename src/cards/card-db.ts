@@ -1,5 +1,5 @@
 import sqlite3InitModule, { type Database } from "@sqlite.org/sqlite-wasm";
-import type { Card, CardKind, Expansion, House } from "../types";
+import type { Card, CardKind, CardPrinting, Expansion, House } from "../types";
 import {
   EXPANSION_TO_ID,
   HOUSE_TO_ID,
@@ -99,7 +99,7 @@ type RawCardRow = {
 
 function constructCard(
   cardRow: RawCardRow,
-  printings: { expansion: Expansion; house: House }[],
+  printings: CardPrinting[],
 ): Card {
   const expMap = new Map<Expansion, Set<House>>();
   for (const p of printings) {
@@ -133,6 +133,7 @@ function constructCard(
     armor: cardRow.armor ?? undefined,
     house: houseValue,
     expansions,
+    printings,
   };
 }
 
@@ -217,14 +218,18 @@ export async function queryCards(
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const sql = `
-    SELECT DISTINCT c.slug, c.title, c.type, c.amber, c.power, c.armor, p.expansion_id, p.house_id
+    SELECT c.slug, c.title, c.type, c.amber, c.power, c.armor, p.expansion_id, p.house_id, p.image_file
     FROM card_printings p
     JOIN cards c ON c.id = p.card_id
     ${whereClause}
     ORDER BY c.title ASC
   `;
 
-  type CombinedRow = RawCardRow & { house_id: number; expansion_id: number };
+  type CombinedRow = RawCardRow & {
+    house_id: number;
+    expansion_id: number;
+    image_file: string | null;
+  };
   const rows = db.exec({
     sql,
     bind,
@@ -234,7 +239,7 @@ export async function queryCards(
 
   const cardMap = new Map<
     string,
-    { card: RawCardRow; printings: { expansion: Expansion; house: House }[] }
+    { card: RawCardRow; printings: CardPrinting[] }
   >();
 
   for (const row of rows) {
@@ -251,16 +256,30 @@ export async function queryCards(
         printings: [],
       });
     }
-    const exp = ID_TO_EXPANSION[row.expansion_id];
-    const h = ID_TO_HOUSE[row.house_id];
-    if (exp && h) {
-      cardMap.get(row.slug)!.printings.push({ expansion: exp, house: h });
+    const expansion = ID_TO_EXPANSION[row.expansion_id];
+    const house = ID_TO_HOUSE[row.house_id];
+    if (expansion && house) {
+      cardMap
+        .get(row.slug)!
+        .printings.push({ expansion, house, imageFile: row.image_file });
     }
   }
 
   return Array.from(cardMap.values()).map(({ card, printings }) =>
     constructCard(card, printings),
   );
+}
+
+/** Expansions that have at least one card, in release (Master Vault ID) order. */
+export async function getExpansionsWithCards(): Promise<Expansion[]> {
+  const db = await openCardDB();
+  const rows = db.exec({
+    sql: `SELECT DISTINCT expansion_id FROM card_printings ORDER BY expansion_id`,
+    rowMode: "object",
+    returnValue: "resultRows",
+  }) as { expansion_id: number }[];
+
+  return rows.flatMap((r) => ID_TO_EXPANSION[r.expansion_id] ?? []);
 }
 
 export async function getExpansionMeta(

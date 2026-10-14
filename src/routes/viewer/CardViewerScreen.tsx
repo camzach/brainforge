@@ -221,7 +221,7 @@ export function CardViewerScreen() {
               <div key={`${card.slug}-${index}`} className={`${styles.cardItem} surface`}>
                 <div className={styles.cardPreview}>
                   <img
-                    src={getCardImageUrl(card.slug, house)}
+                    src={getCardImageUrl(card, house, selectedExpansion || undefined)}
                     alt={card.title}
                     loading="lazy"
                   />
@@ -260,7 +260,12 @@ export function CardViewerScreen() {
                           <span className={styles.fragmentLabel}>
                             {ZONE_DISPLAY[zone]}
                           </span>
-                          <Fragment card={card} house={house} zone={zone} />
+                          <Fragment
+                            card={card}
+                            house={house}
+                            expansion={selectedExpansion || undefined}
+                            zone={zone}
+                          />
                         </div>
                       ))}
                     </div>

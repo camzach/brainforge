@@ -7,7 +7,7 @@ import {
   ZONE_DISPLAY,
   type Zone,
 } from "../../cards/card-utils";
-import { getExpansionMeta } from "../../cards/card-db";
+import { getExpansionMeta, getExpansionsWithCards } from "../../cards/card-db";
 import {
   encodePracticeSearch,
   type PracticeSearchParams,
@@ -28,6 +28,7 @@ function deriveCardTypes(
 
 export function SetupScreen() {
   const navigate = useNavigate();
+  const [availableExpansions, setAvailableExpansions] = useState<Expansion[]>([]);
   const [expansion, setExpansion] = useState<Expansion | null>(null);
   const [expansionHouses, setExpansionHouses] = useState<House[]>([]);
   const [typesByHouse, setTypesByHouse] = useState<Map<House, Set<CardKind>>>(new Map());
@@ -41,6 +42,10 @@ export function SetupScreen() {
     Artifact: new Set(),
     Upgrade: new Set(),
   });
+
+  useEffect(() => {
+    getExpansionsWithCards().then(setAvailableExpansions);
+  }, []);
 
   const canStart =
     expansion &&
@@ -125,9 +130,9 @@ export function SetupScreen() {
             className={styles.select}
           >
             <option value="">— Select —</option>
-            {Object.keys(Expansions).map((exp) => (
+            {availableExpansions.map((exp) => (
               <option key={exp} value={exp}>
-                {Expansions[exp as Expansion]}
+                {Expansions[exp]}
               </option>
             ))}
           </select>
