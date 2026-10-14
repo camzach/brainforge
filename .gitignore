@@ -8,3 +8,6 @@ keyforge.sql
 keyforge.sql.zst
 public/card-db.sqlite
 public/card-db.version.json
+
+# Downloaded card images (fetched at build time via download:images)
+public/card-images/
