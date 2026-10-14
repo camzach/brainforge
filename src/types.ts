@@ -1,6 +1,6 @@
 import type { Zone } from "./cards/card-utils";
-import type { Expansion, House } from "./constants";
-export type { Expansion, House } from "./constants";
+import type { CardKind, Expansion, House } from "./constants";
+export type { CardKind, Expansion, House } from "./constants";
 export {
   EXPANSIONS,
   Expansions,
@@ -10,13 +10,6 @@ export {
   HOUSE_TO_ID,
   ID_TO_HOUSE,
 } from "./constants";
-
-export type CardKind =
-  | "Creature"
-  | "TokenCreature"
-  | "Action"
-  | "Artifact"
-  | "Upgrade";
 
 export type HouseData =
   | House
