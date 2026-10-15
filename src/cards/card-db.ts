@@ -1,10 +1,8 @@
 import sqlite3InitModule, { type Database } from "@sqlite.org/sqlite-wasm";
 import type { Card, CardKind, CardPrinting, Expansion, House } from "../types";
 import {
-  EXPANSION_TO_ID,
-  HOUSE_TO_ID,
-  ID_TO_EXPANSION,
-  ID_TO_HOUSE,
+  EXPANSIONS,
+  HOUSES,
 } from "../types";
 
 function normalizeTitle(title: string): string {
@@ -172,17 +170,15 @@ export async function queryCards(
   const bind: Record<string, string | number> = {};
 
   if (filter.expansion) {
-    const expId = EXPANSION_TO_ID[filter.expansion];
-    if (!expId) return [];
+    if (!(filter.expansion in EXPANSIONS)) return [];
     conditions.push("p.expansion_id = $expansion_id");
-    bind.$expansion_id = expId;
+    bind.$expansion_id = filter.expansion;
   }
 
   if (filter.house) {
-    const houseId = HOUSE_TO_ID[filter.house];
-    if (!houseId) return [];
-    conditions.push("p.house_id = $house_id");
-    bind.$house_id = houseId;
+    if (!HOUSES.includes(filter.house)) return [];
+    conditions.push("p.house = $house");
+    bind.$house = filter.house;
   }
 
   if (filter.type) {
@@ -218,7 +214,7 @@ export async function queryCards(
     conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
   const sql = `
-    SELECT c.slug, c.title, c.type, c.amber, c.power, c.armor, p.expansion_id, p.house_id, p.image_file
+    SELECT c.slug, c.title, c.type, c.amber, c.power, c.armor, p.expansion_id, p.house, p.image_file
     FROM card_printings p
     JOIN cards c ON c.id = p.card_id
     ${whereClause}
@@ -226,7 +222,7 @@ export async function queryCards(
   `;
 
   type CombinedRow = RawCardRow & {
-    house_id: number;
+    house: string;
     expansion_id: number;
     image_file: string | null;
   };
@@ -256,9 +252,9 @@ export async function queryCards(
         printings: [],
       });
     }
-    const expansion = ID_TO_EXPANSION[row.expansion_id];
-    const house = ID_TO_HOUSE[row.house_id];
-    if (expansion && house) {
+    const expansion = row.expansion_id as Expansion;
+    const house = row.house as House;
+    if (expansion in EXPANSIONS && HOUSES.includes(house)) {
       cardMap
         .get(row.slug)!
         .printings.push({ expansion, house, imageFile: row.image_file });
@@ -279,30 +275,31 @@ export async function getExpansionsWithCards(): Promise<Expansion[]> {
     returnValue: "resultRows",
   }) as { expansion_id: number }[];
 
-  return rows.flatMap((r) => ID_TO_EXPANSION[r.expansion_id] ?? []);
+  return rows
+    .map((r) => r.expansion_id as Expansion)
+    .filter((exp) => exp in EXPANSIONS);
 }
 
 export async function getExpansionMeta(
   expansion: Expansion,
 ): Promise<{ houses: House[]; typesByHouse: Map<House, Set<CardKind>> }> {
-  const expId = EXPANSION_TO_ID[expansion];
-  if (!expId) return { houses: [], typesByHouse: new Map() };
+  if (!(expansion in EXPANSIONS)) return { houses: [], typesByHouse: new Map() };
 
   const db = await openCardDB();
   const rows = db.exec({
-    sql: `SELECT DISTINCT p.house_id, c.type
+    sql: `SELECT DISTINCT p.house, c.type
      FROM card_printings p
      JOIN cards c ON c.id = p.card_id
      WHERE p.expansion_id = $expId`,
-    bind: { $expId: expId },
+    bind: { $expId: expansion },
     rowMode: "object",
     returnValue: "resultRows",
-  }) as { house_id: number; type: string }[];
+  }) as { house: string; type: string }[];
 
   const typesByHouse = new Map<House, Set<CardKind>>();
   for (const row of rows) {
-    const house = ID_TO_HOUSE[row.house_id];
-    if (!house) continue;
+    const house = row.house as House;
+    if (!HOUSES.includes(house)) continue;
     if (!typesByHouse.has(house)) typesByHouse.set(house, new Set());
     typesByHouse.get(house)!.add(row.type as CardKind);
   }

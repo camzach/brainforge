@@ -2,9 +2,8 @@ import fs from "fs";
 import crypto from "crypto";
 import Database from "better-sqlite3";
 import {
-  EXPANSION_TO_ID,
-  HOUSE_TO_ID,
-  ID_TO_EXPANSION,
+  EXPANSIONS,
+  HOUSES,
   type CardKind,
   type Expansion,
   type House,
@@ -31,31 +30,6 @@ const SKIP_TYPES = new Set([
   "gigantic creature art",
 ]);
 
-// Normalize house names to match our format
-const HOUSE_MAP: Record<string, House> = {
-  brobnar: "Brobnar",
-  dis: "Dis",
-  logos: "Logos",
-  mars: "Mars",
-  sanctum: "Sanctum",
-  shadows: "Shadows",
-  untamed: "Untamed",
-  saurian: "Saurian",
-  staralliance: "StarAlliance",
-  "star alliance": "StarAlliance",
-  unfathomable: "Unfathomable",
-  ekwidon: "Ekwidon",
-  geistoid: "Geistoid",
-  skyborn: "Skyborn",
-  keyraken: "Keyraken",
-  elders: "Elders",
-  ironyxrebels: "IronyxRebels",
-  "ironyx rebels": "IronyxRebels",
-  ouboros: "Ouboros",
-  redemption: "Redemption",
-  anomaly: "Anomaly",
-  skybeast: "Skybeast",
-};
 
 // Skybeast card IDs (appear in AS and CC, can go in any house)
 const SKYBEAST_IDS = new Set([
@@ -86,7 +60,7 @@ const SKYBEAST_IDS = new Set([
 
 // Cards that should be forced to a specific house
 const FORCED_HOUSE_CARDS: Record<string, House> = {
-  "exchange-officer": "StarAlliance",
+  "exchange-officer": "Star Alliance",
 };
 
 type DatabaseCardRow = {
@@ -103,14 +77,6 @@ type DatabaseCardRow = {
   card_number?: string;
 };
 
-function normalizeHouse(house: string): House {
-  const normalized = HOUSE_MAP[house.trim().toLowerCase()];
-  if (!normalized) {
-    console.warn(`Unknown house: ${house}`);
-    return house as House;
-  }
-  return normalized;
-}
 
 function parsePowerArmor(
   val: string | number | null | undefined,
@@ -210,8 +176,8 @@ function buildCardsFromDb(sourceDbPath: string) {
     const power = parsePowerArmor(row.power);
     const armor = parsePowerArmor(row.armor);
 
-    const expansion = row.expansion ? ID_TO_EXPANSION[row.expansion] : undefined;
-    if (!expansion) {
+    const expansion = (row.expansion ?? undefined) as Expansion | undefined;
+    if (!expansion || !(expansion in EXPANSIONS)) {
       console.warn(
         `Unknown Master Vault expansion ID: ${row.expansion} for ${title}`,
       );
@@ -219,11 +185,10 @@ function buildCardsFromDb(sourceDbPath: string) {
     }
 
     let house: House | House[];
-    let targetExpansion = expansion;
+    let targetExpansion: Expansion = expansion;
 
     const isSkybeast = SKYBEAST_IDS.has(slug);
-    const isAnomaly =
-      row.is_anomaly === 1 || expansion === "ANOMALY_EXPANSION";
+    const isAnomaly = row.is_anomaly === 1 || expansion === 453;
 
     if (FORCED_HOUSE_CARDS[slug]) {
       house = FORCED_HOUSE_CARDS[slug];
@@ -231,9 +196,13 @@ function buildCardsFromDb(sourceDbPath: string) {
       house = "Skybeast";
     } else if (isAnomaly) {
       house = "Anomaly";
-      targetExpansion = "ANOMALY_EXPANSION";
+      targetExpansion = 453;
     } else {
-      house = normalizeHouse(row.house || "");
+      if (!HOUSES.includes(row.house as House)) {
+        console.warn(`Unknown house: ${row.house} for ${title}`);
+        continue;
+      }
+      house = row.house as House;
     }
 
     if (!cardsMap.has(slug)) {
@@ -302,10 +271,10 @@ function buildCardsFromDb(sourceDbPath: string) {
 
     CREATE TABLE card_printings (
       expansion_id INTEGER NOT NULL,
-      house_id INTEGER NOT NULL,
+      house TEXT NOT NULL,
       card_id INTEGER NOT NULL,
       image_file TEXT,
-      PRIMARY KEY (expansion_id, house_id, card_id),
+      PRIMARY KEY (expansion_id, house, card_id),
       FOREIGN KEY (card_id) REFERENCES cards(id)
     ) WITHOUT ROWID;
 
@@ -318,7 +287,7 @@ function buildCardsFromDb(sourceDbPath: string) {
   `);
 
   const insertPrinting = db.prepare(`
-    INSERT INTO card_printings (expansion_id, house_id, card_id, image_file)
+    INSERT INTO card_printings (expansion_id, house, card_id, image_file)
     VALUES (?, ?, ?, ?)
   `);
 
@@ -341,14 +310,9 @@ function buildCardsFromDb(sourceDbPath: string) {
       );
 
       for (const [exp, houseMap] of cardPrintingsMap.get(card.slug) ?? []) {
-        const expId = EXPANSION_TO_ID[exp];
+        const expId = exp;
         for (const [h, imageFile] of houseMap) {
-          const houseId = HOUSE_TO_ID[h];
-          if (!houseId) {
-            console.warn(`No ID found for house: ${h}`);
-            continue;
-          }
-          insertPrinting.run(expId, houseId, cardId, imageFile);
+          insertPrinting.run(expId, h, cardId, imageFile);
         }
       }
     }

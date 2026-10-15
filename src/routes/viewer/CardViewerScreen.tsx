@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getExpansionMeta, queryCards } from "../../cards/card-db";
 import { Fragment } from "../../cards/Fragment";
 import type { Card, CardKind, Expansion, House } from "../../types";
-import { Expansions, HOUSES } from "../../types";
+import { EXPANSIONS, HOUSES } from "../../types";
 import {
   cardTypeZoneMaps,
   getCardHouse,
@@ -143,12 +143,14 @@ export function CardViewerScreen() {
             value={selectedExpansion}
             onChange={(e) => {
               setLoading(true);
-              handleExpansionChange(e.target.value as Expansion | "");
+              handleExpansionChange(
+                e.target.value ? (Number(e.target.value) as Expansion) : "",
+              );
             }}
             className={styles.select}
           >
             <option value="">All Expansions</option>
-            {Object.entries(Expansions).map(([key, name]) => (
+            {Object.entries(EXPANSIONS).map(([key, name]) => (
               <option key={key} value={key}>{name}</option>
             ))}
           </select>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { Expansion, CardKind, House } from "../../types";
-import { Expansions } from "../../types";
+import { EXPANSIONS } from "../../types";
 import {
   cardTypeZoneMaps,
   ZONE_DISPLAY,
@@ -123,7 +123,9 @@ export function SetupScreen() {
           <select
             value={expansion || ""}
             onChange={(e) => {
-              setExpansion((e.target.value as Expansion) || null);
+              setExpansion(
+                e.target.value ? (Number(e.target.value) as Expansion) : null,
+              );
               setHouse(null);
               setExpansionHouses([]);
             }}
@@ -132,7 +134,7 @@ export function SetupScreen() {
             <option value="">— Select —</option>
             {availableExpansions.map((exp) => (
               <option key={exp} value={exp}>
-                {Expansions[exp]}
+                {EXPANSIONS[exp]}
               </option>
             ))}
           </select>
