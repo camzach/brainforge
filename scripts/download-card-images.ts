@@ -124,7 +124,22 @@ async function downloadCardImages() {
 
   const fallbacks = buildFallbacks(rows);
   const filenames = [...fallbacks.keys()];
+  const validFilenames = new Set(filenames);
   console.log(`Found ${filenames.length} unique card images`);
+
+  let deleted = 0;
+  for (const file of fs.readdirSync(OUTPUT_DIR)) {
+    if (!validFilenames.has(file)) {
+      const filePath = path.join(OUTPUT_DIR, file);
+      if (fs.statSync(filePath).isFile()) {
+        fs.unlinkSync(filePath);
+        deleted++;
+      }
+    }
+  }
+  if (deleted > 0) {
+    console.log(`Pruned ${deleted} unreferenced images from cache.`);
+  }
 
   let downloaded = 0;
   let substituted = 0;
@@ -165,7 +180,7 @@ async function downloadCardImages() {
   }
 
   console.log(
-    `\n\n✅ Done. ${downloaded} downloaded (${substituted} via fallback), ${skipped} already cached, ${failed} failed.`,
+    `\n\n✅ Done. ${downloaded} downloaded (${substituted} via fallback), ${skipped} already cached, ${deleted} pruned, ${failed} failed.`,
   );
   if (failed > 0) process.exit(1);
 }
