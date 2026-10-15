@@ -1,12 +1,12 @@
 import type { CardKind, Expansion, GameConfig, House } from "../../types";
-import { HOUSES } from "../../constants";
+import { EXPANSIONS, HOUSES } from "../../constants";
 import { cardTypeZoneMaps, type Zone } from "../../cards/card-utils";
 
 const VALID_HOUSES = new Set<string>(HOUSES);
 
 /**
  * Practice search params schema
- * e.g. /practice/play?exp=CALL_OF_THE_ARCHONS&house=Brobnar&types=Creature,Action&zones=Creature:name+power,Action:rules
+ * e.g. /practice/play?exp=341&house=Brobnar&types=Creature,Action&zones=Creature:name+power,Action:rules
  */
 export type PracticeSearchParams = {
   exp?: Expansion;
@@ -41,7 +41,7 @@ export function encodePracticeSearch(config: GameConfig): PracticeSearchParams {
 export function decodePracticeSearch(
   search: PracticeSearchParams,
 ): GameConfig | null {
-  if (!search.exp) return null;
+  if (!search.exp || !(search.exp in EXPANSIONS)) return null;
 
   const cardTypes = new Set<CardKind>();
   if (search.types) {

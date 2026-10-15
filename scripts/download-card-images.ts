@@ -15,7 +15,7 @@ const WEBP_QUALITY = 80;
 type PrintingRow = {
   image_file: string;
   card_id: number;
-  house_id: number;
+  house: string;
 };
 
 /** `{expansion}_{number}_{hash}_{lang}.webp` -> `{hash}` */
@@ -46,8 +46,8 @@ function buildFallbacks(rows: PrintingRow[]): Map<string, string[]> {
   };
 
   // Rows arrive ordered by expansion_id, so Sets keep earliest printing first.
-  for (const { image_file, card_id, house_id } of rows) {
-    const cardHouse = `${card_id}:${house_id}`;
+  for (const { image_file, card_id, house } of rows) {
+    const cardHouse = `${card_id}:${house}`;
     const hash = assetHash(image_file);
     if (hash) add(byHash, hash, image_file);
     add(byCardHouse, cardHouse, image_file);
@@ -116,7 +116,7 @@ async function downloadCardImages() {
   const db = new Database(CARD_DB_PATH, { readonly: true });
   const rows = db
     .prepare(
-      `SELECT image_file, card_id, house_id FROM card_printings
+      `SELECT image_file, card_id, house FROM card_printings
        WHERE image_file IS NOT NULL ORDER BY expansion_id`,
     )
     .all() as PrintingRow[];

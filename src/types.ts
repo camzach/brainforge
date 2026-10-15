@@ -3,12 +3,7 @@ import type { CardKind, Expansion, House } from "./constants";
 export type { CardKind, Expansion, House } from "./constants";
 export {
   EXPANSIONS,
-  Expansions,
   HOUSES,
-  EXPANSION_TO_ID,
-  ID_TO_EXPANSION,
-  HOUSE_TO_ID,
-  ID_TO_HOUSE,
 } from "./constants";
 
 export type HouseData =

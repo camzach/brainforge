@@ -2,6 +2,7 @@ import { Suspense, use, useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { countCards, getCardByIndex, queryCards } from "../../cards/card-db";
 import type { Card } from "../../types";
+import { EXPANSIONS } from "../../types";
 import { getCardHouses } from "../../cards/card-image-utils";
 
 import styles from "./KeyfordleScreen.module.css";
@@ -563,7 +564,9 @@ function KeyfordleGameView({
                         </span>
                       </td>
                       <td className={getCellStatusClass(expMatch)}>
-                        {guess.expansions.join(", ")}
+                        {guess.expansions
+                          .map((e) => EXPANSIONS[e] ?? e)
+                          .join(", ")}
                       </td>
                     </tr>
                   );
@@ -670,7 +673,9 @@ function KeyfordleGameView({
                     className={`${styles.guessCell} ${getCellStatusClass(expMatch)}`}
                   >
                     <span className={styles.cellLabel}>Expansion(s)</span>
-                    {guess.expansions.join(", ")}
+                    {guess.expansions
+                      .map((e) => EXPANSIONS[e] ?? e)
+                      .join(", ")}
                   </div>
                 </div>
               );
