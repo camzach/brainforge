@@ -23,7 +23,7 @@ const puzzle: KeyforgePuzzle = {
     ],
   },
   spec: {
-    title: "Life for a Life Espionage",
+    title: "Thieves at the Vault",
     description:
       "Forge a key this turn, starting from 0 Æmber with Key of Darkness in hand. Keys cost 6 Æmber.",
     player1: {

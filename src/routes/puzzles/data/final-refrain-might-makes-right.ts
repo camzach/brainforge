@@ -23,9 +23,9 @@ const puzzle: KeyforgePuzzle = {
     ],
   },
   spec: {
-    title: "Final Refrain Might Makes Right",
+    title: "The Crowded Graveyard",
     description:
-      "Forge a key this turn with Might Makes Right and finish with 6 Æmber, enough to forge another key next turn.",
+      "Forge a key this turn and finish with 6 Æmber, enough to forge another key next turn.",
     player1: {
       house: "brobnar",
       houses: ["brobnar", "geistoid", "untamed"],

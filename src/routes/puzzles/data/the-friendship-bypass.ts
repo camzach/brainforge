@@ -22,7 +22,7 @@ const puzzle: KeyforgePuzzle = {
       "Friendship turns the damage Troll takes into damage on its neighbors. That is how you get Keyfrog destroyed on your own turn.",
   },
   spec: {
-    title: "The Friendship Bypass",
+    title: "Frog Under Pressure",
     description: "Forge a key this turn.",
     player1: {
       house: "sanctum",

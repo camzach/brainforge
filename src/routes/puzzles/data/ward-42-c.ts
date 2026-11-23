@@ -25,7 +25,7 @@ const puzzle: KeyforgePuzzle = {
       "The key insight is that Encounter Suit wards its host when it moves away, so Kartanoo keeps a ward even after Refit relocates the upgrade. Sample 42-C then gains its own ward from Encounter Suit attaching to it, which blocks Gleaming the Cube’s destruction. Both creatures survive the turn, and Kangaphant’s threat is nullified.",
   },
   spec: {
-    title: "Ward 42-C",
+    title: "Specimen 42-C",
     description: "Forge a key this turn without losing Sample 42-C or Kartanoo.",
     player1: {
       house: "staralliance",
