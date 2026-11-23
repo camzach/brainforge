@@ -7,7 +7,13 @@ import { getPlayUrl } from "./encode";
 
 type Reveal = number | "solution" | null;
 
-function PuzzleCard({ puzzle }: { puzzle: KeyforgePuzzle }) {
+function PuzzleCard({
+  puzzle,
+  featured,
+}: {
+  puzzle: KeyforgePuzzle;
+  featured?: boolean;
+}) {
   // Which hint (by index) or the solution is open. Only one at a time.
   const [open, setOpen] = useState<Reveal>(null);
   // How many solution steps have been revealed so far.
@@ -17,7 +23,9 @@ function PuzzleCard({ puzzle }: { puzzle: KeyforgePuzzle }) {
   const { hints, solution } = puzzle;
 
   return (
-    <div className={styles.puzzleCard}>
+    <div
+      className={`${styles.puzzleCard} ${featured ? styles.featured : ""}`}
+    >
       <div className={styles.puzzleCardTop}>
         <span className={styles.puzzleDate}>📅 {puzzle.publishedAt}</span>
         {puzzle.difficulty && (
@@ -112,6 +120,10 @@ export function PuzzleDirectoryScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const puzzles = puzzlesDirectoryRoute.useLoaderData();
+  // Newest first; the newest puzzle is featured. Ties keep their original order.
+  const sorted = [...puzzles].sort((a, b) =>
+    b.publishedAt.localeCompare(a.publishedAt),
+  );
 
   return (
     <div className={styles.container}>
@@ -156,8 +168,8 @@ export function PuzzleDirectoryScreen() {
       </div>
 
       <div className={styles.puzzleGrid}>
-        {puzzles.map((puzzle) => (
-          <PuzzleCard key={puzzle.id} puzzle={puzzle} />
+        {sorted.map((puzzle, i) => (
+          <PuzzleCard key={puzzle.id} puzzle={puzzle} featured={i === 0} />
         ))}
 
         {puzzles.length === 0 && (
