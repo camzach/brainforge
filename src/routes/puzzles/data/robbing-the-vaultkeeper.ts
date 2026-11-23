@@ -1,7 +1,6 @@
 import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
-  id: "life-for-a-life-espionage",
   publishedAt: "2026-11-23",
   difficulty: "Medium",
   author: "BrainForge",
@@ -24,9 +23,9 @@ const puzzle: KeyforgePuzzle = {
     ],
   },
   spec: {
-    title: "Thieves at the Vault",
+    title: "Robbing the Vaultkeeper",
     description:
-      "Forge a key this turn, starting from 0 Æmber with Key of Darkness in hand. Keys cost 6 Æmber.",
+      "Forge a key this turn. You start with no Æmber, and keys cost 6.",
     player1: {
       house: "shadows",
       houses: ["shadows", "unfathomable", "staralliance"],

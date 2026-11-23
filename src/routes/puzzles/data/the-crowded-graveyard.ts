@@ -1,7 +1,6 @@
 import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
-  id: "final-refrain-might-makes-right",
   publishedAt: "2026-11-23",
   difficulty: "Hard",
   author: "BrainForge",

@@ -163,7 +163,7 @@ export function PuzzleDirectoryScreen() {
 
       <div className={styles.puzzleGrid}>
         {sorted.map((puzzle, i) => (
-          <PuzzleCard key={puzzle.id} puzzle={puzzle} featured={i === 0} />
+          <PuzzleCard key={puzzle.spec.title} puzzle={puzzle} featured={i === 0} />
         ))}
 
         {sorted.length === 0 && (
