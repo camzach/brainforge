@@ -2,13 +2,33 @@ import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
   id: "life-for-a-life-espionage",
-  code: "eyJ2ZXJzaW9uIjoxLCJ0aXRsZSI6IkxpZmUgZm9yIGEgTGlmZSBFc3Bpb25hZ2UiLCJkZXNjcmlwdGlvbiI6Ii8vIEZvcmdlIGEga2V5IHRoaXMgdHVybiBzdGFydGluZyBmcm9tIDBBIHdpdGggS2V5IG9mIERhcmtuZXNzIChrZXlzIGNvc3QgNikuIiwicGxheWVyMSI6eyJob3VzZSI6InNoYWRvd3MiLCJob3VzZXMiOlsic2hhZG93cyIsInVuZmF0aG9tYWJsZSIsInN0YXJhbGxpYW5jZSJdLCJpblBsYXkiOlsic2VhYnJpbmdlci1rZWtvYSIsIm9wZXJhdGl2ZS1lc3Bpb24iLCJzaWx2ZXJ0b290aCIsIm5vZGR5LXRoZS10aGllZiJdLCJoYW5kIjpbImxpZmUtZm9yLWEtbGlmZSIsInVyY2hpbiIsImtleS1vZi1kYXJrbmVzcyJdLCJkZWNrIjpbIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCIsIm1hY2lzLWFzcCJdfSwicGxheWVyMiI6eyJob3VzZXMiOlsiYnJvYm5hciIsInNoYWRvd3MiLCJzYW5jdHVtIl0sImFtYmVyIjoxLCJpblBsYXkiOlt7ImNhcmQiOiJ0cm9sbCIsInRva2VucyI6eyJhbWJlciI6NH0sImRhbWFnZSI6Mn0sImJhZC1wZW5ueSIseyJjYXJkIjoidGhlLXZhdWx0a2VlcGVyIiwidG9rZW5zIjp7ImFybW9yIjoxfSwiZGFtYWdlIjoyfV0sImRlY2siOlsiYW5nZXIiLCJhbmdlciIsImFuZ2VyIiwiYW5nZXIiLCJhbmdlciIsImFuZ2VyIiwiYW5nZXIiLCJhbmdlciIsImFuZ2VyIiwiYW5nZXIiLCJhbmdlciIsImFuZ2VyIl19fQ",
-  title: "Life for a Life Espionage",
   publishedAt: "2026-11-23",
   author: "BrainForge",
-  description:
-    "Start the turn at 0 Æmber with Key of Darkness in hand (keys cost 6). Forge a key this turn.",
-  goal: "Forge a key this turn starting from 0 Æmber.",
+  spec: {
+    title: "Life for a Life Espionage",
+    description:
+      "Forge a key this turn, starting from 0 Æmber with Key of Darkness in hand. Keys cost 6 Æmber.",
+    player1: {
+      house: "shadows",
+      houses: ["shadows", "unfathomable", "staralliance"],
+      inPlay: [
+        "seabringer-kekoa",
+        "operative-espion",
+        "silvertooth",
+        "noddy-the-thief",
+      ],
+      hand: ["life-for-a-life", "urchin", "key-of-darkness"],
+    },
+    player2: {
+      houses: ["brobnar", "shadows", "sanctum"],
+      amber: 1,
+      inPlay: [
+        { card: "troll", tokens: { amber: 4 }, damage: 2 },
+        "bad-penny",
+        { card: "the-vaultkeeper", tokens: { armor: 1 }, damage: 2 },
+      ],
+    },
+  },
 };
 
 export default puzzle;

@@ -1,14 +1,37 @@
 import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
-  id: "the-friendship-bypass",
-  code: "eyJ2ZXJzaW9uIjoxLCJ0aXRsZSI6IlRoZSBGcmllbmRzaGlwIEJ5cGFzcyIsImRlc2NyaXB0aW9uIjoiRm9yZ2UgYSBrZXkgdGhpcyB0dXJuIGFuZCBkZXN0cm95IHRoZSBvcHBvbmVudCdzIHdhcmRlZCBEcmVja2VyLiIsInBsYXllcjEiOnsiaG91c2UiOiJzYW5jdHVtIiwiaG91c2VzIjpbInNhbmN0dW0iLCJ1bnRhbWVkIiwiYnJvYm5hciJdLCJhbWJlciI6NCwiaW5QbGF5IjpbImtleWZyb2ciLCJ0cm9sbCIsImNvbW1hbmRlci1yZW1pZWwiXSwiaGFuZCI6WyJmcmllbmRzaGlwIl0sImRlY2siOlsiY2hhbXBpb24tYW5hcGhpZWwiLCJjaGFtcGlvbi1hbmFwaGllbCIsImNoYW1waW9uLWFuYXBoaWVsIiwiY2hhbXBpb24tYW5hcGhpZWwiLCJjaGFtcGlvbi1hbmFwaGllbCIsImNoYW1waW9uLWFuYXBoaWVsIiwiY2hhbXBpb24tYW5hcGhpZWwiLCJjaGFtcGlvbi1hbmFwaGllbCIsImNoYW1waW9uLWFuYXBoaWVsIiwiY2hhbXBpb24tYW5hcGhpZWwiLCJjaGFtcGlvbi1hbmFwaGllbCJdfSwicGxheWVyMiI6eyJob3VzZXMiOlsiZGlzIiwic2FuY3R1bSIsInVudGFtZWQiXSwiaW5QbGF5IjpbeyJjYXJkIjoiZHJlY2tlciIsInRva2VucyI6eyJ3YXJkIjoxfX0sImd1YiIseyJjYXJkIjoidGhlLXZhdWx0a2VlcGVyIiwidG9rZW5zIjp7ImFybW9yIjoxfX1dLCJkZWNrIjpbImhhbmQtb2YtZGlzIiwiaGFuZC1vZi1kaXMiLCJoYW5kLW9mLWRpcyIsImhhbmQtb2YtZGlzIiwiaGFuZC1vZi1kaXMiLCJoYW5kLW9mLWRpcyIsImhhbmQtb2YtZGlzIiwiaGFuZC1vZi1kaXMiLCJoYW5kLW9mLWRpcyIsImhhbmQtb2YtZGlzIiwiaGFuZC1vZi1kaXMiLCJoYW5kLW9mLWRpcyJdfX0",
-  title: "The Friendship Bypass",
+  id: "frog-under-pressure",
   publishedAt: "2026-11-23",
   author: "BrainForge",
-  description:
-    "Forge a key this turn and destroy the opponent's warded Drecker.",
-  goal: "Forge a key and destroy the warded Drecker.",
+  spec: {
+    title: "The Friendship Bypass",
+    description: "Forge a key this turn.",
+    player1: {
+      house: "sanctum",
+      houses: ["sanctum", "untamed", "brobnar"],
+      amber: 4,
+      inPlay: [
+        {
+          card: "keyfrog",
+          exhausted: true,
+          upgrades: ["under-pressure"],
+        },
+        "troll",
+        "commander-remiel",
+      ],
+      hand: ["friendship"],
+    },
+    player2: {
+      houses: ["unfathomable", "dis", "sanctum"],
+      amber: 1,
+      inPlay: [
+        { card: "drecker", tokens: { ward: 1 } },
+        "gub",
+        { card: "the-vaultkeeper", tokens: { armor: 1 } },
+      ],
+    },
+  },
 };
 
 export default puzzle;

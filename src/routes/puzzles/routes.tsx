@@ -8,11 +8,6 @@ const PuzzleDirectoryScreen = lazy(() =>
     default: m.PuzzleDirectoryScreen,
   }))
 );
-const PuzzleDetailScreen = lazy(() =>
-  import("./PuzzleDetailScreen").then((m) => ({
-    default: m.PuzzleDetailScreen,
-  }))
-);
 
 async function loadAll() {
   const modules = await Promise.all(Object.values(puzzleModules).map((m) => m()));
@@ -24,14 +19,4 @@ export const puzzlesDirectoryRoute = createRoute({
   path: "/puzzles",
   component: PuzzleDirectoryScreen,
   loader: () => loadAll(),
-});
-
-export const puzzleDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/puzzles/$puzzleId",
-  component: PuzzleDetailScreen,
-  loader: async ({ params }) => {
-    const all = await loadAll();
-    return all.find((p) => p.id === params.puzzleId);
-  },
 });

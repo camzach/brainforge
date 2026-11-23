@@ -1,10 +1,114 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import type { KeyforgePuzzle } from "./types";
 import styles from "./puzzles.module.css";
 import { puzzlesDirectoryRoute } from "./routes";
+import { getPlayUrl } from "./encode";
+
+type Reveal = number | "solution" | null;
+
+function PuzzleCard({ puzzle }: { puzzle: KeyforgePuzzle }) {
+  // Which hint (by index) or the solution is open. Only one at a time.
+  const [open, setOpen] = useState<Reveal>(null);
+  // How many solution steps have been revealed so far.
+  const [revealedSteps, setRevealedSteps] = useState(0);
+  const toggle = (which: Reveal) =>
+    setOpen((current) => (current === which ? null : which));
+  const { hints, solution } = puzzle;
+
+  return (
+    <div className={styles.puzzleCard}>
+      <div className={styles.puzzleCardTop}>
+        <span className={styles.puzzleDate}>📅 {puzzle.publishedAt}</span>
+        {puzzle.difficulty && (
+          <span
+            className={`${styles.difficultyTag} ${styles[puzzle.difficulty.toLowerCase() as keyof typeof styles]}`}
+          >
+            {puzzle.difficulty}
+          </span>
+        )}
+      </div>
+
+      <h3 className={styles.puzzleTitle}>{puzzle.spec.title}</h3>
+
+      <p className={styles.puzzleCardDesc}>{puzzle.spec.description}</p>
+
+      <div className={styles.puzzleCardFooter}>
+        {(hints?.length || solution) && (
+          <div className={styles.spoilerButtons}>
+            {hints?.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={styles.spoilerButton}
+                aria-pressed={open === i}
+                aria-label={`Hint ${i + 1}`}
+                title={`Hint ${i + 1}`}
+                onClick={() => toggle(i)}
+              >
+                💡
+              </button>
+            ))}
+            {solution && (
+              <button
+                type="button"
+                className={styles.spoilerButton}
+                aria-pressed={open === "solution"}
+                onClick={() => toggle("solution")}
+              >
+                Solution
+              </button>
+            )}
+          </div>
+        )}
+        <a href={getPlayUrl(puzzle.spec)} className="btn btn-primary">
+          Play →
+        </a>
+      </div>
+
+      {typeof open === "number" && hints && (
+        <div className={styles.spoilerPanel}>
+          <strong>Hint {open + 1}</strong>
+          <p>{hints[open]}</p>
+        </div>
+      )}
+      {open === "solution" && solution && (
+        <div className={styles.spoilerPanel}>
+          {revealedSteps > 0 && (
+            <ol>
+              {solution.steps.slice(0, revealedSteps).map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
+            </ol>
+          )}
+          {revealedSteps < solution.steps.length ? (
+            <div className={styles.spoilerActions}>
+              <button
+                type="button"
+                className={styles.spoilerButton}
+                onClick={() => setRevealedSteps(revealedSteps + 1)}
+              >
+                {revealedSteps === 0 ? "Show first step" : "Show next step"} (
+                {revealedSteps}/{solution.steps.length})
+              </button>
+              <button
+                type="button"
+                className={styles.spoilerButton}
+                onClick={() => setRevealedSteps(solution.steps.length)}
+              >
+                Show all
+              </button>
+            </div>
+          ) : (
+            solution.commentary && <p>{solution.commentary}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function PuzzleDirectoryScreen() {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const puzzles = puzzlesDirectoryRoute.useLoaderData();
@@ -28,7 +132,7 @@ export function PuzzleDirectoryScreen() {
         <div className={styles.searchBox}>
           <input
             type="text"
-            placeholder="Search puzzles by title, goal, or cards..."
+            placeholder="Search puzzles by title or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -52,63 +156,9 @@ export function PuzzleDirectoryScreen() {
       </div>
 
       <div className={styles.puzzleGrid}>
-        {puzzles.map((puzzle) => {
-          return (
-            <div
-              key={puzzle.id}
-              className={styles.puzzleCard}
-              onClick={() =>
-                navigate({
-                  to: "/puzzles/$puzzleId",
-                  params: { puzzleId: puzzle.id },
-                })
-              }
-            >
-              <div className={styles.puzzleCardTop}>
-                <span className={styles.puzzleDate}>
-                  📅 {puzzle.publishedAt}
-                </span>
-                {puzzle.difficulty && (
-                  <span
-                    className={`${styles.difficultyTag} ${styles[puzzle.difficulty.toLowerCase() as keyof typeof styles]}`}
-                  >
-                    {puzzle.difficulty}
-                  </span>
-                )}
-              </div>
-
-              <h3 className={styles.puzzleTitle}>{puzzle.title}</h3>
-
-              {puzzle.description && (
-                <p className={styles.puzzleCardDesc}>{puzzle.description}</p>
-              )}
-
-              <div className={styles.puzzleCardGoal}>
-                <strong>Goal: </strong>
-                <span>{puzzle.goal}</span>
-              </div>
-
-              <div className={styles.puzzleCardFooter}>
-                <div className={styles.puzzleTags}>
-                  {puzzle.hints && puzzle.hints.length > 0 && (
-                    <span className={styles.hintsBadge}>
-                      💡 {puzzle.hints.length} hint
-                      {puzzle.hints.length === 1 ? "" : "s"}
-                    </span>
-                  )}
-                </div>
-                <Link
-                  to="/puzzles/$puzzleId"
-                  params={{ puzzleId: puzzle.id }}
-                  className="btn btn-primary"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Solve →
-                </Link>
-              </div>
-            </div>
-          );
-        })}
+        {puzzles.map((puzzle) => (
+          <PuzzleCard key={puzzle.id} puzzle={puzzle} />
+        ))}
 
         {puzzles.length === 0 && (
           <div className={styles.noPuzzlesMessage}>

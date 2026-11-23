@@ -100,6 +100,7 @@
 }
 
 .puzzleCard {
+  min-width: 0;
   background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -108,7 +109,6 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
-  cursor: pointer;
   transition:
     transform var(--transition),
     border-color var(--transition);
@@ -144,37 +144,66 @@
   line-height: 1.5;
 }
 
-.puzzleCardGoal {
-  background: var(--bg);
-  border-left: 3px solid var(--accent);
-  padding: 8px 12px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: 13px;
-  color: var(--text);
-}
-
 .puzzleCardFooter {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   margin-top: 8px;
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
-.puzzleTags {
+.spoilerButtons {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
+  margin-right: auto;
 }
 
-.hintsBadge {
-  font-size: 11px;
+.spoilerButton {
+  font-size: 13px;
   background: var(--bg);
   border: 1px solid var(--border);
-  padding: 2px 8px;
   border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.spoilerButton[aria-pressed="true"] {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.spoilerPanel {
+  /* Fill the card but don't contribute to its intrinsic width, so opening a
+     long hint or solution wraps instead of widening the page. */
+  width: 0;
+  min-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.5;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
   color: var(--text-dim);
+}
+
+.spoilerActions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.spoilerPanel p,
+.spoilerPanel ol {
+  margin: 6px 0 0;
+}
+
+.spoilerPanel ol {
+  padding-left: 20px;
 }
 
 .noPuzzlesMessage {
@@ -219,43 +248,4 @@
   background: var(--color-error-bg);
   color: var(--color-error);
   border: 1px solid var(--color-error-border);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   PUZZLE DETAIL
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.detailWrap {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.detailTitle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-h);
-  font-family: var(--display);
-}
-
-.detailDescription {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text);
-}
-
-.detailGoal {
-  font-size: 13px;
-  color: var(--text);
-  background: var(--accent-bg);
-  border-left: 3px solid var(--accent);
-  padding: 4px 10px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
