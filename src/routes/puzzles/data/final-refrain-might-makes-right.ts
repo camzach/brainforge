@@ -3,7 +3,7 @@ import type { KeyforgePuzzle } from "../types";
 const puzzle: KeyforgePuzzle = {
   id: "final-refrain-might-makes-right",
   publishedAt: "2026-11-23",
-  difficulty: "Expert",
+  difficulty: "Hard",
   author: "BrainForge",
   hints: [
     "Tribute Collector can capture Æmber onto any friendly creature.",

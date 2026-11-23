@@ -3,6 +3,7 @@ import type { KeyforgePuzzle } from "../types";
 const puzzle: KeyforgePuzzle = {
   id: "ward-42-c",
   publishedAt: "2026-11-23",
+  difficulty: "Medium",
   author: "BrainForge",
   hints: [
     "Encounter Suit wards Kartanoo before Refit moves it, so the ward stays on Kartanoo.",

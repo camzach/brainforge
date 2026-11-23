@@ -89,7 +89,7 @@ export type PuzzleSpec = {
 export type KeyforgePuzzle = {
   id: string;
   publishedAt: string; // YYYY-MM-DD
-  difficulty?: "Easy" | "Medium" | "Hard" | "Expert";
+  difficulty: "Easy" | "Medium" | "Hard" | "Expert";
   author?: string;
   hints?: string[];
   solution?: {

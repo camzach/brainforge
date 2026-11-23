@@ -3,6 +3,7 @@ import type { KeyforgePuzzle } from "../types";
 const puzzle: KeyforgePuzzle = {
   id: "life-for-a-life-espionage",
   publishedAt: "2026-11-23",
+  difficulty: "Medium",
   author: "BrainForge",
   hints: [
     "Key of Darkness forges at +6 Æmber over the current cost, or only +2 if your opponent has no Æmber. Aim to forge at 8.",
