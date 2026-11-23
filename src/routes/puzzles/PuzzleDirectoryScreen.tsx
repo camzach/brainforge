@@ -69,7 +69,12 @@ function PuzzleCard({
             )}
           </div>
         )}
-        <a href={getPlayUrl(puzzle.spec)} className="btn btn-primary">
+        <a
+          href={getPlayUrl(puzzle.spec)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-primary"
+        >
           Play →
         </a>
       </div>
