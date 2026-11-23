@@ -23,7 +23,10 @@ const CARD_TYPES: CardKind[] = [
 
 export function CardViewerScreen() {
   const [cards, setCards] = useState<Card[]>([]);
-  const [selectedExpansion, setSelectedExpansion] = useState<Expansion | "">("");
+  const [search, setSearch] = useState("");
+  const [selectedExpansion, setSelectedExpansion] = useState<Expansion | "">(
+    "",
+  );
   const [selectedHouse, setSelectedHouse] = useState<House | "">("");
   const [selectedCardTypes, setSelectedCardTypes] = useState<Set<CardKind>>(
     new Set(),
@@ -40,10 +43,14 @@ export function CardViewerScreen() {
       getExpansionMeta(selectedExpansion).then(({ houses }) => {
         if (!isCurrent) return;
         setExpansionHouses(houses);
-        setSelectedHouse((prev) => (prev && !houses.includes(prev) ? "" : prev));
+        setSelectedHouse((prev) =>
+          prev && !houses.includes(prev) ? "" : prev,
+        );
       });
     }
-    return () => { isCurrent = false; };
+    return () => {
+      isCurrent = false;
+    };
   }, [selectedExpansion]);
 
   const handleExpansionChange = (newExp: Expansion | "") => {
@@ -63,7 +70,9 @@ export function CardViewerScreen() {
     queryCards({
       expansion: selectedExpansion || undefined,
       house: selectedHouse || undefined,
-      type: selectedCardTypes.size > 0 ? Array.from(selectedCardTypes) : undefined,
+      type:
+        selectedCardTypes.size > 0 ? Array.from(selectedCardTypes) : undefined,
+      search,
     })
       .then((results) => {
         if (!isCurrent) return;
@@ -73,10 +82,15 @@ export function CardViewerScreen() {
         if (isCurrent) setLoading(false);
       });
 
-    return () => { isCurrent = false; };
-  }, [selectedExpansion, selectedHouse, selectedCardTypes]);
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedExpansion, selectedHouse, selectedCardTypes, search]);
 
-  const getCardDisplayHouse = (card: Card, expansion: Expansion | ""): string => {
+  const getCardDisplayHouse = (
+    card: Card,
+    expansion: Expansion | "",
+  ): string => {
     if (expansion) {
       const house = getCardHouse(card, expansion);
       if (typeof house === "string") return house;
@@ -128,7 +142,9 @@ export function CardViewerScreen() {
   return (
     <div className={styles.page}>
       <div className={styles.back}>
-        <Link to="/" className="btn btn-ghost">← Back</Link>
+        <Link to="/" className="btn btn-ghost">
+          ← Back
+        </Link>
       </div>
 
       <h1 className={styles.title}>Card Viewer</h1>
@@ -151,9 +167,22 @@ export function CardViewerScreen() {
           >
             <option value="">All Expansions</option>
             {Object.entries(EXPANSIONS).map(([key, name]) => (
-              <option key={key} value={key}>{name}</option>
+              <option key={key} value={key}>
+                {name}
+              </option>
             ))}
           </select>
+        </div>
+
+        <div className={styles.filterGroup}>
+          <label htmlFor="search" className={styles.filterLabel}>
+            Search
+          </label>
+          <input
+            id="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
         <div className={styles.filterGroup}>
@@ -171,7 +200,9 @@ export function CardViewerScreen() {
           >
             <option value="">All Houses</option>
             {availableHouses.map((house) => (
-              <option key={house} value={house}>{house}</option>
+              <option key={house} value={house}>
+                {house}
+              </option>
             ))}
           </select>
         </div>
@@ -198,7 +229,9 @@ export function CardViewerScreen() {
           <p>Select an expansion, house, or card type to load cards.</p>
         </div>
       ) : loading ? (
-        <p style={{ textAlign: "center", color: "var(--text-dim)" }}>Loading cards…</p>
+        <p style={{ textAlign: "center", color: "var(--text-dim)" }}>
+          Loading cards…
+        </p>
       ) : (
         <div className={styles.resultsBar}>
           <span>Showing {displayedCards.length} cards</span>
@@ -220,10 +253,17 @@ export function CardViewerScreen() {
             const zones = getCardFragmentZones(card);
 
             return (
-              <div key={`${card.slug}-${index}`} className={`${styles.cardItem} surface`}>
+              <div
+                key={`${card.slug}-${index}`}
+                className={`${styles.cardItem} surface`}
+              >
                 <div className={styles.cardPreview}>
                   <img
-                    src={getCardImageUrl(card, house, selectedExpansion || undefined)}
+                    src={getCardImageUrl(
+                      card,
+                      house,
+                      selectedExpansion || undefined,
+                    )}
                     alt={card.title}
                     loading="lazy"
                   />
@@ -236,7 +276,9 @@ export function CardViewerScreen() {
                     {" · "}
                     <span className={styles.cardHouse}>{house}</span>
                   </p>
-                  {(card.power !== undefined || card.armor !== undefined || card.amber !== undefined) && (
+                  {(card.power !== undefined ||
+                    card.armor !== undefined ||
+                    card.amber !== undefined) && (
                     <div className={styles.cardStats}>
                       {card.power !== undefined && (
                         <span className={styles.cardStat}>P {card.power}</span>
