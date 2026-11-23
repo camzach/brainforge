@@ -28,13 +28,11 @@ function PuzzleCard({
     >
       <div className={styles.puzzleCardTop}>
         <span className={styles.puzzleDate}>📅 {puzzle.publishedAt}</span>
-        {puzzle.difficulty && (
-          <span
-            className={`${styles.difficultyTag} ${styles[puzzle.difficulty.toLowerCase() as keyof typeof styles]}`}
-          >
-            {puzzle.difficulty}
-          </span>
-        )}
+        <span
+          className={`${styles.difficultyTag} ${styles[puzzle.difficulty.toLowerCase() as keyof typeof styles]}`}
+        >
+          {puzzle.difficulty}
+        </span>
       </div>
 
       <h3 className={styles.puzzleTitle}>{puzzle.spec.title}</h3>
@@ -122,13 +120,12 @@ function PuzzleCard({
 }
 
 export function PuzzleDirectoryScreen() {
-  const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const puzzles = puzzlesDirectoryRoute.useLoaderData();
   // Newest first; the newest puzzle is featured. Ties keep their original order.
-  const sorted = [...puzzles].sort((a, b) =>
-    b.publishedAt.localeCompare(a.publishedAt),
-  );
+  const sorted = puzzles
+    .filter((p) => difficultyFilter === "all" || p.difficulty === difficultyFilter)
+    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
   return (
     <div className={styles.container}>
@@ -146,14 +143,6 @@ export function PuzzleDirectoryScreen() {
       </header>
 
       <div className={styles.controlsBar}>
-        <div className={styles.searchBox}>
-          <input
-            type="text"
-            placeholder="Search puzzles by title or description..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
         <div className={styles.filtersRow}>
           <div className={styles.filterItem}>
             <label htmlFor="difficulty-filter">Difficulty:</label>
@@ -177,17 +166,14 @@ export function PuzzleDirectoryScreen() {
           <PuzzleCard key={puzzle.id} puzzle={puzzle} featured={i === 0} />
         ))}
 
-        {puzzles.length === 0 && (
+        {sorted.length === 0 && (
           <div className={styles.noPuzzlesMessage}>
-            <p>No puzzles matched your current search and filters.</p>
+            <p>No puzzles match this difficulty.</p>
             <button
               className="btn btn-ghost"
-              onClick={() => {
-                setSearchTerm("");
-                setDifficultyFilter("all");
-              }}
+              onClick={() => setDifficultyFilter("all")}
             >
-              Clear Filters
+              Show all puzzles
             </button>
           </div>
         )}

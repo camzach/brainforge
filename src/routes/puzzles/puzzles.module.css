@@ -40,28 +40,6 @@
   margin-bottom: 24px;
 }
 
-.searchBox input {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-  font-family: var(--sans);
-  box-sizing: border-box;
-  transition: border-color 0.12s;
-}
-
-.searchBox input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.searchBox input::placeholder {
-  color: var(--text-dim);
-}
-
 .filtersRow {
   display: flex;
   flex-wrap: wrap;
