@@ -8,7 +8,6 @@ export function PuzzleDirectoryScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const puzzles = puzzlesDirectoryRoute.useLoaderData();
-  console.log(puzzles);
 
   return (
     <div className={styles.container}>
@@ -54,7 +53,6 @@ export function PuzzleDirectoryScreen() {
 
       <div className={styles.puzzleGrid}>
         {puzzles.map((puzzle) => {
-          const house = puzzle.setup.activeHouse;
           return (
             <div
               key={puzzle.id}
@@ -92,9 +90,6 @@ export function PuzzleDirectoryScreen() {
 
               <div className={styles.puzzleCardFooter}>
                 <div className={styles.puzzleTags}>
-                  {house && (
-                    <span className={styles.houseTagBadge}>House: {house}</span>
-                  )}
                   {puzzle.hints && puzzle.hints.length > 0 && (
                     <span className={styles.hintsBadge}>
                       💡 {puzzle.hints.length} hint

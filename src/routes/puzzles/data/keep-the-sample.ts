@@ -2,6 +2,7 @@ import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
   id: "keep-the-sample",
+  code: "eyJ2ZXJzaW9uIjoxLCJ0aXRsZSI6IktlZXAgdGhlIFNhbXBsZSIsImRlc2NyaXB0aW9uIjoiRm9yZ2UgYSBrZXkgdGhpcyB0dXJuIHdpdGhvdXQgbG9zaW5nIFNhbXBsZSA0Mi1DIG9yIEthcnRhbm9vLiIsInBsYXllcjEiOnsiaG91c2UiOiJzdGFyYWxsaWFuY2UiLCJob3VzZXMiOlsic3RhcmFsbGlhbmNlIiwiZ2Vpc3RvaWQiLCJ1bnRhbWVkIl0sImluUGxheSI6WyJrYXJ0YW5vbyIseyJjYXJkIjoic2FtcGxlLTQyLWMiLCJ0b2tlbnMiOnsiYW1iZXIiOjN9fV0sImhhbmQiOlsiZW5jb3VudGVyLXN1aXQiXSwiZGVjayI6WyJhbmltYXRpbmctZm9yY2UiXX0sInBsYXllcjIiOnsiaG91c2VzIjpbInVudGFtZWQiLCJzdGFyYWxsaWFuY2UiLCJzYW5jdHVtIl0sImFtYmVyIjoxLCJpblBsYXkiOlt7ImNhcmQiOiJjYXVsZHJvbiIsInVuZGVyIjpbInJlZml0IiwiZ2xlYW1pbmctdGhlLWN1YmUiXX0sImthbmdhcGhhbnQiXSwiaGFuZCI6WyJhbmNpZW50LWJlYXIiLCJhbmNpZW50LWJlYXIiLCJhbmNpZW50LWJlYXIiLCJhbmNpZW50LWJlYXIiLCJhbmNpZW50LWJlYXIiLCJhbmNpZW50LWJlYXIiXSwiZGVjayI6W119fQ",
   title: "Keep the Sample",
   publishedAt: "2024-04-01",
   difficulty: "Hard",
@@ -9,34 +10,6 @@ const puzzle: KeyforgePuzzle = {
   description:
     "Player 1 has Kartanoo and Sample 42-C (with 3 Æmber on it) in play, Encounter Suit in hand, and Animating Force on top of the deck. The opponent has a Cauldron (with Refit and Gleaming the Cube already stacked under it) and Kangaphant in play. Forge a key this turn without losing Sample 42-C or Kartanoo.",
   goal: "Forge a key while keeping both Sample 42-C and Kartanoo in play.",
-  setup: {
-    activeHouse: "Star Alliance",
-    friendly: {
-      hand: ["encounter-suit"],
-      battleline: [{ slug: "kartanoo" }],
-      artifacts: [{ slug: "sample-42c", amber: 3 }],
-      draw: ["animating-force"],
-    },
-    opponent: {
-      aember: 1,
-      battleline: [
-        {
-          slug: "cauldron",
-          underneath: [{ slug: "gleaming-the-cube" }, { slug: "refit" }],
-        },
-        { slug: "kangaphant" },
-      ],
-    },
-    additionalNotes: [
-      "Cards under Cauldron are in order (top to bottom): Refit, Gleaming the Cube.",
-      "Animating Force is the top card of the player's deck.",
-      "Kartanoo's after-reap ability lets the player use a friendly or enemy artifact.",
-      "Cauldron's action draws a card and plays it, sequentially triggering the remaining cards beneath it.",
-      "Gleaming the Cube uses a friendly creature, then destroys it (blocked by a ward token).",
-      "Refit moves an upgrade from one friendly creature to another.",
-      "Kangaphant destroys the weakest friendly creature at end of turn.",
-    ],
-  },
   hints: [
     "Encounter Suit wards Kartanoo before being moved by Refit — the ward stays on Kartanoo.",
     "Animating Force gives Sample 42-C +1 power, making it a valid 4-power creature for Gleaming the Cube.",

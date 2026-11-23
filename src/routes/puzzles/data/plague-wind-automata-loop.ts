@@ -2,6 +2,7 @@ import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
   id: "plague-wind-automata-loop",
+  code: "eyJ2ZXJzaW9uIjoxLCJ0aXRsZSI6IlBsYWd1ZSBXaW5kIEF1dG9tYXRhIExvb3AiLCJkZXNjcmlwdGlvbiI6Ii8vIEZvcmdlIGEga2V5IGJ5IGdlbmVyYXRpbmcgZXhhY3RseSA2IGFlbWJlciB0byBhdm9pZCBsb3NpbmcgZXhjZXNzIGFlbWJlciB0byBJbnRlcmRpbWVuc2lvbmFsIEdyYWZ0LiIsInBsYXllcjEiOnsiaG91c2UiOiJtYXJzIiwiaG91c2VzIjpbIm1hcnMiLCJicm9ibmFyIiwiZ2Vpc3RvaWQiXSwiaW5QbGF5IjpbInNocmluay1yYXktdGVjaG5pY2lhbiIsImJhbm5lci1vZi1iYXR0bGUiLCJiYW5uZXItb2YtYmF0dGxlIl0sImhhbmQiOlsidGhlLWJvZHktc25hdGNoZXJzIiwicGxhZ3VlLXdpbmQiXSwiZGlzY2FyZCI6WyJzaWRla2ljayIsInNpZGVraWNrIiwic2lkZWtpY2siLCJzaWRla2ljayIsInNpZGVraWNrIiwic2lkZWtpY2siLCJzaWRla2ljayIsInNpZGVraWNrIiwic2lkZWtpY2siLCJzaWRla2ljayJdfSwicGxheWVyMiI6eyJob3VzZXMiOlsiZ2Vpc3RvaWQiLCJsb2dvcyIsInNhbmN0dW0iXSwiaW5QbGF5IjpbeyJjYXJkIjoiZGltby1lbGRlcmdoYXN0IiwidG9rZW5zIjp7ImFybW9yIjoyfX0seyJjYXJkIjoiYXJtYWRyb25lIiwidG9rZW5zIjp7ImFybW9yIjozfX0seyJjYXJkIjoibGlvbi1iYXV0cmVtIiwidG9rZW5zIjp7ImFybW9yIjoxfX0seyJjYXJkIjoic2VsZi1ib2xzdGVyaW5nLWF1dG9tYXRhIiwidG9rZW5zIjp7ImFtYmVyIjoxfX1dLCJkZWNrIjpbImVjaG9mbHkiXSwiZGlzY2FyZCI6WyJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiLCJhcm1hZHJvbmUiXX19",
   title: "Plague Wind Automata Loop",
   publishedAt: "2024-04-01",
   difficulty: "Expert",
@@ -9,30 +10,6 @@ const puzzle: KeyforgePuzzle = {
   description:
     "Player 1 is in Mars with The Body Snatchers and Plague Wind in hand, and Shrink Ray Technician + 2 Banners of Battle in play. The opponent has Dimo Elderghast, an Armadrone, Lion Bautrem, and a Self-Bolstering Automata in play. Forge a key by generating exactly 6 Æmber to avoid losing excess to Interdimensional Graft.",
   goal: "Trigger the Self-Bolstering Automata loop to gain exactly 6 Æmber and forge a key.",
-  setup: {
-    activeHouse: "Mars",
-    friendly: {
-      hand: ["the-body-snatchers", "plague-wind"],
-      battleline: [
-        { slug: "shrinkray-technician" },
-        { slug: "banner-of-battle" },
-        { slug: "banner-of-battle" },
-      ],
-    },
-    opponent: {
-      battleline: [
-        { slug: "dimo-elderghast" },
-        { slug: "lion-bautrem" },
-        { slug: "selfbolstering-automata", amber: 1 },
-      ],
-    },
-    additionalNotes: [
-      "Opponent's creature order (left to right) is critical: Dimo Elderghast, Armadrone, Lion Bautrem, Self-Bolstering Automata.",
-      "Interdimensional Graft is in effect — forging costs exactly 6 Æmber; any excess is lost.",
-      "Shrink Ray Technician's reap ability sets a target creature's power to 1.",
-      "The 2 Banners of Battle each give +1 power to friendly creatures.",
-    ],
-  },
   hints: [
     "Shrink Lion Bautrem's power to 1 first so Plague Wind destroys it after the transfer.",
     "The Body Snatchers steals all opponent creatures; Plague Wind then deals -3 power to all non-Mars creatures.",
