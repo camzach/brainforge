@@ -18,7 +18,7 @@ const TYPE_MAP: Record<string, CardKind> = {
   artifact: "Artifact",
   creature: "Creature",
   upgrade: "Upgrade",
-  "gigantic creature base": "Creature",
+  "gigantic creature base": "GiganticCreature",
   "token creature": "TokenCreature",
 };
 

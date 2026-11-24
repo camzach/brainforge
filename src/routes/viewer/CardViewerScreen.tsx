@@ -16,6 +16,7 @@ import styles from "./CardViewerScreen.module.css";
 const CARD_TYPES: CardKind[] = [
   "Creature",
   "TokenCreature",
+  "GiganticCreature",
   "Action",
   "Artifact",
   "Upgrade",

@@ -12,6 +12,15 @@ export const ZONE_DISPLAY: Record<Zone, string> = {
   name: "Name",
 };
 
+export const CARD_TYPE_DISPLAY: Record<CardKind, string> = {
+  Creature: "Creature",
+  TokenCreature: "Token Creature",
+  GiganticCreature: "Gigantic Creature",
+  Action: "Action",
+  Artifact: "Artifact",
+  Upgrade: "Upgrade",
+};
+
 const ONE_AEMBER = new Path2D(
   "m 21.408915 59.436964 11.799549 10.113902 2.528481 -2.287672 11.317943 -0.842759 9.7527 14.689247 -4.81615 9.752655 -15.772887 4.575383 -14.809636 12.04033 -6.260992 -2.64888 -0.722419 -40.21482 z",
 );
@@ -31,6 +40,7 @@ export const cardTypeZoneMaps: Record<
   CardKind,
   Partial<Record<Zone, { bbox: ZoneRect; path: Path2D }>>
 > = {
+  GiganticCreature: {},
   Creature: {
     amber: {
       bbox: {

@@ -3,9 +3,6 @@ import type { Card, Expansion } from "../types";
 import { getClipPath, loadCardImage, type Zone } from "./card-utils";
 import styles from "./Fragment.module.css";
 
-const sketchpad = new OffscreenCanvas(1000, 1000);
-const sketchpadCtx = sketchpad.getContext("2d")!;
-
 type Props = {
   card: Card;
   house: string;
@@ -59,20 +56,13 @@ export function Fragment({ card, house, expansion, zone, selected, onClick }: Pr
     if (!path) return;
 
     loadCardImage(card, house, expansion).then((image) => {
-      sketchpadCtx.save();
-      sketchpadCtx.clearRect(0, 0, 1000, 1000);
-      sketchpadCtx.clip(path.path);
-      sketchpadCtx.drawImage(image, 0, 0);
-      sketchpadCtx.restore();
-
-      ctx.drawImage(
-        sketchpad,
-        ...path.bbox.pos,
-        ...path.bbox.size,
-        0,
-        0,
-        ...path.bbox.size,
-      );
+      if (!canvasRef.current) return;
+      ctx.save();
+      ctx.clearRect(0, 0, w, h);
+      ctx.translate(-path.bbox.pos[0], -path.bbox.pos[1]);
+      ctx.clip(path.path);
+      ctx.drawImage(image, 0, 0);
+      ctx.restore();
     });
   }, [card, house, expansion, path, zone, isVisible]);
 

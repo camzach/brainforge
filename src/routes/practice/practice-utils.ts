@@ -56,6 +56,7 @@ export function decodePracticeSearch(
   const zones: Record<CardKind, Set<Zone>> = {
     Creature: new Set(),
     TokenCreature: new Set(),
+    GiganticCreature: new Set(),
     Action: new Set(),
     Artifact: new Set(),
     Upgrade: new Set(),

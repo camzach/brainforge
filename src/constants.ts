@@ -1,6 +1,7 @@
 export type CardKind =
   | "Creature"
   | "TokenCreature"
+  | "GiganticCreature"
   | "Action"
   | "Artifact"
   | "Upgrade";
