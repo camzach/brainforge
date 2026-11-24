@@ -27,15 +27,22 @@ const puzzle: KeyforgePuzzle = {
     description:
       "Forge a key this turn. You start with no Æmber, and keys cost 6.",
     player1: {
-      house: "shadows",
       houses: ["shadows", "unfathomable", "staralliance"],
       inPlay: [
         "seabringer-kekoa",
         "operative-espion",
         "silvertooth",
         "noddy-the-thief",
+        { card: "hookmaster", exhausted: true },
       ],
-      hand: ["life-for-a-life", "urchin", "key-of-darkness"],
+      hand: [
+        "survey",
+        "life-for-a-life",
+        "dark-discovery",
+        "urchin",
+        "xenotraining",
+        "key-of-darkness",
+      ],
     },
     player2: {
       houses: ["brobnar", "shadows", "sanctum"],

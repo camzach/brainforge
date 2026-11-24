@@ -26,7 +26,6 @@ const puzzle: KeyforgePuzzle = {
     description:
       "Forge a key this turn and finish with 6 Æmber, enough to forge another key next turn.",
     player1: {
-      house: "brobnar",
       houses: ["brobnar", "geistoid", "untamed"],
       keys: { red: true },
       inPlay: [
@@ -39,6 +38,7 @@ const puzzle: KeyforgePuzzle = {
         "alaka-s-brew",
         "igon-the-green",
         "terrance-surefoot",
+        "memette",
       ],
       discard: [
         "tribute-collector",
@@ -54,7 +54,10 @@ const puzzle: KeyforgePuzzle = {
       keys: { red: true, yellow: true },
       inPlay: ["grenade-snib", "grenade-snib", "grenade-snib", "groggins"],
     },
-    goal: [{ type: "keys", count: 2 }, { type: "amber", min: 6 }],
+    goal: [
+      { type: "keys", count: 2 },
+      { type: "amber", min: 6 },
+    ],
   },
 };
 

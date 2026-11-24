@@ -26,12 +26,19 @@ const puzzle: KeyforgePuzzle = {
   },
   spec: {
     title: "Stirring the Pot",
-    description: "Forge a key this turn without losing Sample 42-C or Kartanoo.",
+    description:
+      "Forge a key this turn without losing Sample 42-C or Kartanoo.",
     player1: {
-      house: "staralliance",
       houses: ["staralliance", "geistoid", "untamed"],
       inPlay: ["kartanoo", { card: "sample-42-c", tokens: { amber: 3 } }],
-      hand: ["encounter-suit"],
+      hand: [
+        "punctuated-equilibrium",
+        "encounter-suit",
+        "haunting-measures",
+        "look-what-i-found",
+        "mushroom-with-a-view",
+        "word-of-returning",
+      ],
       deck: ["animating-force"],
     },
     player2: {

@@ -25,7 +25,6 @@ const puzzle: KeyforgePuzzle = {
     title: "Frog Under Pressure",
     description: "Forge a key this turn.",
     player1: {
-      house: "sanctum",
       houses: ["sanctum", "untamed", "brobnar"],
       amber: 4,
       inPlay: [
@@ -36,8 +35,16 @@ const puzzle: KeyforgePuzzle = {
         },
         "troll",
         "commander-remiel",
+        { card: "bumpsy", exhausted: true },
       ],
-      hand: ["friendship"],
+      hand: [
+        "loot-the-bodies",
+        "friendship",
+        "lava-ball",
+        "mushroom-with-a-view",
+        "anger",
+        "fuzzy-gruen",
+      ],
     },
     player2: {
       houses: ["unfathomable", "dis", "sanctum"],
