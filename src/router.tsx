@@ -6,7 +6,6 @@ import {
   practicePlayRoute,
 } from "./routes/practice/routes";
 import { viewerRoute } from "./routes/viewer/routes";
-import { keyfordleRoute } from "./routes/keyfordle/routes";
 
 // Create Route Tree & Router
 const routeTree = rootRoute.addChildren([
@@ -14,7 +13,6 @@ const routeTree = rootRoute.addChildren([
   practiceSetupRoute,
   practicePlayRoute,
   viewerRoute,
-  keyfordleRoute,
 ]);
 
 export const router = createRouter({

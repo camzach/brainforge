@@ -29,21 +29,6 @@ export function HomeScreen() {
 
         <div className={styles.card}>
           <div className={styles.body}>
-            <h2>Keyfordle</h2>
-            <p>
-              Guess the mystery KeyForge card! Get clues on houses, stats,
-              expansions, and title letters with every guess.
-            </p>
-          </div>
-          <div className={styles.actions}>
-            <Link to="/keyfordle" className="btn btn-primary">
-              Play Keyfordle
-            </Link>
-          </div>
-        </div>
-
-        <div className={styles.card}>
-          <div className={styles.body}>
             <h2>Library Access</h2>
             <p>
               Browse the full card pool before you challenge yourself. Filter by
