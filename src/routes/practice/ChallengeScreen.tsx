@@ -258,6 +258,12 @@ export function ChallengeScreen({ config }: Props) {
     if (allCards) loadNextCard(allCards);
   };
 
+  const backLink = (
+    <div className={styles.backRow}>
+      <Link to="/practice/setup" className="btn btn-ghost">← Setup</Link>
+    </div>
+  );
+
   if (finalScore !== null) {
     return (
       <div className={styles.gameOver}>
@@ -294,6 +300,7 @@ export function ChallengeScreen({ config }: Props) {
 
     return (
       <div className={styles.challengePage}>
+        {backLink}
         <div className={styles.progressContainer}>
           <span className={styles.progressText}>
             Progress: {completedCards} / {totalCards} cards{" "}
@@ -372,6 +379,7 @@ export function ChallengeScreen({ config }: Props) {
 
     return (
       <div className={styles.page}>
+        {backLink}
         <div className={styles.progressContainer}>
           <span className={styles.progressText}>
             Progress: {completedCards} / {totalCards} cards{" "}
