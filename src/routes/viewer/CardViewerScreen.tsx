@@ -5,6 +5,7 @@ import { Fragment } from "../../cards/Fragment";
 import type { Card, CardKind, Expansion, House } from "../../types";
 import { EXPANSIONS, HOUSES } from "../../types";
 import {
+  CARD_TYPE_DISPLAY,
   cardTypeZoneMaps,
   getCardHouse,
   ZONE_DISPLAY,
@@ -220,7 +221,7 @@ export function CardViewerScreen() {
                   checked={selectedCardTypes.has(type)}
                   onChange={() => toggleCardType(type)}
                 />
-                {type}
+                {CARD_TYPE_DISPLAY[type]}
               </label>
             ))}
           </div>
@@ -275,7 +276,7 @@ export function CardViewerScreen() {
                 <div className={styles.cardInfo}>
                   <h3 className={styles.cardTitle}>{card.title}</h3>
                   <p className={styles.cardMeta}>
-                    <span className={styles.cardType}>{card.type}</span>
+                    <span className={styles.cardType}>{CARD_TYPE_DISPLAY[card.type]}</span>
                     {" · "}
                     <span className={styles.cardHouse}>{house}</span>
                   </p>

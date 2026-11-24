@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import type { Expansion, CardKind, House } from "../../types";
 import { EXPANSIONS } from "../../types";
 import {
+  CARD_TYPE_DISPLAY,
   cardTypeZoneMaps,
   ZONE_DISPLAY,
   type Zone,
@@ -182,7 +183,7 @@ export function SetupScreen() {
                     checked={cardTypes.has(cardType)}
                     onChange={() => handleCardTypeToggle(cardType)}
                   />
-                  {cardType}
+                  {CARD_TYPE_DISPLAY[cardType]}
                 </label>
               ))}
             </div>
@@ -192,7 +193,7 @@ export function SetupScreen() {
         {expansion &&
           Array.from(cardTypes).map((cardType) => (
             <div key={cardType} className={styles.section}>
-              <span className={styles.sectionLabel}>Zones — {cardType}</span>
+              <span className={styles.sectionLabel}>Zones — {CARD_TYPE_DISPLAY[cardType]}</span>
               <div className={styles.buttonGroup}>
                 {(Object.keys(cardTypeZoneMaps[cardType]) as Zone[]).map(
                   (zone) => (
