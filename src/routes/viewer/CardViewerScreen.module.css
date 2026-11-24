@@ -66,6 +66,27 @@
   color: var(--accent);
 }
 
+.input {
+  padding: 6px 10px;
+  font-size: 14px;
+  font-family: var(--sans);
+  background: var(--code-bg);
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition);
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+.input::placeholder {
+  color: var(--text-dim);
+}
+
 .checkboxList {
   display: flex;
   flex-direction: column;

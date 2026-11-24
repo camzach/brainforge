@@ -181,6 +181,8 @@ export function CardViewerScreen() {
           </label>
           <input
             id="search"
+            className={styles.input}
+            placeholder="Filter by name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
