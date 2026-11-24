@@ -5,6 +5,8 @@ import styles from "./puzzles.module.css";
 import { puzzlesDirectoryRoute } from "./routes";
 import { getPlayUrl } from "./encode";
 
+const SUBMIT_EMAIL = "brainforge-puzzles@camza.ch";
+
 type Reveal = number | "solution" | null;
 
 function PuzzleCard({
@@ -23,9 +25,7 @@ function PuzzleCard({
   const { hints, solution } = puzzle;
 
   return (
-    <div
-      className={`${styles.puzzleCard} ${featured ? styles.featured : ""}`}
-    >
+    <div className={`${styles.puzzleCard} ${featured ? styles.featured : ""}`}>
       <div className={styles.puzzleCardTop}>
         <span className={styles.puzzleDate}>📅 {puzzle.publishedAt}</span>
         <span
@@ -124,7 +124,9 @@ export function PuzzleDirectoryScreen() {
   const puzzles = puzzlesDirectoryRoute.useLoaderData();
   // Newest first; the newest puzzle is featured. Ties keep their original order.
   const sorted = puzzles
-    .filter((p) => difficultyFilter === "all" || p.difficulty === difficultyFilter)
+    .filter(
+      (p) => difficultyFilter === "all" || p.difficulty === difficultyFilter,
+    )
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
   return (
@@ -136,10 +138,6 @@ export function PuzzleDirectoryScreen() {
           </Link>
         </div>
         <h1>KeyForge Puzzle Directory</h1>
-        <p className={styles.subtitle}>
-          Sharpen your piloting skills with tactical scenarios, sequencing
-          puzzles, and lethal math challenges.
-        </p>
       </header>
 
       <div className={styles.controlsBar}>
@@ -161,22 +159,50 @@ export function PuzzleDirectoryScreen() {
         </div>
       </div>
 
-      <div className={styles.puzzleGrid}>
-        {sorted.map((puzzle, i) => (
-          <PuzzleCard key={puzzle.spec.title} puzzle={puzzle} featured={i === 0} />
-        ))}
+      <div className={styles.content}>
+        <div className={styles.puzzleGrid}>
+          {sorted.map((puzzle, i) => (
+            <PuzzleCard
+              key={puzzle.spec.title}
+              puzzle={puzzle}
+              featured={i === 0}
+            />
+          ))}
 
-        {sorted.length === 0 && (
-          <div className={styles.noPuzzlesMessage}>
-            <p>No puzzles match this difficulty.</p>
-            <button
-              className="btn btn-ghost"
-              onClick={() => setDifficultyFilter("all")}
-            >
-              Show all puzzles
-            </button>
-          </div>
-        )}
+          {sorted.length === 0 && (
+            <div className={styles.noPuzzlesMessage}>
+              <p>No puzzles match this difficulty.</p>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setDifficultyFilter("all")}
+              >
+                Show all puzzles
+              </button>
+            </div>
+          )}
+        </div>
+
+        <aside className={styles.submitCard}>
+          <h3 className={styles.puzzleTitle}>Submit a puzzle</h3>
+          <p>
+            Do you have an idea for a puzzle? Share it with me and I may
+            feature it here!
+          </p>
+          <p>Please include:</p>
+          <ul>
+            <li>
+              The goal (e.g. "Forge a key", "Get to check", "Stop your
+              opponent's key")
+            </li>
+            <li>The puzzle setup</li>
+            <li>Your step-by-step solution</li>
+            <li>The name you want credited</li>
+          </ul>
+          <p>
+            Send your puzzle to{" "}
+            <a href={`mailto:${SUBMIT_EMAIL}`}>{SUBMIT_EMAIL}</a>.
+          </p>
+        </aside>
       </div>
     </div>
   );

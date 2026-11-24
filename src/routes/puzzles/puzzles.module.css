@@ -231,3 +231,45 @@
   color: var(--color-error);
   border: 1px solid var(--color-error-border);
 }
+
+/* ── Submit puzzle card ───────────────────────────────────────────────────── */
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.submitCard {
+  position: sticky;
+  top: 24px;
+  min-width: 0;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.submitCard ul {
+  padding-left: 20px;
+}
+
+.submitCard a {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .submitCard {
+    position: static;
+  }
+}
