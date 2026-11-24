@@ -13,9 +13,8 @@ export function HomeScreen() {
 
       <div className={styles.grid}>
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Practice</span>
           <div className={styles.body}>
-            <h2>Challenge Mode</h2>
+            <h2>Well of Memory</h2>
             <p>
               Practice your card recognition and recall. Get prepared for
               sealed!
@@ -29,12 +28,11 @@ export function HomeScreen() {
         </div>
 
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Daily & Infinite</span>
           <div className={styles.body}>
             <h2>Keyfordle</h2>
             <p>
-              Guess the mystery KeyForge card! Get clues on houses,
-              stats, expansions, and title letters with every guess.
+              Guess the mystery KeyForge card! Get clues on houses, stats,
+              expansions, and title letters with every guess.
             </p>
           </div>
           <div className={styles.actions}>
@@ -45,13 +43,11 @@ export function HomeScreen() {
         </div>
 
         <div className={styles.card}>
-          <span className={styles.cardLabel}>Browse</span>
           <div className={styles.body}>
-            <h2>Card Vault</h2>
+            <h2>Library Access</h2>
             <p>
               Browse the full card pool before you challenge yourself. Filter by
-              expansion, house, and type. Toggle fragment overlays to preview
-              what the challenge will hide.
+              expansion, house, and type.
             </p>
           </div>
           <div className={styles.actions}>
