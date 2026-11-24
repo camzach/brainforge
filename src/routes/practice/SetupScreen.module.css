@@ -1,13 +1,13 @@
 .page {
   display: flex;
   flex-direction: column;
-  padding: 40px 32px 80px;
+  padding: 40px 32px 0;
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
 
   @media (max-width: 640px) {
-    padding: 28px 20px 64px;
+    padding: 28px 20px 0;
   }
 }
 
@@ -41,8 +41,8 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px 24px;
+  gap: 10px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -211,16 +211,102 @@
   border: 0;
 }
 
+/* ── Card type rows ───────────────────────────────────────────────────────── */
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sectionActions {
+  display: flex;
+  gap: 12px;
+}
+
+.linkButton {
+  padding: 2px 4px;
+  font-size: 12px;
+  font-family: var(--sans);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.linkButton:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.linkButton:disabled {
+  color: var(--text-dim);
+  cursor: default;
+  opacity: 0.5;
+}
+
+.linkButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.typeList {
+  display: grid;
+  grid-template-columns: max-content 1fr auto;
+  gap: 8px 12px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+/* Rows share the list's columns so type labels align at their widest. */
+.typeRow {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+}
+
+.typeToggle {
+  text-align: center;
+}
+
+.zoneChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  @media (max-width: 640px) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 /* ── Footer ───────────────────────────────────────────────────────────────── */
 
 .footer {
-  margin-top: 24px;
+  position: sticky;
+  bottom: 0;
+  margin-top: 16px;
+  padding: 14px 0 20px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }
 
-.footerHint {
+.summary {
   font-size: 13px;
-  color: var(--text-dim);
+  color: var(--text);
+  line-height: 1.4;
 }
