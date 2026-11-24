@@ -137,7 +137,7 @@ export function PuzzleDirectoryScreen() {
             ← Back
           </Link>
         </div>
-        <h1>KeyForge Puzzle Directory</h1>
+        <h1>Rooftop Laboratory</h1>
       </header>
 
       <div className={styles.controlsBar}>
@@ -185,8 +185,8 @@ export function PuzzleDirectoryScreen() {
         <aside className={styles.submitCard}>
           <h3 className={styles.puzzleTitle}>Submit a puzzle</h3>
           <p>
-            Do you have an idea for a puzzle? Share it with me and I may
-            feature it here!
+            Do you have an idea for a puzzle? Share it with me and I may feature
+            it here!
           </p>
           <p>Please include:</p>
           <ul>

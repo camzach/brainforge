@@ -29,6 +29,21 @@ export function HomeScreen() {
 
         <div className={styles.card}>
           <div className={styles.body}>
+            <h2>Rooftop Laboratory</h2>
+            <p>
+              Dr. Verokter has brewed up some KeyForge puzzles to test your
+              decision-making.
+            </p>
+          </div>
+          <div className={styles.actions}>
+            <Link to="/puzzles" className="btn btn-primary">
+              Browse puzzles
+            </Link>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.body}>
             <h2>Library Access</h2>
             <p>
               Browse the full card pool before you challenge yourself. Filter by
