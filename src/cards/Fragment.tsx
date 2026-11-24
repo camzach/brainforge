@@ -16,6 +16,8 @@ export function Fragment({ card, house, expansion, zone, selected, onClick }: Pr
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const path = getClipPath(card, zone);
+  const w = path?.bbox.size[0] ?? 1;
+  const h = path?.bbox.size[1] ?? 1;
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -64,10 +66,7 @@ export function Fragment({ card, house, expansion, zone, selected, onClick }: Pr
       ctx.drawImage(image, 0, 0);
       ctx.restore();
     });
-  }, [card, house, expansion, path, zone, isVisible]);
-
-  const w = path?.bbox.size[0] ?? 1;
-  const h = path?.bbox.size[1] ?? 1;
+  }, [card, house, expansion, path, zone, isVisible, w, h]);
 
   // Target a consistent visual area (~9000px²) regardless of fragment shape.
   // max-width = sqrt(targetArea * aspectRatio), clamped to a min so tiny
