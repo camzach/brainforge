@@ -9,6 +9,15 @@ const SUBMIT_EMAIL = "brainforge-puzzles@camza.ch";
 
 type Reveal = number | "solution" | null;
 
+// publishedAt is a calendar date, so format it in UTC to avoid a timezone
+// shifting it by a day.
+function formatDate(date: string) {
+  return new Date(date).toLocaleDateString(undefined, {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  });
+}
+
 function PuzzleCard({
   puzzle,
   featured,
@@ -26,16 +35,20 @@ function PuzzleCard({
 
   return (
     <div className={`${styles.puzzleCard} ${featured ? styles.featured : ""}`}>
-      <div className={styles.puzzleCardTop}>
-        <span className={styles.puzzleDate}>📅 {puzzle.publishedAt}</span>
-        <span
-          className={`${styles.difficultyTag} ${styles[puzzle.difficulty.toLowerCase() as keyof typeof styles]}`}
-        >
-          {puzzle.difficulty}
-        </span>
+      <div className={styles.puzzleHeading}>
+        <h3 className={styles.puzzleTitle}>{puzzle.spec.title}</h3>
+        <div className={styles.puzzleByline}>
+          <span>
+            {puzzle.author && `by ${puzzle.author} · `}
+            {formatDate(puzzle.publishedAt)}
+          </span>
+          <span
+            className={`${styles.difficultyTag} ${styles[puzzle.difficulty.toLowerCase() as keyof typeof styles]}`}
+          >
+            {puzzle.difficulty}
+          </span>
+        </div>
       </div>
-
-      <h3 className={styles.puzzleTitle}>{puzzle.spec.title}</h3>
 
       <p className={styles.puzzleCardDesc}>{puzzle.spec.description}</p>
 

@@ -101,13 +101,17 @@
   border-color: var(--accent-border);
 }
 
-.puzzleCardTop {
+.puzzleHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.puzzleByline {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.puzzleDate {
+  gap: 8px;
   font-size: 12px;
   color: var(--text-dim);
 }

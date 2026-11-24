@@ -11,3 +11,6 @@ public/card-db.version.json
 
 # Downloaded card images (fetched at build time via download:images)
 public/card-images/
+
+# Puzzles not yet published (kept locally, not in the repo)
+src/routes/puzzles/unreleased/

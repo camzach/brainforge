@@ -3,7 +3,6 @@ import type { KeyforgePuzzle } from "../types";
 const puzzle: KeyforgePuzzle = {
   publishedAt: "2026-11-23",
   difficulty: "Easy",
-  author: "BrainForge",
   hints: [
     "Keyfrog forges a key at the current cost when it is destroyed, so you need 6 Æmber at that moment.",
     "Keyfrog is exhausted, so you can't destroy it by using it to fight. Maybe there's another way?",
