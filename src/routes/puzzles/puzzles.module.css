@@ -1,0 +1,279 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PUZZLE DIRECTORY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.navTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  margin-top: 8px;
+  font-size: 17px;
+}
+
+/* ── Controls bar ─────────────────────────────────────────────────────────── */
+
+.controlsBar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--bg-subtle);
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.filtersRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterItem label {
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.filterItem select {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+/* ── Puzzle grid ──────────────────────────────────────────────────────────── */
+
+.puzzleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.puzzleCard {
+  min-width: 0;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  transition:
+    transform var(--transition),
+    border-color var(--transition);
+}
+
+.puzzleCard.featured {
+  grid-column: 1 / -1;
+}
+
+.puzzleCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-border);
+}
+
+.puzzleHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.puzzleByline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.puzzleTitle {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-h);
+  font-family: var(--display);
+}
+
+.puzzleCardDesc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.puzzleCardFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.spoilerButtons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-right: auto;
+}
+
+.spoilerButton {
+  font-size: 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.spoilerButton[aria-pressed="true"] {
+  border-color: var(--accent-border);
+  background: var(--accent-bg);
+}
+
+.spoilerPanel {
+  /* Fill the card but don't contribute to its intrinsic width, so opening a
+     long hint or solution wraps instead of widening the page. */
+  width: 0;
+  min-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.5;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  color: var(--text-dim);
+}
+
+.spoilerActions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.spoilerPanel p,
+.spoilerPanel ol {
+  margin: 6px 0 0;
+}
+
+.spoilerPanel ol {
+  padding-left: 20px;
+}
+
+.noPuzzlesMessage {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 16px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+}
+
+/* ── Difficulty tags ──────────────────────────────────────────────────────── */
+
+.difficultyTag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.difficultyTag.easy {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.difficultyTag.medium {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.difficultyTag.hard {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+.difficultyTag.expert {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid var(--color-error-border);
+}
+
+/* ── Submit puzzle card ───────────────────────────────────────────────────── */
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+.submitCard {
+  position: sticky;
+  top: 24px;
+  min-width: 0;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.submitCard ul {
+  padding-left: 20px;
+}
+
+.submitCard a {
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .submitCard {
+    position: static;
+  }
+}

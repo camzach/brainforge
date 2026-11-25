@@ -16,6 +16,16 @@ const MODES = [
     actionClass: "btn-primary",
   },
   {
+    slug: "puzzling-trinket",
+    title: "Puzzling Trinket",
+    description:
+      "Solve curated KeyForge board state puzzles to test your decision-making and line-finding.",
+    actionLabel: "Browse puzzles",
+    href: "/puzzles" as const,
+    houseColor: "ekwidon",
+    actionClass: "btn-primary",
+  },
+  {
     slug: "codex-of-true-names",
     title: "Codex of True Names",
     description:

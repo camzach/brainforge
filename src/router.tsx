@@ -5,6 +5,7 @@ import {
   practiceSetupRoute,
   practicePlayRoute,
 } from "./routes/practice/routes";
+import { puzzlesDirectoryRoute } from "./routes/puzzles/routes";
 import { viewerRoute } from "./routes/viewer/routes";
 
 // Create Route Tree & Router
@@ -12,6 +13,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   practiceSetupRoute,
   practicePlayRoute,
+  puzzlesDirectoryRoute,
   viewerRoute,
 ]);
 
