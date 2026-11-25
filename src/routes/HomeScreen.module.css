@@ -79,14 +79,14 @@
 
 /* ── House styling accents ── */
 
-.card.geistoid:hover {
-  border-color: #a855f7;
-  box-shadow: 0 10px 28px rgba(168, 85, 247, 0.2);
-}
-
 .card.logos:hover {
   border-color: #38bdf8;
   box-shadow: 0 10px 28px rgba(56, 189, 248, 0.2);
+}
+
+.card.dis:hover {
+  border-color: #c026d3;
+  box-shadow: 0 10px 28px rgba(192, 38, 211, 0.25);
 }
 
 .card.saurian:hover {
