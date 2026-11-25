@@ -1,7 +1,7 @@
 import type { KeyforgePuzzle } from "../types";
 
 const puzzle: KeyforgePuzzle = {
-  publishedAt: "2026-11-24",
+  publishedAt: "2026-11-25",
   difficulty: "Easy",
   author: "Chix Brocrrp",
   hints: [
@@ -26,6 +26,7 @@ const puzzle: KeyforgePuzzle = {
     player1: {
       houses: ["sanctum", "untamed", "brobnar"],
       amber: 4,
+      keys: { red: true, blue: true },
       inPlay: [
         {
           card: "keyfrog",
@@ -40,14 +41,15 @@ const puzzle: KeyforgePuzzle = {
         "loot-the-bodies",
         "friendship",
         "incensed",
-        "mushroom-with-a-view",
+        "nature-s-call",
         "anger",
         "fuzzy-gruen",
       ],
     },
     player2: {
       houses: ["unfathomable", "dis", "sanctum"],
-      amber: 1,
+      amber: 6,
+      keys: { red: true, yellow: true },
       inPlay: [
         { card: "charette", tokens: { amber: 3 } },
         "gub",
