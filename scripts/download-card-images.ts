@@ -9,6 +9,8 @@ const CARD_DB_PATH = path.join(__dirname, "../public/card-db.sqlite");
 const OUTPUT_DIR = path.join(__dirname, "../public/card-images");
 const SOURCE_URL =
   "https://mastervault-storage-prod.s3.amazonaws.com/media/card_front/en/";
+const CARD_WIDTH = 300;
+const CARD_HEIGHT = 420;
 const CONCURRENCY = 10;
 const WEBP_QUALITY = 80;
 
@@ -71,12 +73,56 @@ function buildFallbacks(rows: PrintingRow[]): Map<string, string[]> {
  * Returns the PNG bytes, or null if the object doesn't exist. The bucket
  * doesn't grant ListBucket, so S3 answers 403 (not 404) for missing keys.
  */
-async function fetchPng(filename: string): Promise<Buffer | null> {
+async function fetchSourcePng(filename: string): Promise<Buffer | null> {
   const url = `${SOURCE_URL}${filename.replace(/\.webp$/i, ".png")}`;
   const res = await fetch(url);
   if (res.status === 403 || res.status === 404) return null;
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return Buffer.from(await res.arrayBuffer());
+}
+
+/**
+ * Gigantic creatures are named `{exp}_{num}_{baseHash}+{artHash}_{lang}.webp`
+ * (see build-cards.ts). Each half is rotated 90° counter-clockwise, then the
+ * art half is stacked on top of the base half. The result is scaled back to
+ * the standard card size so the rest of the app can treat it like any card.
+ */
+async function fetchGiganticPng(filename: string): Promise<Buffer | null> {
+  const [exp, num, hashes, lang] = filename.replace(/\.webp$/i, "").split("_");
+  const [baseHash, artHash] = hashes.split("+");
+  const [basePng, artPng] = await Promise.all([
+    fetchSourcePng(`${exp}_${num}_${baseHash}_${lang}.webp`),
+    fetchSourcePng(`${exp}_${num}_${artHash}_${lang}.webp`),
+  ]);
+  if (!basePng || !artPng) return null;
+
+  const rotate = async (png: Buffer) =>
+    sharp(png).rotate(-90).png().toBuffer({ resolveWithObject: true });
+  const [base, art] = await Promise.all([rotate(basePng), rotate(artPng)]);
+
+  const width = Math.max(base.info.width, art.info.width);
+  const stacked = await sharp({
+    create: {
+      width,
+      height: art.info.height + base.info.height,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 1 },
+    },
+  })
+    .composite([
+      { input: art.data, left: 0, top: 0 },
+      { input: base.data, left: 0, top: art.info.height },
+    ])
+    .png()
+    .toBuffer();
+  // Resize in a second pass: sharp applies resize before composite.
+  return sharp(stacked).resize(CARD_WIDTH, CARD_HEIGHT).png().toBuffer();
+}
+
+function fetchPng(filename: string): Promise<Buffer | null> {
+  return assetHash(filename)?.includes("+")
+    ? fetchGiganticPng(filename)
+    : fetchSourcePng(filename);
 }
 
 /**

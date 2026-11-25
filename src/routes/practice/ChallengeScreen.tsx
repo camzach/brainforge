@@ -68,7 +68,7 @@ export function ChallengeScreen({ config }: Props) {
   const loadNextCard = useCallback(
     (cards: CardType[]) => {
       const incompleteCards = cards.filter(
-        (c) => !correctCardsRef.current.includes(c.title),
+        (c) => !correctCardsRef.current.includes(c.slug),
       );
 
       if (incompleteCards.length === 0) {
@@ -244,11 +244,11 @@ export function ChallengeScreen({ config }: Props) {
       }
     }
     if (cardCorrect) {
-      setCorrectCards((correct) => [...correct, card.title]);
+      setCorrectCards((correct) => [...correct, card.slug]);
     }
     setResults(newResults);
     setPhase("results");
-  }, [card?.type, card?.title, config.zones, selections, fragments]);
+  }, [card?.type, card?.slug, config.zones, selections, fragments]);
 
   const handleReplay = () => {
     setCorrectCards([]);

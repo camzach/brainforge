@@ -36,11 +36,36 @@ export const FOUR_AEMBER = new Path2D(
 
 export type ZoneRect = { pos: [number, number]; size: [number, number] };
 
-export const cardTypeZoneMaps: Record<
-  CardKind,
-  Partial<Record<Zone, { bbox: ZoneRect; path: Path2D }>>
-> = {
-  GiganticCreature: {},
+type ZoneMap = Partial<Record<Zone, { bbox: ZoneRect; path: Path2D }>>;
+
+const AMBER_BBOX: ZoneRect = { pos: [10, 60], size: [50, 125] };
+const AMBER_CLIPS = [ONE_AEMBER, TWO_AEMBER, THREE_AEMBER, FOUR_AEMBER].map(
+  (path) => ({ bbox: AMBER_BBOX, path }),
+);
+
+export const cardTypeZoneMaps: Record<CardKind, ZoneMap> = {
+  GiganticCreature: {
+    name: {
+      bbox: { pos: [48, 261], size: [204, 23] },
+      path: new Path2D("M 48 261 l 204 0 l 0 23 l -204 0 z"),
+    },
+    power: {
+      bbox: { pos: [6, 265], size: [42, 40] },
+      path: new Path2D("M 6 265 l 42 0 l 0 40 l -42 0 z"),
+    },
+    armor: {
+      bbox: { pos: [257, 267], size: [36, 36] },
+      path: new Path2D("M 257 267 l 36 0 l 0 36 l -36 0 z"),
+    },
+    traits: {
+      bbox: { pos: [20, 293], size: [260, 13] },
+      path: new Path2D("M 20 293 l 260 0 l 0 13 l -260 0 z"),
+    },
+    rules: {
+      bbox: { pos: [14, 306], size: [272, 86] },
+      path: new Path2D("M 14 306 l 272 0 l 0 86 l -272 0 z"),
+    },
+  },
   Creature: {
     amber: {
       bbox: {
@@ -210,18 +235,8 @@ export function getClipPath(
   zone: Zone,
 ): { bbox: ZoneRect; path: Path2D } | undefined {
   if (zone === "amber" && card.amber !== undefined) {
-    const amberPath = [ONE_AEMBER, TWO_AEMBER, THREE_AEMBER, FOUR_AEMBER][
-      card.amber - 1
-    ];
-    if (amberPath) {
-      return {
-        bbox: {
-          pos: [10, 60],
-          size: [50, 125],
-        },
-        path: amberPath,
-      };
-    }
+    const amberClip = AMBER_CLIPS[card.amber - 1];
+    if (amberClip) return amberClip;
   }
   if (card.type in cardTypeZoneMaps) {
     const zoneMap = cardTypeZoneMaps[card.type];

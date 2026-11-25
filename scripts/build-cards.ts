@@ -20,6 +20,7 @@ const TYPE_MAP: Record<string, CardKind> = {
   upgrade: "Upgrade",
   "gigantic creature base": "GiganticCreature",
   "token creature": "TokenCreature",
+  "evil twin creature": "Creature",
 };
 
 // Card types to skip
@@ -29,7 +30,6 @@ const SKIP_TYPES = new Set([
   "the tide",
   "gigantic creature art",
 ]);
-
 
 // Skybeast card IDs (appear in AS and CC, can go in any house)
 const SKYBEAST_IDS = new Set([
@@ -77,7 +77,6 @@ type DatabaseCardRow = {
   card_number?: string;
 };
 
-
 function parsePowerArmor(
   val: string | number | null | undefined,
 ): number | undefined {
@@ -110,6 +109,22 @@ function generateSlug(title: string): string {
 function toWebpFilename(url: string | null): string | null {
   const basename = url?.split("/").pop();
   return basename ? basename.replace(/\.png$/i, ".webp") : null;
+}
+
+/**
+ * A gigantic creature is two cards: a base (bottom) and an art half (top).
+ * The download script stitches them into one image, named by joining both
+ * asset hashes: `{exp}_{num}_{baseHash}+{artHash}_{lang}.webp`.
+ * Both halves share the expansion and card number.
+ */
+function toCompositeFilename(
+  baseFile: string | null,
+  artFile: string | null | undefined,
+): string | null {
+  if (!baseFile || !artFile) return baseFile;
+  const [exp, num, baseHash, lang] = baseFile.split("_");
+  const artHash = artFile.split("_")[2];
+  return `${exp}_${num}_${baseHash}+${artHash}_${lang}`;
 }
 
 function buildCardsFromDb(sourceDbPath: string) {
@@ -156,6 +171,17 @@ function buildCardsFromDb(sourceDbPath: string) {
     Map<Expansion, Map<House, string | null>>
   >();
 
+  // Art halves of gigantic creatures: expansion|card number|house -> image
+  const giganticArt = new Map<string, string | null>();
+  for (const row of rows) {
+    if (row.card_type?.toLowerCase() === "gigantic creature art") {
+      giganticArt.set(
+        `${row.expansion}|${row.card_number}|${row.house}`,
+        toWebpFilename(row.front_image),
+      );
+    }
+  }
+
   for (const row of rows) {
     if (!row.card_type) continue;
     const typeKey = row.card_type.toLowerCase();
@@ -170,7 +196,11 @@ function buildCardsFromDb(sourceDbPath: string) {
     }
 
     const title = row.card_title_en || row.card_title;
-    const slug = generateSlug(title);
+    // Evil twins are stored as regular creatures but share their title with
+    // the original, so they need their own slug (the unique key).
+    const slug =
+      generateSlug(title) +
+      (typeKey === "evil twin creature" ? "-evil-twin" : "");
 
     const amber = row.amber || 0;
     const power = parsePowerArmor(row.power);
@@ -229,7 +259,14 @@ function buildCardsFromDb(sourceDbPath: string) {
 
     // A later row without an image never overwrites one that has an image.
     const houseMap = expMap.get(targetExpansion)!;
-    const imageFile = toWebpFilename(row.front_image);
+    const baseImage = toWebpFilename(row.front_image);
+    const imageFile =
+      cardType === "GiganticCreature"
+        ? toCompositeFilename(
+            baseImage,
+            giganticArt.get(`${row.expansion}|${row.card_number}|${row.house}`),
+          )
+        : baseImage;
     for (const h of Array.isArray(house) ? house : [house]) {
       if (imageFile || !houseMap.has(h)) houseMap.set(h, imageFile);
     }
