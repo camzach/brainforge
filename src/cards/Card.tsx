@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import type { Card, Expansion } from "../types";
+import type { Card, Expansion, Fragment } from "../types";
 import {
+  AMBER_BBOX,
   FOUR_AEMBER,
   getClipPath,
   loadCardImage,
@@ -13,6 +14,7 @@ type Props = {
   house: string;
   expansion?: Expansion;
   hiddenZones?: Zone[];
+  selectedFragments?: Fragment[];
   showResults?: Partial<Record<Zone, boolean>>;
   onImageError?: () => void;
 };
@@ -22,6 +24,7 @@ export function Card({
   house,
   expansion,
   hiddenZones = [],
+  selectedFragments = [],
   showResults,
   onImageError,
 }: Props) {
@@ -34,13 +37,39 @@ export function Card({
     const ctx = canvasRef.current.getContext("2d");
     if (!ctx) return;
 
+    let cancelled = false;
+
     const style = getComputedStyle(canvasRef.current);
     const bgColor = style.getPropertyValue("--bg").trim();
-    const correctColor = style.getPropertyValue("--color-correct").trim();
-    const incorrectColor = style.getPropertyValue("--color-incorrect").trim();
+    const bgSubtleColor = style.getPropertyValue("--bg-subtle").trim();
+    const textDimColor = style.getPropertyValue("--text-dim").trim();
+    const correctColor = style.getPropertyValue("--color-success").trim();
+    const incorrectColor = style.getPropertyValue("--color-error").trim();
 
-    loadCardImage(card, house, expansion)
-      .then((image) => {
+    const fragmentImagePromises = selectedFragments.map(async (fragment) => {
+      if (fragment.zone === "amber" && fragment.card.amber === 0) {
+        return { fragment, image: null };
+      }
+      try {
+        const image = await loadCardImage(
+          fragment.card,
+          fragment.house,
+          expansion,
+        );
+        return { fragment, image };
+      } catch {
+        return { fragment, image: null };
+      }
+    });
+
+    Promise.all([
+      loadCardImage(card, house, expansion),
+      Promise.all(fragmentImagePromises),
+    ])
+      .then(([image, loadedFragments]) => {
+        if (cancelled || !canvasRef.current) return;
+
+        ctx.clearRect(0, 0, 300, 420);
         ctx.drawImage(image, 0, 0, 300, 420);
 
         for (const zone of hiddenZones) {
@@ -54,29 +83,82 @@ export function Card({
           }
         }
 
+        for (const { fragment, image: fragImage } of loadedFragments) {
+          if (fragment.zone === "amber") {
+            if (fragment.card.amber === 0) {
+              ctx.fillStyle = bgSubtleColor;
+              ctx.fill(FOUR_AEMBER);
+              ctx.fillStyle = textDimColor;
+              ctx.font = "12px sans-serif";
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              const cx = AMBER_BBOX.pos[0] + AMBER_BBOX.size[0] / 2;
+              const cy = AMBER_BBOX.pos[1] + AMBER_BBOX.size[1] / 2;
+              ctx.fillText("0", cx, cy);
+            } else if (fragImage) {
+              const path = getClipPath(fragment.card, "amber");
+              if (path) {
+                ctx.save();
+                ctx.clip(path.path);
+                ctx.drawImage(fragImage, 0, 0, 300, 420);
+                ctx.restore();
+              }
+            }
+          } else if (fragImage) {
+            const path = getClipPath(fragment.card, fragment.zone);
+            if (path) {
+              ctx.save();
+              ctx.clip(path.path);
+              ctx.drawImage(fragImage, 0, 0, 300, 420);
+              ctx.restore();
+            }
+          }
+        }
+
         if (showResults) {
-          for (const zone of hiddenZones) {
-            const isCorrect = showResults[zone];
-            if (isCorrect === undefined) continue;
-            const path = getClipPath(card, zone);
-            if (!path) continue;
-            ctx.strokeStyle = isCorrect ? correctColor : incorrectColor;
+          for (const [zone, isCorrect] of Object.entries(showResults) as [
+            Zone,
+            boolean,
+          ][]) {
+            // A 0-Æmber card has no amber clip path; outline the same area
+            // that gets hidden instead.
+            const outline =
+              zone === "amber" && !card.amber
+                ? FOUR_AEMBER
+                : getClipPath(card, zone)?.path;
+            if (!outline) continue;
+            // Dark halo so the outline stays visible over same-coloured art.
+            ctx.strokeStyle = bgColor;
             ctx.lineWidth = 4;
-            ctx.stroke(path.path);
+            ctx.stroke(outline);
+            ctx.strokeStyle = isCorrect ? correctColor : incorrectColor;
+            ctx.lineWidth = 2;
+            ctx.stroke(outline);
           }
         }
 
         setLoaded(true);
       })
       .catch(() => {
-        if (onImageError) onImageError();
+        if (!cancelled && onImageError) onImageError();
       });
-  }, [card, expansion, hiddenZones, house, onImageError, showResults]);
 
-  const classList = [
-    styles.canvas,
-    !loaded ? styles.placeholder : "",
-  ].filter(Boolean).join(" ");
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    card,
+    expansion,
+    hiddenZones,
+    house,
+    onImageError,
+    selectedFragments,
+    showResults,
+  ]);
+
+  const classList = [styles.canvas, !loaded ? styles.placeholder : ""]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <canvas

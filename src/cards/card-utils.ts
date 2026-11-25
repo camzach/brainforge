@@ -38,7 +38,7 @@ export type ZoneRect = { pos: [number, number]; size: [number, number] };
 
 type ZoneMap = Partial<Record<Zone, { bbox: ZoneRect; path: Path2D }>>;
 
-const AMBER_BBOX: ZoneRect = { pos: [10, 60], size: [50, 125] };
+export const AMBER_BBOX: ZoneRect = { pos: [10, 60], size: [50, 125] };
 const AMBER_CLIPS = [ONE_AEMBER, TWO_AEMBER, THREE_AEMBER, FOUR_AEMBER].map(
   (path) => ({ bbox: AMBER_BBOX, path }),
 );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   cardTypeZoneMaps,
@@ -51,6 +51,27 @@ export function ChallengeScreen({ config }: Props) {
     rules: false,
   });
   const [correctCards, setCorrectCards] = useState<string[]>([]);
+
+  const selectedFragments = useMemo(
+    () =>
+      fragments.filter((f) =>
+        Object.values(selections).includes(f.id),
+      ),
+    [fragments, selections],
+  );
+
+  const challengeZones = useMemo(
+    () => (card ? Array.from(config.zones[card.type]) : []),
+    [card, config.zones],
+  );
+
+  const shownResults = useMemo(
+    () =>
+      Object.fromEntries(challengeZones.map((z) => [z, results[z]])) as Partial<
+        Record<Zone, boolean>
+      >,
+    [challengeZones, results],
+  );
 
   const totalCards = allCards?.length ?? 0;
   const completedCards = correctCards.length;
@@ -295,7 +316,7 @@ export function ChallengeScreen({ config }: Props) {
   }
 
   if (phase === "challenge" && card) {
-    const zones = Array.from(config.zones[card.type]);
+    const zones = challengeZones;
     const unassignedZones = zones.filter((z) => selections[z] === null);
 
     return (
@@ -321,6 +342,7 @@ export function ChallengeScreen({ config }: Props) {
               house={cardHouse!}
               expansion={config.expansion}
               hiddenZones={zones}
+              selectedFragments={selectedFragments}
             />
           </div>
 
@@ -398,7 +420,7 @@ export function ChallengeScreen({ config }: Props) {
           house={cardHouse!}
           expansion={config.expansion}
           hiddenZones={[]}
-          showResults={results}
+          showResults={shownResults}
         />
         <div className={styles.resultsList}>
           {zones.map((zone) => {
