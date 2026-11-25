@@ -53,7 +53,8 @@ export function HomeScreen() {
       <header className={styles.hero}>
         <h1 className={styles.title}>BrainForge</h1>
         <p className={styles.tagline}>
-          Learn to recognise cards by their parts.
+          "I taught me everything you know."
+          <br />— Professor Sutterkin
         </p>
       </header>
 
