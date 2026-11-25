@@ -1,7 +1,63 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { queryCards } from "../cards/card-db";
+import { getCardImageUrl } from "../cards/card-image-utils";
 import styles from "./HomeScreen.module.css";
 
+const MODES = [
+  {
+    slug: "shard-of-knowledge",
+    title: "Shard of Knowledge",
+    description:
+      "Practice your card recognition and recall across expansions. Get prepared for sealed!",
+    actionLabel: "Start challenge",
+    href: "/practice/setup" as const,
+    houseColor: "logos",
+    actionClass: "btn-primary",
+  },
+  {
+    slug: "rooftop-laboratory",
+    title: "Rooftop Laboratory",
+    description:
+      "Dr. Verokter has brewed up some KeyForge puzzles to test your decision-making.",
+    actionLabel: "Browse puzzles",
+    href: "/puzzles" as const,
+    houseColor: "logos",
+    actionClass: "btn-primary",
+  },
+  {
+    slug: "codex-of-true-names",
+    title: "Codex of True Names",
+    description:
+      "Browse the full card pool before you challenge yourself. Filter by expansion, house, and type.",
+    actionLabel: "Open viewer",
+    href: "/viewer" as const,
+    houseColor: "dis",
+    actionClass: "btn-secondary",
+  },
+];
+
 export function HomeScreen() {
+  const [images, setImages] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let isCurrent = true;
+    Promise.all(
+      MODES.map(async (mode) => {
+        const cards = await queryCards({ slug: mode.slug });
+        const img = cards[0] ? getCardImageUrl(cards[0]) : "";
+        return [mode.slug, img] as const;
+      }),
+    ).then((entries) => {
+      if (!isCurrent) return;
+      setImages(Object.fromEntries(entries));
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, []);
+
   return (
     <div className={styles.container}>
       <header className={styles.hero}>
@@ -12,50 +68,40 @@ export function HomeScreen() {
       </header>
 
       <div className={styles.grid}>
-        <div className={styles.card}>
-          <div className={styles.body}>
-            <h2>Well of Memory</h2>
-            <p>
-              Practice your card recognition and recall. Get prepared for
-              sealed!
-            </p>
-          </div>
-          <div className={styles.actions}>
-            <Link to="/practice/setup" className="btn btn-primary">
-              Start challenge
-            </Link>
-          </div>
-        </div>
+        {MODES.map((mode) => {
+          const imageUrl = images[mode.slug];
 
-        <div className={styles.card}>
-          <div className={styles.body}>
-            <h2>Rooftop Laboratory</h2>
-            <p>
-              Dr. Verokter has brewed up some KeyForge puzzles to test your
-              decision-making.
-            </p>
-          </div>
-          <div className={styles.actions}>
-            <Link to="/puzzles" className="btn btn-primary">
-              Browse puzzles
-            </Link>
-          </div>
-        </div>
+          return (
+            <Link
+              key={mode.title}
+              to={mode.href}
+              className={`${styles.card} ${styles[mode.houseColor] || ""}`}
+            >
+              <div className={styles.artFrame}>
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt={mode.title}
+                    className={styles.cardImage}
+                    loading="lazy"
+                  />
+                )}
+                <div className={styles.artOverlay} />
+              </div>
 
-        <div className={styles.card}>
-          <div className={styles.body}>
-            <h2>Library Access</h2>
-            <p>
-              Browse the full card pool before you challenge yourself. Filter by
-              expansion, house, and type.
-            </p>
-          </div>
-          <div className={styles.actions}>
-            <Link to="/viewer" className="btn btn-secondary">
-              Open viewer
+              <div className={styles.body}>
+                <h2 className={styles.visuallyHidden}>{mode.title}</h2>
+                <p className={styles.description}>{mode.description}</p>
+              </div>
+
+              <div className={styles.actions}>
+                <span className={`btn ${mode.actionClass} ${styles.actionBtn}`}>
+                  {mode.actionLabel} →
+                </span>
+              </div>
             </Link>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
   );
