@@ -16,13 +16,13 @@ const MODES = [
     actionClass: "btn-primary",
   },
   {
-    slug: "rooftop-laboratory",
-    title: "Rooftop Laboratory",
+    slug: "puzzling-trinket",
+    title: "Puzzling Trinket",
     description:
-      "Dr. Verokter has brewed up some KeyForge puzzles to test your decision-making.",
+      "Solve curated KeyForge board state puzzles to test your decision-making and line-finding.",
     actionLabel: "Browse puzzles",
     href: "/puzzles" as const,
-    houseColor: "logos",
+    houseColor: "ekwidon",
     actionClass: "btn-primary",
   },
   {

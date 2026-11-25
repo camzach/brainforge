@@ -150,7 +150,7 @@ export function PuzzleDirectoryScreen() {
             ← Back
           </Link>
         </div>
-        <h1>Rooftop Laboratory</h1>
+        <h1>Puzzle Directory</h1>
       </header>
 
       <div className={styles.controlsBar}>
