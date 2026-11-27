@@ -12,6 +12,7 @@ import {
   type Zone,
 } from "../../cards/card-utils";
 import { getCardImageUrl } from "../../cards/card-image-utils";
+import { VirtualCardGrid } from "./VirtualCardGrid";
 import styles from "./CardViewerScreen.module.css";
 
 const CARD_TYPES: CardKind[] = [
@@ -251,8 +252,9 @@ export function CardViewerScreen() {
       )}
 
       {!loading && hasFilter && (
-        <div className={styles.cardsGrid}>
-          {displayedCards.map((card, index) => {
+        <VirtualCardGrid
+          items={displayedCards}
+          renderItem={(card, index) => {
             const house = getCardDisplayHouse(card, selectedExpansion);
             const zones = getCardFragmentZones(card);
 
@@ -321,8 +323,8 @@ export function CardViewerScreen() {
                 )}
               </div>
             );
-          })}
-        </div>
+          }}
+        />
       )}
     </div>
   );

@@ -16,6 +16,7 @@
   "dependencies": {
     "@sqlite.org/sqlite-wasm": "3.53.4-build1",
     "@tanstack/react-router": "^1.170.38",
+    "@tanstack/react-virtual": "^3.14.28",
     "classnames": "^2.5.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
